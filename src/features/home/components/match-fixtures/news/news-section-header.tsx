@@ -12,7 +12,11 @@ interface NewsSectionHeaderProps {
 export function NewsSectionHeader({ title, href, viewAllLabel }: NewsSectionHeaderProps) {
   return (
     <div className="flex items-center justify-between">
-      <Typography variant="h5" weight="700" className="text-12 text-gradient-white">
+      <Typography
+        size="20"
+        weight="700"
+        className="text-gradient-white max-md:!text-17 max-sm:!text-14"
+      >
         {title}
       </Typography>
       <Link

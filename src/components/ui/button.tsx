@@ -22,7 +22,7 @@ const buttonVariants = cva(
           "relative overflow-hidden rounded-full bg-gradient-button text-btn-primary-text h-9 px-5 gap-1.5 shadow-[0_2px_10px_theme(colors.gold/0.25)] hover:scale-[1.03] hover:shadow-[0_0_20px_4px_theme(colors.gold/0.35)] active:scale-95 before:absolute before:inset-0 before:w-1/2 before:bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent)] before:opacity-0 before:-translate-x-full hover:before:opacity-100 hover:before:[animation:shine_0.6s_ease-in-out]",
         cancel:
           "relative overflow-hidden rounded-full border border-white/15 bg-white/5 text-muted shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:scale-[1.03] hover:border-white/30 hover:bg-white/10 hover:text-white active:scale-95 before:absolute before:inset-0 before:w-1/2 before:bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent)] before:opacity-0 before:-translate-x-full hover:before:opacity-100 hover:before:[animation:shine_0.6s_ease-in-out]",
-        tab: "rounded-full border-transparent text-white/50 hover:text-white/80",
+        tab: "rounded-full border-white/10 bg-white/[0.06] text-white/50 hover:bg-white/10 hover:text-white/80",
       },
 
       size: {

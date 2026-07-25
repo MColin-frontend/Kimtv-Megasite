@@ -22,7 +22,7 @@ export function LiveBanner() {
       isLoading={isLoading}
       skeletonClassName="aspect-[1660/132]"
       className="w-full"
-      rounded="rounded-8"
+      rounded="rounded-8 max-sm:rounded-4"
     />
   )
 }

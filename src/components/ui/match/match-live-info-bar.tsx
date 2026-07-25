@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Calendar, ChartBarStacked, Share2, Trophy } from "lucide-react"
+import { Calendar, Trophy } from "lucide-react"
 
 import { formatFootballGameTime, formatMatchDate, formatMatchTime } from "@/lib/date"
 import { cn } from "@/lib/utils"
@@ -19,17 +19,23 @@ import {
 import { MatchFootballStateEnum, MatchStatusEnum } from "@/enums/match.enum"
 import type { MatchInterface } from "@/models/match.models"
 
+import { closePollApi, createPollApi, getActivePollApi } from "@/features/live/api/poll.api"
+import { PollHistoryModal } from "@/features/live/components/poll-history-modal"
 import { PollModal } from "@/features/live/components/poll-modal"
+import type { PollInterface } from "@/features/live/poll.models"
+import type { PollFormType } from "@/features/live/poll.schema"
 import { AvatarWithTooltip } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Img } from "@/components/ui/image"
 import { Typography } from "@/components/ui/typography"
 
+import icPoll from "@assets/icons/common/ic-poll.svg"
+import icShare from "@assets/icons/common/ic-share.svg"
 import imgStadiumBg from "@assets/images/common/img-no-source.png"
 import imgVs from "@assets/images/common/img-vs.png"
 
 import { MatchLiveIndicator } from "./parts/match-live-indicator"
-import { MatchPeriodBadge } from "./parts/match-period-badge"
+import { MatchStatusBadge } from "./parts/match-status-badge"
 
 /* ── Types ───────────────────────────────────────────────── */
 
@@ -82,33 +88,34 @@ function ShareButton() {
 
   return (
     <div id="match-share-btn" className="relative">
-      <button
+      <Button
         onClick={toggle}
-        className="group hover:border-border-hover hover:text-gold/90 flex h-[30px] items-center gap-1 rounded-full border border-white/20 bg-white/5 px-3 text-white/70 transition-all hover:bg-white/10 max-sm:h-6 max-sm:gap-0.5 max-sm:px-2"
+        className="group flex h-[30px] items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 text-white/80 backdrop-blur-sm transition-all hover:border-white/40 hover:bg-white/[0.18] hover:text-white max-sm:h-6 max-sm:px-2"
       >
-        <Share2 className="group-hover:text-gold/90 size-[14px] shrink-0 transition-colors max-sm:size-3" />
-        <Typography
-          variant="caption"
-          weight="500"
-          className="max-sm:text-10 group-hover:text-gold/90 transition-colors"
-        >
-          Chia sẻ
-        </Typography>
-      </button>
+        <Img
+          src={icShare}
+          alt="share"
+          width={14}
+          height={14}
+          objectFit="contain"
+          className="shrink-0 opacity-70 brightness-0 invert transition-opacity group-hover:opacity-100"
+        />
+        <span className="text-12 font-600 leading-none">Chia sẻ</span>
+      </Button>
       {open && (
-        <div className="rounded-8 absolute top-full right-0 z-50 mt-1.5 w-[280px] border border-white/10 bg-[#0c1526] p-3 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+        <div className="rounded-8 absolute top-full right-0 z-50 mt-1.5 w-[280px] border border-white/10 bg-[#0c1526] p-3 shadow-[0_8px_32px_rgba(0,0,0,0.5)] max-sm:w-[calc(100vw-3rem)]">
           <div className="flex items-center gap-2">
             <input
               readOnly
               value={typeof window !== "undefined" ? window.location.href : ""}
               className="rounded-6 text-12 text-muted min-w-0 flex-1 border border-white/10 bg-white/5 px-2 py-1.5 outline-none"
             />
-            <button
+            <Button
               onClick={copy}
               className="rounded-6 text-12 font-500 shrink-0 bg-white/10 px-3 py-1.5 text-white transition-colors hover:bg-white/20"
             >
               {copied ? "Đã sao chép!" : "Sao chép"}
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -123,6 +130,8 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
   const navigateToLive = useLiveNavigate()
   const { user } = useAuth()
   const [pollOpen, setPollOpen] = useState(false)
+  const [historyOpen, setHistoryOpen] = useState(false)
+  const [activePoll, setActivePoll] = useState<PollInterface | null>(null)
 
   const isRoomOwner =
     !!user &&
@@ -132,12 +141,50 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
 
   function handleClick() {
     if (!match.matchId || !match.gameId) return
-    navigateToLive(match.matchId, match.gameId)
+    const roomId = match.anchorRoomVos?.[0]?.roomId ?? undefined
+    navigateToLive(match.matchId, match.gameId, roomId)
   }
 
-  function handlePoll(e: React.MouseEvent) {
+  async function handlePoll(e: React.MouseEvent) {
     e.stopPropagation()
+    const firstAnchor = match.anchorRoomVos?.[0]
+    const chatroomId = firstAnchor?.roomId ?? match.matchId
+    if (chatroomId) {
+      const poll = await getActivePollApi(chatroomId)
+      setActivePoll(poll)
+    }
     setPollOpen(true)
+  }
+
+  async function handleEndPoll() {
+    if (!activePoll?.pollId) return
+    await closePollApi(activePoll.pollId)
+    setActivePoll(null)
+  }
+
+  async function handlePollSubmit(data: PollFormType) {
+    const firstAnchor = match.anchorRoomVos?.[0]
+    // kimtvpc: isAnchor → roomId + gameId=0, else → matchId + gameId
+    const isAnchor = !!firstAnchor
+    const chatroomId = isAnchor ? (firstAnchor?.roomId ?? match.matchId) : match.matchId
+    const gameId = isAnchor ? 0 : (match.gameId ?? 0)
+
+    const duration =
+      data.duration === "custom" ? Number(data.customDuration ?? 60) : Number(data.duration)
+
+    const payload = {
+      chatroomId,
+      gameId,
+      pollType: data.pollType,
+      question: data.question,
+      options: data.options.map((o) => o.value).filter(Boolean),
+      duration,
+      ...(data.minSelect != null && { minSelect: data.minSelect }),
+      ...(data.maxSelect != null && { maxSelect: data.maxSelect }),
+    }
+
+    console.log("[poll] create payload:", payload)
+    await createPollApi(payload)
   }
 
   const {
@@ -253,7 +300,7 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
       )}
 
       {/* Content above bg */}
-      <div className="relative z-[2] flex flex-col gap-1 max-lg:gap-2">
+      <div className="relative z-[2] flex flex-col gap-2 max-lg:gap-3">
         {/* Row 1: live + time + share — ẩn trên mobile */}
         <div className="flex w-full items-center justify-between max-sm:-my-1 max-sm:origin-left">
           <div className="flex items-center gap-2 max-md:scale-90 max-sm:scale-75">
@@ -262,10 +309,7 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
           </div>
           <div className="flex items-center gap-1.5">
             <div className="flex items-center gap-1.5">
-              <MatchPeriodBadge
-                label={periodLabel}
-                className="max-sm:hidden max-sm:px-1 max-sm:text-[10px]"
-              />
+              <MatchStatusBadge type="live" label={periodLabel} className="hidden max-sm:flex" />
               {displayMinute != null && displayMinute !== 0 && (
                 <div className="rounded-4 border-gold/30 bg-gold/10 border px-1.5 py-0.5 max-sm:px-1 max-sm:py-0">
                   <Typography
@@ -280,15 +324,38 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
                 </div>
               )}
             </div>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation()
+                setHistoryOpen(true)
+              }}
+              className="group flex h-[30px] items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 text-white/80 backdrop-blur-sm transition-all hover:border-white/40 hover:bg-white/[0.18] hover:text-white max-sm:h-6 max-sm:px-2"
+            >
+              <Img
+                src={icPoll}
+                alt="poll"
+                width={14}
+                height={14}
+                objectFit="contain"
+                className="shrink-0 opacity-70 brightness-0 invert transition-opacity group-hover:opacity-100"
+              />
+              <span className="text-12 font-600 leading-none">Lịch sử</span>
+            </Button>
             {isRoomOwner && (
               <Button
-                variant="ghost"
                 onClick={handlePoll}
-                className="border-gold/60 bg-gold/15 text-12 font-600 text-gold hover:border-gold hover:bg-gold/25 h-[30px] gap-1 rounded-full border px-3 shadow-[0_0_12px_rgba(246,195,67,0.3)] transition-all hover:shadow-[0_0_20px_rgba(246,195,67,0.5)] max-sm:h-6 max-sm:gap-0.5 max-sm:px-2"
+                className="bg-gradient-button font-700 flex h-[30px] items-center gap-1.5 rounded-full px-3 text-black shadow-[0_0_0_1px_rgba(246,195,67,0.6),0_0_18px_rgba(246,195,67,0.45),0_2px_8px_rgba(0,0,0,0.4)] transition-all hover:scale-[1.03] hover:shadow-[0_0_0_1px_rgba(246,195,67,0.9),0_0_28px_rgba(246,195,67,0.65)] active:scale-95 max-sm:h-6 max-sm:px-2"
               >
-                <ChartBarStacked className="drop-shadow-gold size-[14px] max-sm:size-3" />
-                <span className="font-600 max-sm:text-10 drop-shadow-gold">
-                  {t("match.card.poll" as Parameters<typeof t>[0])}
+                <Img
+                  src={icPoll}
+                  alt="poll"
+                  width={14}
+                  height={14}
+                  objectFit="contain"
+                  className="shrink-0 brightness-0"
+                />
+                <span className="text-12 font-700 leading-none">
+                  {t("live.poll.title" as Parameters<typeof t>[0])}
                 </span>
               </Button>
             )}
@@ -352,23 +419,9 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
                     {awayScore ?? 0}
                   </Typography>
                 </div>
-                {isLive && (
-                  <MatchPeriodBadge
-                    label={periodLabel}
-                    className="max-md:text-10 max-sm:text-10 max-md:px-1 max-sm:px-1"
-                  />
-                )}
+                {isLive && <MatchStatusBadge type="live" label={periodLabel} />}
                 {isFinished && (
-                  <div className="rounded-4 border-gold/30 bg-gold/10 shadow-gold-glow border px-1.5 py-px">
-                    <Typography
-                      as="span"
-                      variant="caption"
-                      weight="600"
-                      className="text-gold drop-shadow-gold-sm"
-                    >
-                      {t(MATCH_CARD_I18N_KEYS.finished)}
-                    </Typography>
-                  </div>
+                  <MatchStatusBadge type="finished" label={t(MATCH_CARD_I18N_KEYS.finished)} />
                 )}
               </>
             )}
@@ -392,27 +445,27 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
 
         {/* Row 3: stats + anchors */}
         {showStats && (
-          <div className="flex items-center justify-center gap-3">
-            <div className="rounded-8 flex items-center justify-between bg-white/10 px-2 py-1.5 backdrop-blur-[80px] [will-change:transform] max-sm:py-1">
+          <div className="flex items-center justify-center gap-3 max-sm:gap-1">
+            <div className="rounded-8 flex items-center justify-between bg-white/10 px-2 py-1.5 backdrop-blur-[80px] [will-change:transform] max-sm:px-1 max-sm:py-0.5">
               {stats.map((s, i) => (
                 <div key={i} className="flex flex-1 items-center">
-                  {i > 0 && <div className="h-4 w-px shrink-0 bg-white/20 max-sm:h-3" />}
-                  <div className="flex flex-1 flex-col items-center gap-0.5 px-5 max-sm:px-3">
-                    <div className="flex items-center gap-1">
+                  {i > 0 && <div className="h-4 w-px shrink-0 bg-white/20 max-sm:h-2.5" />}
+                  <div className="flex flex-1 flex-col items-center gap-0.5 px-5 max-sm:px-1">
+                    <div className="flex items-center gap-1 max-sm:gap-0.5">
                       <Img
                         src={s.icon}
                         alt={s.alt}
                         width={16}
                         height={16}
                         objectFit="contain"
-                        className="max-sm:size-3.5"
+                        className="max-sm:!size-[10px]"
                       />
                       <Typography
                         as="span"
                         variant="caption"
                         size="14"
                         weight="700"
-                        className="max-sm:!text-12 text-white tabular-nums"
+                        className="max-sm:!text-10 text-white tabular-nums"
                       >
                         {s.value}
                       </Typography>
@@ -421,7 +474,7 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
                       as="span"
                       variant="caption"
                       weight="500"
-                      className="max-sm:!text-10 whitespace-nowrap text-white/80"
+                      className="whitespace-nowrap text-white/80 max-sm:!text-[9px]"
                     >
                       {s.label}
                     </Typography>
@@ -437,9 +490,10 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
                     key={i}
                     src={anchor.userAvatar}
                     name={anchor.userName}
-                    size={38}
+                    size={44}
                     index={i}
-                    overlap={6}
+                    overlap={8}
+                    className="max-md:!size-9 max-sm:!size-7"
                   />
                 ))}
                 {anchors.length > 3 && (
@@ -447,7 +501,7 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
                     as="div"
                     size="10"
                     weight="600"
-                    className="text-muted relative -ml-1.5 flex size-[26px] items-center justify-center rounded-full bg-white/10 ring-2 ring-[#0c1526]"
+                    className="text-muted relative -ml-2 flex size-[36px] items-center justify-center rounded-full bg-white/10 max-md:!size-8 max-sm:!size-6"
                   >
                     +{anchors.length - 3}
                   </Typography>
@@ -498,7 +552,20 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
           )}
         </div>
       </div>
-      {pollOpen && <PollModal open={pollOpen} onOpenChange={setPollOpen} />}
+      {pollOpen && (
+        <PollModal
+          open={pollOpen}
+          onOpenChange={setPollOpen}
+          onSubmit={handlePollSubmit}
+          activePoll={activePoll}
+          onEndPoll={handleEndPoll}
+        />
+      )}
+      <PollHistoryModal
+        open={historyOpen}
+        onOpenChange={setHistoryOpen}
+        chatroomId={match.anchorRoomVos?.[0]?.roomId ?? match.matchId}
+      />
     </div>
   )
 }

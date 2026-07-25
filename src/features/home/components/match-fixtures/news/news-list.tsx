@@ -24,7 +24,7 @@ function NewsListContent({
 }) {
   return (
     <>
-      <div className="hidden flex-col lg:flex">
+      <div className="hidden flex-col gap-2 divide-y divide-white/[0.06] lg:flex">
         {items.map((item) => (
           <NewsItemRow
             key={String(item.newsId)}
@@ -51,11 +51,16 @@ async function FeaturedSection({
   getHref,
 }: NewsSectionPropsInterface) {
   const items = await fetchFeaturedNewsAction()
-  if (isEmpty(items)) return null
+  const validItems = items?.filter((item) => item.coverUrl && item.title) ?? []
+  if (isEmpty(validItems)) return null
   return (
-    <div className="card-glow rounded-12 flex flex-col gap-2 p-4 max-sm:p-3">
+    <div className="card-glow rounded-12 flex flex-col gap-3 p-4 max-sm:gap-2 max-sm:p-3">
       <NewsSectionHeader title={title} href={viewAllHref} viewAllLabel={viewAllLabel} />
-      <NewsListContent items={items.slice(0, 5)} categoryLabel={categoryLabel} getHref={getHref} />
+      <NewsListContent
+        items={validItems.slice(0, 5)}
+        categoryLabel={categoryLabel}
+        getHref={getHref}
+      />
     </div>
   )
 }

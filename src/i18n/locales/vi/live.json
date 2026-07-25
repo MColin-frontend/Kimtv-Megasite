@@ -1,24 +1,59 @@
 {
   "poll": {
-    "title": "Tạo Poll Bình Chọn",
+    "title": "Tạo Poll",
+    "viewTitle": "Bình Chọn",
     "subtitle": "Tạo câu hỏi và lựa chọn cho bình chọn",
+    "type": {
+      "label": "Loại Poll",
+      "single": "Chọn 1",
+      "singleDesc": "Chọn duy nhất 1 đáp án",
+      "multiple": "Chọn nhiều",
+      "multipleDesc": "Chọn một hoặc nhiều đáp án",
+      "rating": "Đánh giá",
+      "ratingDesc": "Đánh giá theo thang điểm"
+    },
     "steps": {
       "question": "Câu hỏi",
       "options": "Lựa chọn",
+      "minMax": "Số lựa chọn",
+      "ratingScale": "Thang điểm",
       "duration": "Thời gian"
     },
     "placeholder": {
       "question": "Nhập câu hỏi poll...",
       "option": "Lựa chọn",
-      "duration": "Số phút hiển thị poll"
+      "duration": "Số phút hiển thị poll",
+      "customDuration": "Nhập số phút..."
     },
     "labels": {
-      "minutes": "phút"
+      "minutes": "phút",
+      "seconds": "giây",
+      "minSelect": "Tối thiểu",
+      "maxSelect": "Tối đa",
+      "minRating": "Điểm tối thiểu",
+      "maxRating": "Điểm tối đa",
+      "optionCount": "lựa chọn",
+      "addOption": "Thêm lựa chọn",
+      "optionHint": "Tối thiểu {min} lựa chọn, tối đa {max} lựa chọn",
+      "customDuration": "Thời gian tuỳ chỉnh",
+      "maxDuration": "Tối đa 24 giờ",
+      "totalVotes": "{count} lượt bình chọn",
+      "hintSingle": "Chọn 1 đáp án",
+      "hintMultiple": "Bạn có thể chọn nhiều đáp án",
+      "shareTitle": "Chia sẻ nhanh:",
+      "votes": "phiếu bình chọn",
+      "youVoted": "Bạn đã chọn:",
+      "timeLeft": "Thời gian còn lại",
+      "disclaimer": "Bình chọn của bạn là ẩn danh và không ảnh hưởng đến kết quả trận đấu."
     },
     "actions": {
       "addOption": "Thêm lựa chọn",
-      "cancel": "Huỷ",
-      "submit": "Tạo Poll"
+      "cancel": "Hủy",
+      "submit": "Tạo Poll",
+      "end": "Kết thúc Poll",
+      "vote": "Bình chọn",
+      "voted": "Đã bình chọn",
+      "viewResult": "Xem kết quả"
     },
     "errors": {
       "questionRequired": "Vui lòng nhập câu hỏi",
@@ -26,7 +61,22 @@
       "optionRequired": "Vui lòng nhập lựa chọn",
       "optionsMin": "Cần ít nhất 2 lựa chọn",
       "durationRequired": "Vui lòng nhập thời gian",
-      "durationPositive": "Thời gian phải lớn hơn 0"
+      "durationPositive": "Thời gian phải lớn hơn 0",
+      "minSelectRequired": "Vui lòng nhập số tối thiểu",
+      "maxSelectRequired": "Vui lòng nhập số tối đa",
+      "maxSelectGteMin": "Tối đa phải ≥ tối thiểu",
+      "maxSelectExceed": "Tối đa không được vượt quá số lựa chọn"
+    },
+    "status": {
+      "active": "Đang diễn ra",
+      "ended": "Đã kết thúc",
+      "votes": "{count} lượt bình chọn"
+    },
+    "confirm": {
+      "close": "Tắt bình chọn sẽ không thể mở lại để chọn lần nữa",
+      "closeTitle": "Xác nhận thoát",
+      "cancel": "Ở lại",
+      "confirm": "Xác nhận thoát"
     }
   }
 }

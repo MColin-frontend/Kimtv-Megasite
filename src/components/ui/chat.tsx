@@ -34,6 +34,10 @@ import {
   CHAT_USER_ROLE,
 } from "@/constants/ui/ui-chat.constants"
 
+import { getActivePollApi, votePollApi } from "@/features/live/api/poll.api"
+import { PollVoteView } from "@/features/live/components/poll-vote-view"
+import { PollChannelEnum } from "@/features/live/poll.constants"
+import type { PollInterface } from "@/features/live/poll.models"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Img } from "@/components/ui/image"
@@ -46,6 +50,7 @@ import icCrown from "@assets/icons/chat/ic-crown.png"
 import icPinImg from "@assets/icons/chat/ic-pin.png"
 import icRemove from "@assets/icons/chat/ic-remove.png"
 import icRestriction from "@assets/icons/chat/ic-restriction.png"
+import icChat from "@assets/icons/common/ic-chat.png"
 import icFacebook from "@assets/icons/layout/ic-facebook.png"
 import icTele from "@assets/icons/layout/ic-tele.png"
 import icZalo from "@assets/icons/layout/ic-zalo.png"
@@ -85,11 +90,15 @@ export interface ChatProps {
   onBanRoom?: (message: ChatMessage, mute: boolean) => void
   onBanAll?: (message: ChatMessage, mute: boolean) => void
   onSetManager?: (message: ChatMessage, set: boolean) => void
+  onPollMessage?: (channel: string, data: unknown) => void
   inputSuffix?: React.ReactNode
+  topContent?: React.ReactNode
   className?: string
-  /** Truyền trực tiếp để tránh phụ thuộc URL param khi dùng trên home page */
+  /** Home page truyền trực tiếp để tránh timing issue. Live page dùng URL. */
   chatroomId?: string | number
   gameId?: number
+  /** Khi true — Chat không tự quản lý poll (parent tự xử lý qua onPollMessage) */
+  externalPoll?: boolean
 }
 
 const WS_RECONNECT_DELAY = 2000
@@ -103,7 +112,7 @@ function ChatAvatar({ message, size = 48 }: { message: ChatMessage; size?: numbe
   const wrapperCls = message.hasAnchorMe
     ? "bg-gradient-to-br from-[#ffd75a] to-[#f6c343] shadow-[0_0_8px_2px_rgba(246,195,67,0.45)]"
     : message.hasFictitious
-      ? "bg-gradient-to-b from-[#ff20da] to-[#d911a0] shadow-[0_0_8px_2px_rgba(255,32,218,0.35)]"
+      ? ""
       : "bg-white"
 
   return (
@@ -137,10 +146,7 @@ function RoleBadge({ message, t }: { message: ChatMessage; t: TFunc }) {
         as="span"
         size="10"
         weight="600"
-        className={cn(
-          "mr-1 inline-block rounded-full px-1.5 py-px align-middle text-white",
-          CHAT_CLASSES.adminGradient
-        )}
+        className="rounded-4 mr-1 inline-block bg-fuchsia-500/15 px-1.5 py-0.5 align-middle text-fuchsia-400 backdrop-blur-sm"
       >
         {t("chat.role.admin")}
       </Typography>
@@ -188,7 +194,7 @@ function WelcomeMessageItem({
                     variant="body-sm"
                     weight="600"
                     className={cn(
-                      "max-sm:text-12 block max-w-48 cursor-pointer truncate",
+                      "max-sm:text-10 block max-w-48 cursor-pointer truncate",
                       CHAT_CLASSES.username
                     )}
                   >
@@ -220,7 +226,7 @@ function WelcomeMessageItem({
               </Typography>
             )}
           </div>
-          <Typography as="span" variant="body-sm" className="text-muted max-sm:text-12">
+          <Typography as="span" variant="body-sm" className="text-muted max-sm:text-10">
             {t("chat.welcome")}
           </Typography>
         </div>
@@ -512,7 +518,7 @@ function UserPopup({
                 {t("chat.actions.delete")}
               </span>
             </button>
-            {message.type !== CHAT_MESSAGE_TYPE.VIRTUAL && (
+            {message.hasFictitious && (
               <button
                 onClick={() => {
                   if (isPinned) onUnpin?.(message)
@@ -791,9 +797,12 @@ export function Chat({
   onBanRoom,
   onBanAll,
   onSetManager,
+  onPollMessage,
+  topContent,
   className,
   chatroomId: chatroomIdProp,
   gameId: gameIdProp,
+  externalPoll = false,
 }: ChatProps) {
   const { t } = useTranslation()
   const { getParam, pathname } = useRouter()
@@ -804,7 +813,7 @@ export function Chat({
   /* ── Internal state ──────────────────────────────────────── */
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [pinnedMessages, setPinnedMessages] = useState<ChatMessage[]>([])
-  const [activePoll, _setActivePoll] = useState<PollData | null>(null) // TODO: set từ API khi có
+  const [poll, setPoll] = useState<PollInterface | null>(null)
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
     CHAT_CONNECTION_STATUS.DISCONNECTED
   )
@@ -830,20 +839,39 @@ export function Chat({
   const listRef = useRef<HTMLDivElement>(null)
   const isAtBottomRef = useRef(true)
   const wsRef = useRef<WebSocket | null>(null)
-  const heartbeatRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const onPollMessageRef = useRef(onPollMessage)
+  // eslint-disable-next-line react-hooks/refs
+  onPollMessageRef.current = onPollMessage
+  const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  async function handlePollVote(optionKeys: string[]) {
+    if (!poll?.pollId) return
+    const updated = await votePollApi(poll.pollId, optionKeys)
+    if (updated) return updated
+  }
   const reconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const reconnectCountRef = useRef(0)
   const pageIndexRef = useRef(0)
   const loadingMoreRef = useRef(false)
 
-  // Props được ưu tiên (home page truyền trực tiếp tránh timing issue)
-  // Fallback về path segment hoặc URL param
+  // Dùng window.location.search để tránh useSearchParams() hydration timing issue
   const pathLastSegment = pathname.split("/").filter(Boolean).pop() ?? ""
-  const chatroomIdFromUrl = /^\d+$/.test(pathLastSegment)
+  const _urlParams =
+    typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null
+  const roomIdFromUrl = _urlParams?.get("room_id") ?? getParam("room_id")
+  const matchIdFromUrl = /^\d+$/.test(pathLastSegment)
     ? pathLastSegment
-    : getParam(HERO_VIDEO_PARAMS.MATCH_ID)
-  const chatroomId = chatroomIdProp != null ? String(chatroomIdProp) : chatroomIdFromUrl
-  const gameId = gameIdProp ?? Number(getParam(HERO_VIDEO_PARAMS.GAME_ID) ?? 0)
+    : (_urlParams?.get(HERO_VIDEO_PARAMS.MATCH_ID) ?? getParam(HERO_VIDEO_PARAMS.MATCH_ID))
+  // isAnchor: có room_id → dùng roomId + game_id=0 (giống kimtvpc)
+  // else: dùng matchId + gameId từ URL
+  const isAnchor = !!roomIdFromUrl
+  const chatroomId = isAnchor
+    ? roomIdFromUrl!
+    : (matchIdFromUrl ?? (chatroomIdProp != null ? String(chatroomIdProp) : undefined))
+  const pollChatroomId = chatroomId
+  const _gameIdFromUrl =
+    _urlParams?.get(HERO_VIDEO_PARAMS.GAME_ID) ?? getParam(HERO_VIDEO_PARAMS.GAME_ID)
+  const gameId = isAnchor ? 0 : Number(_gameIdFromUrl ?? 0) || gameIdProp || 0
 
   const mergedSocials = { ...DEFAULT_SOCIALS, ...socials }
 
@@ -851,7 +879,7 @@ export function Chat({
 
   const clearHeartbeat = useCallback(() => {
     if (heartbeatRef.current) {
-      clearTimeout(heartbeatRef.current)
+      clearInterval(heartbeatRef.current)
       heartbeatRef.current = null
     }
   }, [])
@@ -865,15 +893,11 @@ export function Chat({
 
   const startHeartbeat = useCallback(() => {
     clearHeartbeat()
-    const scheduleNext = () => {
-      heartbeatRef.current = setTimeout(() => {
-        if (wsRef.current?.readyState === WebSocket.OPEN) {
-          wsRef.current.send(JSON.stringify({ op_type: 9 }))
-          scheduleNext()
-        }
-      }, WS_HEARTBEAT_INTERVAL)
-    }
-    scheduleNext()
+    heartbeatRef.current = setInterval(() => {
+      if (wsRef.current?.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({ op_type: 9 }))
+      }
+    }, WS_HEARTBEAT_INTERVAL)
   }, [clearHeartbeat])
 
   const closeWs = useCallback(() => {
@@ -885,7 +909,11 @@ export function Chat({
     if (wsRef.current) {
       const ws = wsRef.current
       wsRef.current = null
-      ws.close()
+      if (ws.readyState === WebSocket.CONNECTING) {
+        ws.addEventListener("open", () => ws.close(), { once: true })
+      } else {
+        ws.close()
+      }
     }
   }, [clearHeartbeat])
 
@@ -918,12 +946,53 @@ export function Chat({
           setConnectionStatus(CHAT_CONNECTION_STATUS.CONNECTED)
           startHeartbeat()
           reconnectCountRef.current = 0
+          console.log(`[chat] connected ✓ chatroom_id: ${cId}, game_id: ${gId}`)
         })
 
         ws.addEventListener("message", ({ data: raw }) => {
           if (ws !== wsRef.current || raw === "ping") return
+
           try {
             const res = JSON.parse(raw) as Record<string, unknown>
+
+            console.log("[chat] raw:", raw)
+
+            if (Object.values(PollChannelEnum).includes(res.channel as PollChannelEnum)) {
+              console.log("[chat] poll event →", res.channel, res.data)
+              onPollMessageRef.current?.(res.channel as string, res.data)
+              if (!externalPoll) {
+                const p = res.data as PollInterface
+                if (res.channel === PollChannelEnum.START) {
+                  setPoll(p)
+                } else if (res.channel === PollChannelEnum.ACTIVE) {
+                  setPoll((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          remainingSec: p.remainingSec,
+                          options: p.options,
+                          totalVotes: p.totalVotes,
+                          status: p.status,
+                        }
+                      : p
+                  )
+                } else if (res.channel === PollChannelEnum.UPDATE) {
+                  setPoll((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          options: p.options ?? prev.options,
+                          totalVotes: p.totalVotes ?? prev.totalVotes,
+                        }
+                      : p
+                  )
+                } else if (res.channel === PollChannelEnum.CLOSED) {
+                  setPoll(null)
+                }
+              }
+              return
+            }
+
             const data = res.data as Record<string, unknown> | undefined
             if (!data || (data.code as number) === 10) return
             if (res.channel === "CHATROOM" && data.content) {
@@ -1024,6 +1093,16 @@ export function Chat({
       setPinnedMessages(pinned)
     })
   }, [chatroomId, gameId])
+
+  /* ── Poll: fetch active + reset khi chatroom đổi ────────── */
+  useEffect(() => {
+    if (!pollChatroomId || externalPoll) return
+    console.log("[poll] fetching — pollChatroomId:", pollChatroomId, "chatroomId:", chatroomId)
+    getActivePollApi(pollChatroomId).then((p) => {
+      console.log("[poll] active poll response:", p)
+      if (p) setPoll(p)
+    })
+  }, [pollChatroomId, externalPoll])
 
   /* ── WebSocket: reconnect khi chatroom đổi hoặc auth đổi ── */
   useEffect(() => {
@@ -1202,22 +1281,29 @@ export function Chat({
           </a>
         )}
       </div>
+      {/* Poll slot */}
+      {!externalPoll && poll && (
+        <PollVoteView poll={poll} onVote={handlePollVote} onClose={() => setPoll(null)} />
+      )}
+      {topContent && <div className="shrink-0">{topContent}</div>}
+
       {/* Messages section */}
       <div className="rounded-6 relative flex min-h-0 flex-1 flex-col overflow-hidden bg-white/[0.03] backdrop-blur-xl">
-        <div className="flex shrink-0 items-center justify-between border-b border-white/8 px-3 py-2.5">
+        <div className="flex shrink-0 items-center justify-between border-b border-white/8 px-3 pt-2.5 pb-1.5">
           <div className="flex items-center gap-2">
-            {/* Live dot với ping animation */}
-            <span className="relative flex size-2 shrink-0">
-              <span className="bg-live-green absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
-              <span className="bg-live-green relative inline-flex size-2 rounded-full" />
-            </span>
+            <div className="border-gold/30 rounded-full border p-1">
+              <div className="border-gold/60 bg-gold rounded-full border p-1">
+                <Img src={icChat} alt="chat" width={16} height={16} objectFit="contain" />
+              </div>
+            </div>
             <Typography
               as="span"
-              variant="body-sm"
-              weight="700"
-              className="tracking-widest text-white uppercase"
+              variant="h4"
+              weight="800"
+              className="tracking-widest uppercase italic"
             >
-              Live Chat
+              <span className="text-gold drop-shadow-gold">Live</span>
+              <span className="text-white"> Chat</span>
             </Typography>
           </div>
           {/* Live badge */}
@@ -1315,8 +1401,6 @@ export function Chat({
             ))}
           </div>
         )}
-
-        {activePoll && <ChatPoll poll={activePoll} />}
 
         {/* Message list */}
         <div

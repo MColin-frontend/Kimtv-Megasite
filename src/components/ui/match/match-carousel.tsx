@@ -5,12 +5,10 @@ import { HTTP_METHOD, LIVE_MATCH_TYPE, MATCH_QUERY_PARAMS } from "@/lib/match.ut
 import { useTranslation } from "@/i18n"
 import type { MatchInterface } from "@/models/match.models"
 
-import { LiveMatchFilterSection } from "@/features/live-schedule/components/live-match-filter-section"
 import CarouselInfinityApi from "@/components/ui/carousel/carousel-infinity-api"
 import { Empty } from "@/components/ui/empty"
 
 import { MatchCard } from "./match-card"
-import type { LiveSearchMatchInterface } from "./match-card-live"
 import { MatchStatusLabel, type MatchStatusType } from "./match-status-label"
 
 interface MatchCarouselProps {
@@ -29,22 +27,10 @@ export function MatchCarousel({
   method = HTTP_METHOD.POST,
   params = MATCH_QUERY_PARAMS.ALL_GAMES,
   matchType = LIVE_MATCH_TYPE.LIVE,
-  hideFilter,
 }: MatchCarouselProps) {
   const { t } = useTranslation()
-  const isLiveSection =
+  const isLive =
     statusType === LIVE_MATCH_TYPE.LIVE || (!statusType && matchType === LIVE_MATCH_TYPE.LIVE)
-
-  if (isLiveSection) {
-    return (
-      <LiveMatchFilterSection
-        hideFilter={hideFilter}
-        renderCard={(match: LiveSearchMatchInterface) => (
-          <MatchCard match={match as unknown as MatchInterface} />
-        )}
-      />
-    )
-  }
 
   return (
     <section className="card-glow rounded-12 flex flex-col gap-4 p-5 max-sm:gap-2 max-sm:p-3">
@@ -58,7 +44,11 @@ export function MatchCarousel({
           <MatchCard match={match} isLoading={isLoading} matchType={matchType} />
         )}
         renderEmpty={() => <Empty tip={t("common.empty")} />}
-        slideClassName="basis-[350px] max-sm:basis-full"
+        slideClassName={
+          isLive
+            ? "basis-1/5 max-lg:basis-1/3 max-sm:basis-full"
+            : "basis-[350px] max-sm:basis-full"
+        }
         gapClassName="gap-3"
       />
     </section>
