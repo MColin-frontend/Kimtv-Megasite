@@ -7,10 +7,13 @@ import { Check, Users, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 import { getPollHistoryApi } from "@/features/live/api/poll.api"
-import type { PollInterface } from "@/features/live/poll.models"
+import { POLL_TYPE_BADGE_CONFIG, type PollInterface } from "@/features/live/poll.models"
 import { Empty } from "@/components/ui/empty"
+import { Img } from "@/components/ui/image"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Typography } from "@/components/ui/typography"
+
+import icPoll from "@assets/icons/common/ic-poll.svg"
 
 /* ── Option ──────────────────────────────────────────────── */
 
@@ -105,13 +108,15 @@ function HistoryOption({
 
               <div className="flex shrink-0 items-center gap-1.5">
                 <div className="flex items-center gap-1 text-white/40">
-                  <Users className="mb-[2px] size-3 shrink-0" />
-                  <span className="text-12 font-400 leading-[1] tabular-nums">{opt.voteCount}</span>
+                  <Users className="mb-0.5 size-3 shrink-0" />
+                  <span className="text-12 font-400 leading-none tabular-nums">
+                    {opt.voteCount}
+                  </span>
                 </div>
                 <div className="h-3 w-px bg-white/5" />
                 <span
                   className={cn(
-                    "text-12 font-700 leading-[1] tabular-nums",
+                    "text-12 font-700 leading-none tabular-nums",
                     highlight ? "text-gold" : "text-white/50"
                   )}
                 >
@@ -121,7 +126,7 @@ function HistoryOption({
             </div>
 
             {/* Progress bar */}
-            <div className="h-[4px] overflow-hidden rounded-full bg-white/[0.08]">
+            <div className="h-1 overflow-hidden rounded-full bg-white/[0.08]">
               <div
                 className={cn(
                   "relative h-full overflow-hidden rounded-full transition-[width] duration-700 ease-out",
@@ -130,10 +135,7 @@ function HistoryOption({
                 style={{ width: `${pct}%` }}
               >
                 {pct > 0 && (
-                  <div
-                    className="absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/50 to-transparent"
-                    style={{ animation: "shimmer 1.8s linear infinite" }}
-                  />
+                  <div className="absolute inset-y-0 w-1/2 animate-[shimmer_1.8s_linear_infinite] bg-gradient-to-r from-transparent via-white/50 to-transparent" />
                 )}
               </div>
             </div>
@@ -147,83 +149,30 @@ function HistoryOption({
 /* ── Card ────────────────────────────────────────────────── */
 
 function PollCard({ poll, index }: { poll: PollInterface; index: number }) {
-  const typeConfig = {
-    SINGLE_CHOICE: {
-      label: "SINGLE CHOICE",
-      color: "rgba(74,222,128,1)",
-      bg: "rgba(74,222,128,0.1)",
-      border: "rgba(74,222,128,0.25)",
-    },
-    MULTIPLE_CHOICE: {
-      label: "MULTIPLE CHOICE",
-      color: "rgba(139,92,246,1)",
-      bg: "rgba(139,92,246,0.1)",
-      border: "rgba(139,92,246,0.25)",
-    },
-    RATING: {
-      label: "RATING",
-      color: "var(--gold)",
-      bg: "rgba(246,195,67,0.1)",
-      border: "rgba(246,195,67,0.25)",
-    },
-  }[poll.type] ?? {
+  const typeConfig = POLL_TYPE_BADGE_CONFIG[poll.type] ?? {
     label: poll.type,
-    color: "rgba(255,255,255,0.5)",
-    bg: "rgba(255,255,255,0.06)",
-    border: "rgba(255,255,255,0.1)",
+    cls: "text-white/50 bg-white/[0.06] border border-white/10",
   }
-
   const votedKeys = poll.userVotedOptionKeys ?? []
 
   return (
-    <div
-      className="relative flex flex-col"
-      style={{
-        background: "#181920",
-        borderRadius: 14,
-        padding: "14px 16px 10px",
-        boxShadow:
-          "0 4px 20px rgba(0,0,0,0.5), 0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.3)",
-      }}
-    >
+    <div className="rounded-16 bg-chat-bg relative flex flex-col px-4 pt-3.5 pb-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.5),0_8px_32px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-1px_0_rgba(0,0,0,0.3)]">
       {/* Number badge */}
-      <div
-        className="absolute -top-px -left-px flex items-center justify-center"
-        style={{
-          width: 36,
-          height: 36,
-          background: "var(--gradient-gold)",
-          borderRadius: "14px 0 12px 0",
-          color: "#111",
-          fontSize: 16,
-          fontWeight: 900,
-          letterSpacing: -0.5,
-        }}
-      >
+      <div className="bg-gradient-gold rounded-tl-16 rounded-br-12 text-16 font-800 tracking-0 absolute -top-px -left-px flex size-9 items-center justify-center rounded-tr-none rounded-bl-none text-black">
         {index + 1}
       </div>
 
-      {/* Topbar — justify-end như kimtvpc */}
+      {/* Topbar */}
       <div className="mb-2.5 flex items-center justify-end gap-1">
-        <span
-          className="flex items-center gap-1"
-          style={{ fontSize: 14, color: "rgba(255,255,255,0.7)" }}
-        >
-          <Users className="mb-[2px] size-3 shrink-0" />
+        <span className="text-14 flex items-center gap-1 text-white/70">
+          <Users className="mb-0.5 size-3 shrink-0" />
           {poll.totalVotes} phiếu
         </span>
         <span
-          className="flex items-center gap-1"
-          style={{
-            fontSize: 12,
-            fontWeight: 700,
-            letterSpacing: 0.5,
-            padding: "2px 7px",
-            borderRadius: 4,
-            color: typeConfig.color,
-            background: typeConfig.bg,
-            border: `1px solid ${typeConfig.border}`,
-          }}
+          className={cn(
+            "text-12 rounded-4 font-700 tracking-1 flex items-center gap-1 px-2 py-0.5",
+            typeConfig.cls
+          )}
         >
           <Check className="size-2.5 shrink-0" strokeWidth={3} />
           {typeConfig.label}
@@ -233,18 +182,14 @@ function PollCard({ poll, index }: { poll: PollInterface; index: number }) {
       {/* Question */}
       <Tooltip>
         <TooltipTrigger className="mb-2.5 w-fit max-w-full text-left">
-          <p
-            className="line-clamp-2"
-            style={{
-              fontSize: 14,
-              fontWeight: 500,
-              color: "rgba(255,255,255,0.85)",
-              lineHeight: 1.4,
-              margin: 0,
-            }}
+          <Typography
+            as="p"
+            variant="body-sm"
+            weight="500"
+            className="line-clamp-2 leading-snug text-white/85"
           >
             {poll.question}
-          </p>
+          </Typography>
         </TooltipTrigger>
         <TooltipContent>{poll.question}</TooltipContent>
       </Tooltip>
@@ -256,34 +201,20 @@ function PollCard({ poll, index }: { poll: PollInterface; index: number }) {
         ))}
       </div>
 
-      {/* Footer */}
+      {/* Voted tags */}
       {votedKeys.length > 0 && (
-        <div
-          className="mt-1 flex flex-col gap-1.5"
-          style={{ paddingTop: 10, marginTop: 4, borderTop: "1px solid rgba(255,255,255,0.06)" }}
-        >
-          {/* Voted tags */}
+        <div className="mt-1 flex flex-col gap-1.5 border-t border-white/[0.06] pt-2.5">
           <div className="flex flex-wrap items-center gap-1.5">
-            <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", whiteSpace: "nowrap" }}>
+            <Typography as="span" variant="caption" className="shrink-0 text-white/40">
               Bạn đã chọn:
-            </span>
+            </Typography>
             <div className="flex flex-wrap gap-1">
               {votedKeys.map((k) => {
                 const opt = poll.options?.find((o) => o.optionKey === k)
                 return (
                   <span
                     key={k}
-                    className="inline-flex items-center whitespace-nowrap"
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 600,
-                      lineHeight: 1,
-                      padding: "3px 9px",
-                      borderRadius: 4,
-                      color: "var(--gold)",
-                      background: "rgba(246,195,67,0.12)",
-                      border: "1px solid rgba(246,195,67,0.25)",
-                    }}
+                    className="rounded-4 border-gold/25 bg-gold/12 text-gold text-12 font-600 inline-flex items-center border px-2 py-0.75 leading-100 whitespace-nowrap"
                   >
                     {k}. {opt?.label}
                   </span>
@@ -307,15 +238,10 @@ interface PollHistoryModalProps {
 
 export function PollHistoryModal({ open, onOpenChange, chatroomId }: PollHistoryModalProps) {
   const [list, setList] = useState<PollInterface[]>([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
-    if (!open || !chatroomId) return
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLoading(true)
-
-    setList([])
-    getPollHistoryApi(chatroomId)
+    getPollHistoryApi(chatroomId as string | number)
       .then((res) => setList(Array.isArray(res) ? res : []))
       .catch(() => setList([]))
       .finally(() => setLoading(false))
@@ -326,15 +252,7 @@ export function PollHistoryModal({ open, onOpenChange, chatroomId }: PollHistory
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm" />
         <Dialog.Popup className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="relative flex w-full max-w-7xl flex-col overflow-hidden"
-            style={{
-              background: "#0f1219",
-              borderRadius: 16,
-              height: "65vh",
-              boxShadow: "0 32px 100px rgba(0,0,0,0.85)",
-            }}
-          >
+          <div className="rounded-16 bg-poll-modal relative flex h-[65vh] w-full max-w-7xl flex-col overflow-hidden shadow-[0_32px_100px_rgba(0,0,0,0.85)]">
             {/* Close */}
             <button
               onClick={() => onOpenChange(false)}
@@ -344,76 +262,52 @@ export function PollHistoryModal({ open, onOpenChange, chatroomId }: PollHistory
             </button>
 
             {/* Header */}
-            <div
-              className="flex shrink-0 items-center gap-3 px-5 py-4"
-              style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}
-            >
-              <img src="/icons/ic-poll.svg" alt="" className="drop-shadow-gold size-8 shrink-0" />
+            <div className="flex shrink-0 items-center gap-3 border-b border-white/[0.07] px-5 py-4">
+              <Img
+                src={icPoll}
+                alt=""
+                width={32}
+                height={32}
+                objectFit="contain"
+                className="drop-shadow-gold filter-poll-icon shrink-0"
+              />
               <div className="flex flex-col gap-1">
-                <span
-                  className="tracking-widest uppercase"
-                  style={{
-                    fontSize: 17,
-                    fontWeight: 800,
-                    color: "var(--gold)",
-                    textShadow: "0 0 8px rgba(246,195,67,0.4)",
-                  }}
+                <Typography
+                  as="span"
+                  variant="overline"
+                  weight="800"
+                  className="text-gold drop-shadow-gold"
                 >
                   Lịch sử bình chọn
-                </span>
-                <span style={{ fontSize: 14, color: "rgba(255,255,255,0.35)" }}>
+                </Typography>
+                <Typography as="span" variant="caption" className="text-white/35">
                   Bình chọn để nhận thưởng & xem kết quả trực tiếp
-                </span>
+                </Typography>
               </div>
             </div>
 
             {/* Body */}
-            <div
-              className="flex-1 overflow-y-auto"
-              style={{
-                padding: 14,
-                scrollbarWidth: "thin",
-                scrollbarColor: "rgba(255,255,255,0.12) transparent",
-              }}
-            >
+            <div className="flex-1 scrollbar-none overflow-y-auto p-3.5">
               {loading ? (
                 <div className="grid grid-cols-3 gap-3 max-md:grid-cols-2 max-sm:grid-cols-1">
                   {Array.from({ length: 6 }).map((_, i) => (
                     <div
                       key={i}
-                      className="relative flex flex-col gap-3 overflow-hidden"
-                      style={{
-                        background: "#181920",
-                        borderRadius: 14,
-                        padding: "14px 16px 12px",
-                        border: "1px solid rgba(255,255,255,0.06)",
-                      }}
+                      className="rounded-16 bg-chat-bg relative flex flex-col gap-3 overflow-hidden border border-white/[0.06] px-4 pt-3.5 pb-3"
                     >
-                      {/* Shimmer overlay */}
-                      <div
-                        className="absolute inset-0 -translate-x-full animate-[shimmer_1.4s_infinite]"
-                        style={{
-                          background:
-                            "linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent)",
-                        }}
-                      />
-                      {/* Number badge */}
-                      <div className="absolute -top-px -left-px size-9 rounded-tl-[14px] bg-white/8" />
-                      {/* Top row */}
+                      <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.4s_infinite] bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
+                      <div className="rounded-tl-16 absolute -top-px -left-px size-9 bg-white/8" />
                       <div className="mb-1 flex items-center justify-end gap-2">
                         <div className="rounded-4 h-4 w-16 bg-white/8" />
                         <div className="rounded-4 h-4 w-24 bg-white/8" />
                       </div>
-                      {/* Question */}
                       <div className="mb-1 flex flex-col gap-1.5">
                         <div className="rounded-4 h-3.5 w-full bg-white/8" />
                         <div className="rounded-4 h-3.5 w-3/4 bg-white/8" />
                       </div>
-                      {/* Options */}
                       {[1, 2].map((o) => (
                         <div key={o} className="rounded-8 h-10 w-full bg-white/[0.05]" />
                       ))}
-                      {/* Footer */}
                       <div className="mt-auto flex items-center justify-between">
                         <div className="rounded-4 h-3 w-16 bg-white/8" />
                         <div className="rounded-4 h-3 w-12 bg-white/8" />
