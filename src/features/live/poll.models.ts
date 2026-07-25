@@ -60,6 +60,18 @@ export const POLL_TYPE_API_MAP: Record<PollTypeApiValue, PollTypeValue> = {
   RATING: "rating",
 }
 
+export const POLL_TYPE_BADGE_CONFIG: Record<PollTypeApiValue, { label: string; cls: string }> = {
+  SINGLE_CHOICE: {
+    label: "SINGLE CHOICE",
+    cls: "text-green-400 bg-green-400/10 border border-green-400/25",
+  },
+  MULTIPLE_CHOICE: {
+    label: "MULTIPLE CHOICE",
+    cls: "text-violet-400 bg-violet-400/10 border border-violet-400/25",
+  },
+  RATING: { label: "RATING", cls: "text-gold bg-gold/10 border border-gold/25" },
+}
+
 /* ── Create/Vote payload types ───────────────────────────── */
 
 export interface CreatePollPayloadInterface {

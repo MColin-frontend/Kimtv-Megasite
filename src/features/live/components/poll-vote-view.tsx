@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 import { ChartBarStacked, Check, ChevronDown, Users, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -95,7 +95,7 @@ function OptionRow({
           >
             <Typography
               as="span"
-              size="16"
+              variant="h6"
               weight="800"
               className={cn(
                 "leading-none select-none",
@@ -130,24 +130,27 @@ function OptionRow({
                 <div className="flex shrink-0 items-center gap-1.5">
                   <div className="flex items-center gap-1 text-white/40">
                     <Users className="size-3 shrink-0" />
-                    <span
-                      className={cn(
-                        "text-12 leading-[1] tabular-nums",
-                        voteCount > 0 ? "font-700 text-gold" : "font-400"
-                      )}
+                    <Typography
+                      as="span"
+                      size="12"
+                      weight={voteCount > 0 ? "700" : "400"}
+                      className={cn("leading-none tabular-nums", voteCount > 0 && "text-gold")}
                     >
                       {voteCount}
-                    </span>
+                    </Typography>
                   </div>
                   <div className="h-3 w-px bg-white/5" />
-                  <span
+                  <Typography
+                    as="span"
+                    size="12"
+                    weight="700"
                     className={cn(
-                      "text-12 font-700 leading-[1] tabular-nums",
-                      selected ? "text-gold" : pct > 0 ? "text-gold" : "text-white/50"
+                      "leading-none tabular-nums",
+                      selected || pct > 0 ? "text-gold" : "text-white/50"
                     )}
                   >
                     {pct}%
-                  </span>
+                  </Typography>
                 </div>
               )}
             </div>
@@ -188,12 +191,10 @@ interface PollVoteViewProps {
 
 export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewProps) {
   const { t } = useTranslation()
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [pollData, setPollData] = useState<PollInterface>(poll)
-  const [selectedKeys, setSelectedKeys] = useState<string[]>(poll.userVotedOptionKeys ?? [])
-  const [loading, setLoading] = useState(false)
 
-  const totalSecRef = useRef(poll.remainingSec)
+  const [selectedKeys, setSelectedKeys] = useState<string[]>(poll.userVotedOptionKeys ?? [])
+  const [loading, setLoading] = useState<boolean>(false)
+
   // Đọc thẳng từ prop — socket POLL_ACTIVE/UPDATE/START cập nhật qua parent
   const remainingSec = poll.remainingSec
   const isUrgent = remainingSec > 0 && remainingSec <= 10
@@ -206,17 +207,6 @@ export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewP
   const voted = isPollVoted(poll) || !active
   const showData = voted || poll.showRealtime
   const canVote = active && !voted && selectedKeys.length > 0 && !loading
-
-  // Chỉ reset khi poll mới (POLL_START hoặc initial fetch)
-
-  useEffect(() => {
-    totalSecRef.current = poll.remainingSec
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPollData(poll)
-
-    setSelectedKeys(poll.userVotedOptionKeys ?? [])
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [poll.pollId])
 
   function handleSelect(key: string) {
     if (voted) return
@@ -238,7 +228,6 @@ export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewP
     try {
       const updated = await onVote?.(selectedKeys)
       if (updated && typeof updated === "object" && "pollId" in updated) {
-        setPollData(updated as PollInterface)
         setSelectedKeys((updated as PollInterface).userVotedOptionKeys ?? [])
       }
     } finally {
@@ -367,12 +356,15 @@ export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewP
                   {selectedKeys.map((key) => {
                     const opt = poll.options.find((o) => o.optionKey === key)
                     return (
-                      <span
+                      <Typography
                         key={key}
-                        className="rounded-4 border-gold/30 bg-gold/10 text-gold text-10 font-600 px-2 py-0.5 leading-none"
+                        as="span"
+                        size="10"
+                        weight="600"
+                        className="rounded-4 border-gold/30 bg-gold/10 text-gold px-2 py-0.5 leading-none"
                       >
                         {key}. {opt?.label ?? key}
-                      </span>
+                      </Typography>
                     )
                   })}
                 </div>
@@ -391,12 +383,7 @@ export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewP
                     >
                       {poll.totalVotes}
                     </Typography>
-                    <Typography
-                      as="span"
-                      size="10"
-                      weight="400"
-                      className="leading-none text-white/40"
-                    >
+                    <Typography as="span" variant="caption" className="leading-none text-white/40">
                       {t("live.poll.labels.votes")}
                     </Typography>
                   </div>
