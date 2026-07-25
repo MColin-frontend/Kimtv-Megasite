@@ -69,6 +69,8 @@ interface TypographyProps extends HTMLAttributes<HTMLElement> {
   color?: string
 }
 
+const TEXT_SIZE_RE = /(?:^|\s)(?:[a-z0-9-]+:)*!?text-\d+(?=\s|$)/g
+
 function Typography({
   as,
   variant = "body",
@@ -83,10 +85,14 @@ function Typography({
 
   const isRawColor = color?.startsWith("#") || color?.startsWith("rgb")
 
+  const variantClasses = size
+    ? typographyVariants({ variant }).replace(TEXT_SIZE_RE, "").trim()
+    : typographyVariants({ variant })
+
   return (
     <Tag
       className={cn(
-        typographyVariants({ variant }),
+        variantClasses,
         size && `text-${size}`,
         weight && `font-${weight}`,
         color && !isRawColor && `text-${color}`,

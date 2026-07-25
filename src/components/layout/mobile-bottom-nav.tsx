@@ -177,9 +177,9 @@ export function MobileBottomNav() {
                       />
                     ) : null}
                     {item.badge && (
-                      <span className="absolute -top-1 -right-1 flex size-2">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
-                        <span className="relative inline-flex size-2 rounded-full bg-red-500 shadow-[0_0_4px_rgba(239,68,68,0.9)]" />
+                      <span className="absolute -top-1 -right-1 flex size-2.5">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-600 opacity-90" />
+                        <span className="relative inline-flex size-2.5 rounded-full bg-red-600 shadow-[0_0_6px_2px_rgba(220,38,38,1),0_0_12px_4px_rgba(220,38,38,0.6)]" />
                       </span>
                     )}
                   </div>

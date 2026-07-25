@@ -14,7 +14,12 @@ interface EmptyProps {
 
 export function Empty({ tip, image, imageSize = 120, className }: EmptyProps) {
   return (
-    <div className={cn("flex flex-col items-center justify-center gap-3 py-10", className)}>
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center gap-3 py-10 max-sm:gap-2 max-sm:py-6",
+        className
+      )}
+    >
       <Img
         src={image ?? imgEmpty}
         alt="empty"
@@ -24,7 +29,7 @@ export function Empty({ tip, image, imageSize = 120, className }: EmptyProps) {
         className="opacity-60"
       />
       {tip && (
-        <Typography variant="body-lg" weight="500" className="text-center text-white/40">
+        <Typography size="16" weight="500" className="max-sm:!text-14 text-center text-white/40">
           {tip}
         </Typography>
       )}

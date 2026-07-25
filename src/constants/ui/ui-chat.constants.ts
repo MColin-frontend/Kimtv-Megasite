@@ -76,7 +76,7 @@ export const CHAT_CLASSES = {
   text: "text-chat-text",
   status: "text-chat-status",
   pin: "text-chat-pin",
-  username: "text-[#54aaff]",
+  username: "text-[#3d9aff]",
   muted: "text-chat-muted",
   vipUser: "text-chat-vip-user",
   vipWelcome: "text-chat-vip-welcome",

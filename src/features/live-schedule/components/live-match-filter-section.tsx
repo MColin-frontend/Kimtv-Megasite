@@ -131,7 +131,8 @@ export function LiveMatchFilterSection({
                   <MatchCardLive key={`${match.matchId}-${i}`} match={match} />
                 )
               }
-              slideClassName="basis-[85vw]"
+              slideClassName="basis-full"
+              gapClassName="gap-3"
               keyExtractor={(m, i) => `${m.matchId}-${i}`}
             />
           </div>

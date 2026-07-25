@@ -460,10 +460,50 @@ export interface Dictionary {
     poll: {
       title: string
       subtitle: string
-      steps: { question: string; options: string; duration: string }
-      placeholder: { question: string; option: string; duration: string }
-      labels: { minutes: string }
-      actions: { addOption: string; cancel: string; submit: string }
+      type: {
+        label: string
+        single: string
+        singleDesc: string
+        multiple: string
+        multipleDesc: string
+        rating: string
+        ratingDesc: string
+      }
+      steps: {
+        question: string
+        options: string
+        minMax: string
+        ratingScale: string
+        duration: string
+      }
+      placeholder: { question: string; option: string; duration: string; customDuration: string }
+      labels: {
+        minutes: string
+        seconds: string
+        minSelect: string
+        maxSelect: string
+        minRating: string
+        maxRating: string
+        optionCount: string
+        addOption: string
+        optionHint: string
+        customDuration: string
+        maxDuration: string
+        totalVotes: string
+        hintSingle: string
+        hintMultiple: string
+        shareTitle: string
+        votes: string
+      }
+      actions: {
+        addOption: string
+        cancel: string
+        submit: string
+        end: string
+        vote: string
+        voted: string
+        viewResult: string
+      }
       errors: {
         questionRequired: string
         questionMax: string
@@ -471,7 +511,12 @@ export interface Dictionary {
         optionsMin: string
         durationRequired: string
         durationPositive: string
+        minSelectRequired: string
+        maxSelectRequired: string
+        maxSelectGteMin: string
+        maxSelectExceed: string
       }
+      status: { active: string; ended: string; votes: string }
     }
   }
   broadcastCenter: {

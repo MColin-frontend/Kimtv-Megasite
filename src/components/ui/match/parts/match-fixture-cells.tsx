@@ -38,7 +38,7 @@ export function ScoreBadge({ match }: { match: MatchInterface }) {
           as="span"
           variant="h3"
           weight="700"
-          className="text-gold drop-shadow-gold-score tracking-0 leading-none tabular-nums"
+          className="text-gold tracking-0 leading-none tabular-nums"
         >
           {match.homeScore ?? 0}
         </Typography>
@@ -49,7 +49,7 @@ export function ScoreBadge({ match }: { match: MatchInterface }) {
           as="span"
           variant="h3"
           weight="700"
-          className="text-gold drop-shadow-gold-score tracking-0 leading-none tabular-nums"
+          className="text-gold tracking-0 leading-none tabular-nums"
         >
           {match.awayScore ?? 0}
         </Typography>
