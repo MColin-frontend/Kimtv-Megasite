@@ -270,12 +270,12 @@ export function PollHistoryModal({ open, onOpenChange, chatroomId }: PollHistory
                 width={32}
                 height={32}
                 objectFit="contain"
-                className="drop-shadow-gold filter-poll-icon shrink-0"
+                className="shrink-0"
               />
               <div className="flex flex-col gap-1">
                 <Typography
                   as="span"
-                  variant="overline"
+                  variant="h4"
                   weight="800"
                   className="text-gold drop-shadow-gold"
                 >
@@ -288,43 +288,45 @@ export function PollHistoryModal({ open, onOpenChange, chatroomId }: PollHistory
             </div>
 
             {/* Body */}
-            <div className="flex-1 scrollbar-none overflow-y-auto p-3.5">
-              {loading ? (
-                <div className="grid grid-cols-3 gap-3 max-md:grid-cols-2 max-sm:grid-cols-1">
-                  {Array.from({ length: 6 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="rounded-16 bg-chat-bg relative flex flex-col gap-3 overflow-hidden border border-white/[0.06] px-4 pt-3.5 pb-3"
-                    >
-                      <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.4s_infinite] bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
-                      <div className="rounded-tl-16 absolute -top-px -left-px size-9 bg-white/8" />
-                      <div className="mb-1 flex items-center justify-end gap-2">
-                        <div className="rounded-4 h-4 w-16 bg-white/8" />
-                        <div className="rounded-4 h-4 w-24 bg-white/8" />
+            <div className="flex min-h-0 flex-1 flex-col p-3.5">
+              <div className="min-h-0 flex-1 scrollbar-none overflow-y-auto">
+                {loading ? (
+                  <div className="grid grid-cols-3 gap-3 max-md:grid-cols-2 max-sm:grid-cols-1">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="rounded-16 bg-chat-bg relative flex flex-col gap-3 overflow-hidden border border-white/[0.06] px-4 pt-3.5 pb-3"
+                      >
+                        <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.4s_infinite] bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
+                        <div className="rounded-tl-16 absolute -top-px -left-px size-9 bg-white/8" />
+                        <div className="mb-1 flex items-center justify-end gap-2">
+                          <div className="rounded-4 h-4 w-16 bg-white/8" />
+                          <div className="rounded-4 h-4 w-24 bg-white/8" />
+                        </div>
+                        <div className="mb-1 flex flex-col gap-1.5">
+                          <div className="rounded-4 h-3.5 w-full bg-white/8" />
+                          <div className="rounded-4 h-3.5 w-3/4 bg-white/8" />
+                        </div>
+                        {[1, 2].map((o) => (
+                          <div key={o} className="rounded-8 h-10 w-full bg-white/[0.05]" />
+                        ))}
+                        <div className="mt-auto flex items-center justify-between">
+                          <div className="rounded-4 h-3 w-16 bg-white/8" />
+                          <div className="rounded-4 h-3 w-12 bg-white/8" />
+                        </div>
                       </div>
-                      <div className="mb-1 flex flex-col gap-1.5">
-                        <div className="rounded-4 h-3.5 w-full bg-white/8" />
-                        <div className="rounded-4 h-3.5 w-3/4 bg-white/8" />
-                      </div>
-                      {[1, 2].map((o) => (
-                        <div key={o} className="rounded-8 h-10 w-full bg-white/[0.05]" />
-                      ))}
-                      <div className="mt-auto flex items-center justify-between">
-                        <div className="rounded-4 h-3 w-16 bg-white/8" />
-                        <div className="rounded-4 h-3 w-12 bg-white/8" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : list.length === 0 ? (
-                <Empty tip="Chưa có lịch sử bình chọn" />
-              ) : (
-                <div className="grid grid-cols-3 gap-3 max-md:grid-cols-2 max-sm:grid-cols-1">
-                  {list.map((poll, i) => (
-                    <PollCard key={poll.pollId} poll={poll} index={i} />
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                ) : list.length === 0 ? (
+                  <Empty tip="Chưa có lịch sử bình chọn" />
+                ) : (
+                  <div className="grid grid-cols-3 gap-3 max-md:grid-cols-2 max-sm:grid-cols-1">
+                    {list.map((poll, i) => (
+                      <PollCard key={poll.pollId} poll={poll} index={i} />
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </Dialog.Popup>

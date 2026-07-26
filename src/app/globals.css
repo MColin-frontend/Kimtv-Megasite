@@ -126,7 +126,7 @@
   --hover-transform: translateY(-6px) scale(1.01);
 
   /* ─── Poll ─── */
-  --bg-poll-modal: #0f1219;
+  --poll-modal: #14161c;
 
   /* ─── Chat ─── */
   --chat-bg: #18191f;
@@ -203,7 +203,7 @@
   --color-live-green: var(--live-green);
   --color-live-green-bg: var(--live-green-bg);
   --color-divider: var(--divider);
-  --color-bg-poll-modal: var(--bg-poll-modal);
+  --color-poll-modal: var(--poll-modal);
   --color-chat-bg: var(--chat-bg);
   --color-chat-surface: var(--chat-surface);
   --color-chat-text: var(--chat-text);
@@ -887,10 +887,6 @@
 @utility text-shadow-gold {
   text-shadow: 0 0 8px rgba(246, 195, 67, 0.4);
 }
-@utility filter-poll-icon {
-  filter: invert(80%) sepia(60%) saturate(500%) hue-rotate(2deg) brightness(1.05);
-}
-
 /* ─── Scrollbar hide ─────────────────────────────────────────── */
 @utility scrollbar-none {
   scrollbar-width: none;
