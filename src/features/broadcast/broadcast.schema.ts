@@ -13,10 +13,10 @@ import {
 
 export function createRoomOwnerSchema(t: (key: TranslationKey) => string) {
   return z.object({
-    intro: z.string().min(1, t("broadcast.roomOwner.fields.intro.error")),
-    introDetail: z.string().min(1, t("broadcast.roomOwner.fields.introDetail.error")),
-    announcement: z.string().min(1, t("broadcast.roomOwner.fields.announcement.error")),
-    images: z.array(z.string()).min(1, t("broadcast.roomOwner.fields.images.error")),
+    intro: z.string().min(1, t("broadcast.room-owner.fields.intro.error")),
+    introDetail: z.string().min(1, t("broadcast.room-owner.fields.intro-detail.error")),
+    announcement: z.string().min(1, t("broadcast.room-owner.fields.announcement.error")),
+    images: z.array(z.string()).min(1, t("broadcast.room-owner.fields.images.error")),
   })
 }
 
@@ -28,8 +28,8 @@ export function createStreamSettingsSchema(t: (key: TranslationKey) => string) {
       ...createRoomOwnerSchema(t).shape,
       title: z
         .string()
-        .min(1, t("broadcast.streamSettings.fields.title.error"))
-        .max(40, t("broadcast.streamSettings.fields.title.maxLength")),
+        .min(1, t("broadcast.stream-settings.fields.title.error"))
+        .max(40, t("broadcast.stream-settings.fields.title.max-length")),
       scheduled: z.boolean(),
       scheduledAt: z.date().nullable(),
       liveMode: z.nativeEnum(LiveModeEnum),
@@ -58,15 +58,15 @@ export function createStreamSettingsSchema(t: (key: TranslationKey) => string) {
       ),
     })
     .refine((data) => !data.scheduled || data.scheduledAt !== null, {
-      message: t("broadcast.streamSettings.fields.scheduledAt.error"),
+      message: t("broadcast.stream-settings.fields.scheduled-at.error"),
       path: ["scheduledAt"],
     })
     .refine((data) => data.liveMode !== LiveModeEnum.MATCH || !!data.league, {
-      message: t("broadcast.streamSettings.fields.league.error"),
+      message: t("broadcast.stream-settings.fields.league.error"),
       path: ["league"],
     })
     .refine((data) => data.liveMode !== LiveModeEnum.MATCH || !!data.match, {
-      message: t("broadcast.streamSettings.fields.match.error"),
+      message: t("broadcast.stream-settings.fields.match.error"),
       path: ["match"],
     })
 }

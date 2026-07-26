@@ -45,15 +45,15 @@ import { MessageInput } from "@/components/ui/message-input"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Typography } from "@/components/ui/typography"
 
-import icBlacklist from "@assets/icons/chat/ic-blacklist.png"
-import icCrown from "@assets/icons/chat/ic-crown.png"
-import icPinImg from "@assets/icons/chat/ic-pin.png"
-import icRemove from "@assets/icons/chat/ic-remove.png"
-import icRestriction from "@assets/icons/chat/ic-restriction.png"
-import icChat from "@assets/icons/common/ic-chat.png"
-import icFacebook from "@assets/icons/layout/ic-facebook.png"
-import icTele from "@assets/icons/layout/ic-tele.png"
-import icZalo from "@assets/icons/layout/ic-zalo.png"
+import imgBlacklist from "@assets/images/chat/img-blacklist.png"
+import imgCrown from "@assets/images/chat/img-crown.png"
+import imgPin from "@assets/images/chat/img-pin.png"
+import imgRemove from "@assets/images/chat/img-remove.png"
+import imgRestriction from "@assets/images/chat/img-restriction.png"
+import imgChat from "@assets/images/common/img-chat.png"
+import imgFacebook from "@assets/images/layout/img-facebook.png"
+import imgTele from "@assets/images/layout/img-tele.png"
+import imgZalo from "@assets/images/layout/img-zalo.png"
 
 /* ── Types ───────────────────────────────────────────────── */
 
@@ -178,7 +178,7 @@ function WelcomeMessageItem({
           <div className="max-sm:origin-top-left max-sm:scale-[0.64]">
             {message.hasAnchorMe && (
               <div className="border-gold-hover absolute -top-2 -right-1 z-11 flex size-6 items-center justify-center rounded-full border-[0.5px] bg-black/70 p-[2px]">
-                <Img src={icCrown} alt="crown" width={14} height={14} objectFit="contain" />
+                <Img src={imgCrown} alt="crown" width={14} height={14} objectFit="contain" />
               </div>
             )}
             <ChatAvatar message={message} size={48} />
@@ -285,7 +285,7 @@ function MessageItem({
         <div className="max-sm:origin-top-left max-sm:scale-[0.64]">
           {message.hasAnchorMe && (
             <div className="border-gold-hover absolute -top-2 -right-1 z-10 flex size-6 items-center justify-center rounded-full border-[0.5px] bg-black/70 p-[2px]">
-              <Img src={icCrown} alt="crown" width={14} height={14} objectFit="contain" />
+              <Img src={imgCrown} alt="crown" width={14} height={14} objectFit="contain" />
             </div>
           )}
           <ChatAvatar message={message} size={48} />
@@ -398,7 +398,7 @@ function UserPopup({
           <div className="relative shrink-0">
             {message.hasAnchorMe && (
               <div className="border-gold/70 absolute -top-1 -right-0.5 z-10 flex size-6 items-center justify-center rounded-full border-[0.5px] bg-black/80">
-                <Img src={icCrown} alt="crown" width={13} height={13} objectFit="contain" />
+                <Img src={imgCrown} alt="crown" width={13} height={13} objectFit="contain" />
               </div>
             )}
             <ChatAvatar message={message} size={64} />
@@ -486,7 +486,7 @@ function UserPopup({
                 }}
                 className="flex flex-col items-center gap-2 transition-transform active:scale-90"
               >
-                <Img src={icBlacklist} alt="" width={40} height={40} objectFit="contain" />
+                <Img src={imgBlacklist} alt="" width={40} height={40} objectFit="contain" />
                 <span className="text-12 font-600 w-16 text-center leading-tight text-white/80">
                   {t("chat.actions.ban-all")}
                 </span>
@@ -500,7 +500,7 @@ function UserPopup({
                 }}
                 className="flex flex-col items-center gap-2 transition-transform active:scale-90"
               >
-                <Img src={icRestriction} alt="" width={40} height={40} objectFit="contain" />
+                <Img src={imgRestriction} alt="" width={40} height={40} objectFit="contain" />
                 <span className="text-12 font-600 w-16 text-center leading-tight text-white/80">
                   {t("chat.actions.ban-room")}
                 </span>
@@ -513,7 +513,7 @@ function UserPopup({
               }}
               className="flex flex-col items-center gap-2 transition-transform active:scale-90"
             >
-              <Img src={icRemove} alt="" width={40} height={40} objectFit="contain" />
+              <Img src={imgRemove} alt="" width={40} height={40} objectFit="contain" />
               <span className="text-12 font-600 w-16 text-center leading-tight text-white/80">
                 {t("chat.actions.delete")}
               </span>
@@ -528,7 +528,7 @@ function UserPopup({
                 className="flex flex-col items-center gap-2 transition-transform active:scale-90"
               >
                 <Img
-                  src={icPinImg}
+                  src={imgPin}
                   alt=""
                   width={40}
                   height={40}
@@ -559,7 +559,7 @@ function UserPopup({
               className="flex flex-col items-center gap-2 transition-transform active:scale-90"
             >
               <Img
-                src={icRestriction}
+                src={imgRestriction}
                 alt=""
                 width={40}
                 height={40}
@@ -1216,7 +1216,7 @@ export function Chat({
             className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#2aabee] py-1.5 no-underline shadow-[0_2px_8px_rgba(42,171,238,0.3)] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(42,171,238,0.45)] hover:brightness-110 active:scale-95 max-sm:gap-1 max-sm:px-2 max-sm:py-1"
           >
             <Img
-              src={icTele.src}
+              src={imgTele.src}
               alt=""
               width={14}
               height={14}
@@ -1240,7 +1240,7 @@ export function Chat({
             className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#1877f2] py-1.5 no-underline shadow-[0_2px_8px_rgba(24,119,242,0.3)] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(24,119,242,0.45)] hover:brightness-110 active:scale-95 max-sm:gap-1 max-sm:px-2 max-sm:py-1"
           >
             <Img
-              src={icFacebook.src}
+              src={imgFacebook.src}
               alt=""
               width={14}
               height={14}
@@ -1264,7 +1264,7 @@ export function Chat({
             className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#0068ff] py-1.5 no-underline shadow-[0_2px_8px_rgba(0,104,255,0.3)] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(0,104,255,0.45)] hover:brightness-110 active:scale-95 max-sm:gap-1 max-sm:px-2 max-sm:py-1"
           >
             <Img
-              src={icZalo.src}
+              src={imgZalo.src}
               alt=""
               width={14}
               height={14}
@@ -1293,7 +1293,7 @@ export function Chat({
           <div className="flex items-center gap-2">
             <div className="border-gold/30 rounded-full border p-1">
               <div className="border-gold/60 bg-gold rounded-full border p-1">
-                <Img src={icChat} alt="chat" width={16} height={16} objectFit="contain" />
+                <Img src={imgChat} alt="chat" width={16} height={16} objectFit="contain" />
               </div>
             </div>
             <Typography

@@ -7,29 +7,29 @@
     "benefit3": "Được hỗ trợ kỹ thuật và đào tạo từ đội ngũ KimTV",
     "cta": "Đăng ký làm BLV",
     "form": {
-      "sectionInfo": "Thông tin cá nhân",
-      "sectionId": "CMND / CCCD",
-      "sectionIdHint": "(Tải lên ảnh mặt trước, mặt sau và ảnh cầm CMND)",
+      "section-info": "Thông tin cá nhân",
+      "section-id": "CMND / CCCD",
+      "section-id-hint": "(Tải lên ảnh mặt trước, mặt sau và ảnh cầm CMND)",
       "name": "Tên",
-      "namePlaceholder": "Nhập tên hiển thị",
+      "name-placeholder": "Nhập tên hiển thị",
       "phone": "Số điện thoại",
-      "phonePlaceholder": "Nhập số điện thoại",
-      "idNumber": "Số CMND / CCCD",
-      "idNumberPlaceholder": "Nhập số CMND / CCCD",
+      "phone-placeholder": "Nhập số điện thoại",
+      "id-number": "Số CMND / CCCD",
+      "id-number-placeholder": "Nhập số CMND / CCCD",
       "brief": "Giới thiệu cá nhân",
-      "briefPlaceholder": "Mô tả ngắn về bản thân...",
-      "idFront": "Mặt trước",
-      "idBack": "Mặt sau",
-      "idHolding": "Ảnh cầm CMND",
+      "brief-placeholder": "Mô tả ngắn về bản thân...",
+      "id-front": "Mặt trước",
+      "id-back": "Mặt sau",
+      "id-holding": "Ảnh cầm CMND",
       "submit": "Đăng ký chủ phòng",
       "tip": "Nền tảng sẽ trích 20% hoa hồng từ quà tặng.",
-      "successTitle": "Đã gửi đơn đăng ký!",
-      "successDesc": "Chúng tôi sẽ xem xét và liên hệ với bạn trong thời gian sớm nhất.",
-      "backHome": "Về trang chủ"
+      "success-title": "Đã gửi đơn đăng ký!",
+      "success-desc": "Chúng tôi sẽ xem xét và liên hệ với bạn trong thời gian sớm nhất.",
+      "back-home": "Về trang chủ"
     }
   },
   "hero": {
-    "fallbackName": "Thành viên",
+    "fallback-name": "Thành viên",
     "role": "BLV",
     "subtitle": "Bình luận viên & Content Creator tại KimTV",
     "channel": "Kênh phát sóng"
@@ -47,7 +47,7 @@
     "item7": "Cấm người dưới 18 tuổi: Người dưới 18 tuổi bị cấm phát trực tiếp.",
     "item8": "Cấm logo của nền tảng khác: Nghiêm cấm xuất hiện logo của các nền tảng phát trực tiếp khác trong quá trình phát sóng."
   },
-  "roomOwner": {
+  "room-owner": {
     "title": "Thông tin chủ phòng",
     "subtitle": "Hiển thị trên trang kênh của bạn",
     "fields": {
@@ -56,7 +56,7 @@
         "placeholder": "Nhập giới thiệu",
         "error": "Vui lòng nhập giới thiệu"
       },
-      "introDetail": {
+      "intro-detail": {
         "label": "Giới thiệu chi tiết",
         "placeholder": "Mô tả chi tiết về kênh của bạn...",
         "error": "Vui lòng nhập giới thiệu chi tiết"
@@ -76,23 +76,23 @@
       "save": "Lưu"
     },
     "preview": {
-      "noIntro": "Chưa có giới thiệu",
-      "introDetail": "Giới thiệu chi tiết",
+      "no-intro": "Chưa có giới thiệu",
+      "intro-detail": "Giới thiệu chi tiết",
       "images": "Ảnh chi tiết",
       "announcement": "Thông báo phát sóng",
       "edit": "Chỉnh sửa",
       "label": "Thông tin chủ phòng"
     }
   },
-  "streamPanel": {
+  "stream-panel": {
     "title": "Cài đặt luồng phát",
     "refresh": "Làm mới key",
-    "refreshSuccess": "Đã cập nhật thông tin luồng phát",
+    "refresh-success": "Đã cập nhật thông tin luồng phát",
     "fields": {
-      "rtmpUrl": "RTMP URL",
-      "streamKey": "Stream Key",
-      "liveUrlHls": "Live URL (HLS)",
-      "liveUrlFlv": "Live URL (FLV)"
+      "rtmp-url": "RTMP URL",
+      "stream-key": "Stream Key",
+      "live-url-hls": "Live URL (HLS)",
+      "live-url-flv": "Live URL (FLV)"
     }
   },
   "guide": {
@@ -107,13 +107,13 @@
       "step4": "4. Kết thúc"
     }
   },
-  "streamSettings": {
+  "stream-settings": {
     "title": "Cài đặt trực tiếp",
     "status": {
       "idle": "Chưa phát sóng"
     },
-    "liveId": "ID phát trực tiếp",
-    "ownerInfo": {
+    "live-id": "ID phát trực tiếp",
+    "owner-info": {
       "subtitle": "Giới thiệu, ảnh và thông báo phát sóng"
     },
     "admin": {
@@ -125,7 +125,7 @@
         "label": "Tiêu đề",
         "placeholder": "Nhập tiêu đề buổi phát",
         "error": "Vui lòng nhập tiêu đề",
-        "maxLength": "Tối đa 40 ký tự"
+        "max-length": "Tối đa 40 ký tự"
       },
       "cover": {
         "label": "Ảnh bìa",
@@ -134,12 +134,12 @@
       "scheduled": {
         "label": "Có đặt trước?"
       },
-      "scheduledAt": {
+      "scheduled-at": {
         "label": "Thời gian đặt trước",
         "placeholder": "Chọn ngày",
         "error": "Vui lòng chọn thời gian đặt trước"
       },
-      "liveMode": {
+      "live-mode": {
         "label": "Chọn chế độ phát trực tiếp"
       },
       "sport": {
@@ -155,19 +155,19 @@
         "placeholder": "Chọn trận đấu",
         "error": "Vui lòng chọn trận đấu"
       },
-      "matchStatus": {
+      "match-status": {
         "label": "Trạng thái trận"
       },
-      "streamType": {
+      "stream-type": {
         "label": "Cài đặt phát trực tiếp"
       },
-      "loginRequired": {
+      "login-required": {
         "label": "Yêu cầu đăng nhập"
       },
-      "externalComment": {
+      "external-comment": {
         "label": "Bình luận bên ngoài"
       },
-      "m3u8Url": {
+      "m3u8-url": {
         "label": "Địa chỉ m3u8",
         "placeholder": "Vui lòng nhập địa chỉ"
       }
@@ -175,7 +175,7 @@
     "options": {
       "yes": "Có",
       "no": "Không",
-      "liveMode": {
+      "live-mode": {
         "match": "Trận đấu liên quan",
         "free": "Tuỳ chỉnh"
       },
@@ -184,43 +184,43 @@
         "basketball": "Bóng rổ",
         "tennis": "Tennis",
         "volleyball": "Bóng chuyền",
-        "tableTennis": "Bóng bàn",
+        "table-tennis": "Bóng bàn",
         "badminton": "Cầu lông",
         "snooker": "Billiards",
         "baseball": "Bóng chày",
         "football": "Bóng bầu dục",
         "cricket": "Cricket"
       },
-      "liveStatus": {
+      "live-status": {
         "live": "Đang diễn ra"
       },
-      "matchStatus": {
+      "match-status": {
         "upcoming": "Chưa bắt đầu",
         "live": "Đang diễn ra",
         "finished": "Đã kết thúc",
         "cancelled": "Huỷ trận",
         "postponed": "Hoãn trận"
       },
-      "streamType": {
+      "stream-type": {
         "host": "Chủ phòng phát trực tiếp",
         "anchor": "BLV phát trực tiếp",
         "bot": "Bot phát trực tiếp"
       },
-      "loginRequired": {
+      "login-required": {
         "no": "Không cần đăng nhập",
         "yes": "Đăng nhập",
         "coin": "Xu thanh toán",
         "level": "Giới hạn cấp độ người xem"
       },
-      "externalComment": {
+      "external-comment": {
         "none": "Không kết nối",
         "connected": "Kết nối"
       },
-      "customType": {
-        "customLive": "Phát sóng trực tiếp tùy chỉnh"
+      "custom-type": {
+        "custom-live": "Phát sóng trực tiếp tùy chỉnh"
       }
     },
-    "bannedUsers": {
+    "banned-users": {
       "label": "Người dùng bị cấm nói",
       "view": "Xem"
     },
@@ -228,12 +228,12 @@
       "cancel": "Huỷ",
       "confirm": "Xác nhận",
       "edit": "Chỉnh sửa",
-      "startStream": "Bắt đầu phát sóng",
-      "startStreamSuccess": "Đã bắt đầu phát sóng thành công",
-      "endStream": "Kết thúc",
-      "cancelReservation": "Huỷ đặt chỗ",
-      "cancelReservationConfirm": "Xác nhận hủy đặt trước phát trực tiếp?",
-      "endStreamSuccess": "Đã kết thúc phát sóng"
+      "start-stream": "Bắt đầu phát sóng",
+      "start-stream-success": "Đã bắt đầu phát sóng thành công",
+      "end-stream": "Kết thúc",
+      "cancel-reservation": "Huỷ đặt chỗ",
+      "cancel-reservation-confirm": "Xác nhận hủy đặt trước phát trực tiếp?",
+      "end-stream-success": "Đã kết thúc phát sóng"
     }
   }
 }

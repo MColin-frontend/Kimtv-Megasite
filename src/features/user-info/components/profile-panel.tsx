@@ -153,9 +153,9 @@ export function UserInfoProfilePanel() {
                 userInfo?.description
               ) : userInfo?.adminId ? (
                 <>
-                  {t("common.user-info.fallbackBio1")}
+                  {t("common.user-info.fallback-bio1")}
                   <br />
-                  {t("common.user-info.fallbackBio2")}
+                  {t("common.user-info.fallback-bio2")}
                 </>
               ) : null}
             </Typography>

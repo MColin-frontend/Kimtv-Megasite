@@ -30,17 +30,6 @@ export const CHAT_SYMBOLS = {
   COLLAPSE: "▲",
 } as const
 
-/* ── VIP icons ───────────────────────────────────────────── */
-
-const CDN = "https://kimtv-oss.99kimtvs.top"
-
-export const CHAT_VIP_ICONS = {
-  /** Từ CDN vì chưa có file local */
-  SVIP: `${CDN}/images/svip_icon.png`,
-  VIP: `${CDN}/images/vip_icon.png`,
-  level: (n: number) => `/images/chat/vip${Math.min(12, Math.max(0, Math.floor(n || 0)))}.png`,
-} as const
-
 /* ── Social names ────────────────────────────────────────── */
 
 export const CHAT_SOCIAL_NAMES = {

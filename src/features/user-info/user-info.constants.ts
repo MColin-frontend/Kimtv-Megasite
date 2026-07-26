@@ -39,7 +39,7 @@ export const USER_INFO_STAT_ITEMS = [
     statKey: "registrationDays" as const,
     icon: CalendarDays,
     labelKey: "common.user-info.stats.joined" satisfies TranslationKey,
-    suffixKey: "common.user-info.stats.joinedSuffix" satisfies TranslationKey,
+    suffixKey: "common.user-info.stats.joined-suffix" satisfies TranslationKey,
   },
 ] as const
 

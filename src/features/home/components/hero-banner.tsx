@@ -4,7 +4,7 @@ import dynamic from "next/dynamic"
 
 import { useAdPlacements } from "@/hooks/tanstack/use-ad-placements"
 
-import heroBanner from "@assets/images/common/img-wc-banner.mp4"
+import heroBanner from "@assets/videos/common/video-wc-banner.mp4"
 
 const AdBanner = dynamic(() => import("@/components/ui/ad-banner").then((m) => m.AdBanner), {
   ssr: false,

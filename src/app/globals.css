@@ -150,7 +150,7 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-inter), Arial, Helvetica, sans-serif;
+  --font-sans: var(--font-oswald), var(--font-inter), Arial, Helvetica, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
@@ -322,11 +322,12 @@
 /* ─── Base ───────────────────────────────────────────────────── */
 @layer base {
   html {
-    @apply font-sans;
+    font-family: var(--font-oswald), var(--font-inter), Arial, Helvetica, sans-serif !important;
   }
   body {
     background: linear-gradient(180deg, #091320 0%, #0b1628 35%, #0d1830 70%, #091320 100%);
     background-attachment: fixed;
+    font-family: var(--font-oswald), var(--font-inter), Arial, Helvetica, sans-serif !important;
     @apply text-foreground;
   }
 

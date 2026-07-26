@@ -7,9 +7,9 @@ import { cn } from "@/lib/utils"
 
 import { useTranslation } from "@/i18n"
 
-import { PollTypeEnum } from "@/features/live/poll.constants"
+import { POLL_TYPE_API_MAP, PollTypeEnum } from "@/features/live/poll.constants"
 import type { PollInterface } from "@/features/live/poll.models"
-import { isPollActive, isPollVoted, POLL_TYPE_API_MAP } from "@/features/live/poll.models"
+import { isPollActive, isPollVoted } from "@/features/live/poll.models"
 import { Button } from "@/components/ui/button"
 import { ConfirmModal } from "@/components/ui/modal/confirm"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
@@ -263,7 +263,7 @@ export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewP
                 weight="800"
                 className="text-gold drop-shadow-gold leading-none"
               >
-                {t("live.poll.viewTitle")}
+                {t("live.poll.view-title")}
               </Typography>
             </div>
             <div className="flex items-center gap-2">
@@ -351,7 +351,7 @@ export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewP
               {voted && selectedKeys.length > 0 && (
                 <div className="flex flex-wrap items-center gap-1.5">
                   <Typography as="span" variant="caption" className="shrink-0 text-white/40">
-                    {t("live.poll.labels.youVoted")}
+                    {t("live.poll.labels.you-voted")}
                   </Typography>
                   {selectedKeys.map((key) => {
                     const opt = poll.options.find((o) => o.optionKey === key)
@@ -420,7 +420,7 @@ export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewP
         open={confirmClose}
         onOpenChange={setConfirmClose}
         type="destructive"
-        title={t("live.poll.confirm.closeTitle")}
+        title={t("live.poll.confirm.close-title")}
         content={t("live.poll.confirm.close")}
         confirmLabel={t("live.poll.confirm.confirm")}
         cancelLabel={t("live.poll.confirm.cancel")}

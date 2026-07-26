@@ -100,7 +100,7 @@ export function BroadcastReservation() {
         total={total}
         onPageChange={filter.setPage}
         extraColumn={{
-          header: t("broadcastCenter.reservation.book"),
+          header: t("broadcast-center.reservation.book"),
           width: "120px",
           render: (match: MatchInterface) => {
             if (match.status !== 1) return null
@@ -121,8 +121,8 @@ export function BroadcastReservation() {
                 }
               >
                 {isBooked
-                  ? t("broadcastCenter.reservation.booked")
-                  : t("broadcastCenter.reservation.book")}
+                  ? t("broadcast-center.reservation.booked")
+                  : t("broadcast-center.reservation.book")}
               </Typography>
             )
           },

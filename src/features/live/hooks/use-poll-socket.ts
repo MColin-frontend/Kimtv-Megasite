@@ -76,23 +76,19 @@ export function usePollSocket({
 
     function connect() {
       const url = getPollWsUrl(cId, gameId)
-      console.log("[poll-ws] connecting →", url)
       const ws = new WebSocket(url)
       wsRef.current = ws
 
       ws.addEventListener("open", () => {
         if (ws !== wsRef.current) return
         reconnectCount.current = 0
-        console.log("[poll-ws] connected ✓ chatroom_id:", cId, "game_id:", gameId)
         heartbeat()
       })
 
       ws.addEventListener("message", ({ data: raw }) => {
         if (ws !== wsRef.current || raw === "ping") return
-        console.log("[poll-ws] raw message:", raw)
         try {
           const msg = JSON.parse(raw) as PollWsMessage
-          console.log("[poll-ws] channel:", msg.channel, "data:", msg.data)
           if (!msg.channel) return
           if (msg.channel === PollChannelEnum.START) onStartRef.current?.(msg.data)
           if (msg.channel === PollChannelEnum.ACTIVE) onActiveRef.current?.(msg.data)

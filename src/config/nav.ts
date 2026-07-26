@@ -7,19 +7,15 @@ export interface NavItemInterface {
   href: string
 }
 
-/**
- * Thêm ngôn ngữ mới: thêm key vào mỗi object trong NAV_LABELS
- * Nếu thiếu → tự fallback về DEFAULT_LOCALE (vi)
- */
 const NAV_LABELS: Record<string, Partial<Record<LocaleType, string>>> = {
-  home: { vi: "Trang chủ", en: "Home" },
-  schedule: { vi: "Lịch thi đấu", en: "Schedule" },
-  liveScore: { vi: "Tỉ số trực tuyến", en: "Live Score" },
-  results: { vi: "Kết quả", en: "Results" },
-  standings: { vi: "BXH", en: "Standings" },
-  news: { vi: "Tin tức", en: "News" },
-  video: { vi: "Video", en: "Video" },
-  data: { vi: "Dữ liệu", en: "Data" },
+  home: { vi: "Trang chủ" },
+  schedule: { vi: "Lịch thi đấu" },
+  liveScore: { vi: "Tỉ số trực tuyến" },
+  results: { vi: "Kết quả" },
+  standings: { vi: "BXH" },
+  news: { vi: "Tin tức" },
+  video: { vi: "Video" },
+  data: { vi: "Dữ liệu" },
 }
 
 function t(key: string, locale: LocaleType): string {

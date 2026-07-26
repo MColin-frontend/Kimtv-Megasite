@@ -11,7 +11,6 @@ export type { TranslationKey } from "./use-translation"
 
 const dictionaries: Record<LocaleType, () => Promise<{ default: Dictionary }>> = {
   vi: () => import("./locales/vi"),
-  en: () => import("./locales/en"),
 }
 
 export async function getDictionary(locale: LocaleType): Promise<Dictionary> {

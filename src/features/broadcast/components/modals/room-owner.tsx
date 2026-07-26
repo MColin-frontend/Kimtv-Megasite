@@ -86,10 +86,10 @@ export function RoomOwnerModal({
             <div className="relative flex shrink-0 items-center justify-between px-6 py-4">
               <div>
                 <Typography variant="h5" className="text-white">
-                  {t("broadcast.roomOwner.title")}
+                  {t("broadcast.room-owner.title")}
                 </Typography>
                 <Typography variant="caption" className="text-white/35">
-                  {t("broadcast.roomOwner.subtitle")}
+                  {t("broadcast.room-owner.subtitle")}
                 </Typography>
               </div>
               <Dialog.Close
@@ -105,13 +105,13 @@ export function RoomOwnerModal({
               <FormField
                 control={control}
                 name="intro"
-                label={t("broadcast.roomOwner.fields.intro.label")}
+                label={t("broadcast.room-owner.fields.intro.label")}
                 required
-                rules={{ required: t("broadcast.roomOwner.fields.intro.error") }}
+                rules={{ required: t("broadcast.room-owner.fields.intro.error") }}
                 render={(field) => (
                   <Input
                     {...field}
-                    placeholder={t("broadcast.roomOwner.fields.intro.placeholder")}
+                    placeholder={t("broadcast.room-owner.fields.intro.placeholder")}
                     inputSize="default"
                   />
                 )}
@@ -119,39 +119,39 @@ export function RoomOwnerModal({
               <FormField
                 control={control}
                 name="introDetail"
-                label={t("broadcast.roomOwner.fields.introDetail.label")}
+                label={t("broadcast.room-owner.fields.intro-detail.label")}
                 required
-                rules={{ required: t("broadcast.roomOwner.fields.introDetail.error") }}
+                rules={{ required: t("broadcast.room-owner.fields.intro-detail.error") }}
                 render={(field) => (
                   <TextEditor
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder={t("broadcast.roomOwner.fields.introDetail.placeholder")}
+                    placeholder={t("broadcast.room-owner.fields.intro-detail.placeholder")}
                   />
                 )}
               />
               <FormField
                 control={control}
                 name="announcement"
-                label={t("broadcast.roomOwner.fields.announcement.label")}
+                label={t("broadcast.room-owner.fields.announcement.label")}
                 required
-                rules={{ required: t("broadcast.roomOwner.fields.announcement.error") }}
+                rules={{ required: t("broadcast.room-owner.fields.announcement.error") }}
                 render={(field) => (
                   <TextEditor
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder={t("broadcast.roomOwner.fields.announcement.placeholder")}
+                    placeholder={t("broadcast.room-owner.fields.announcement.placeholder")}
                   />
                 )}
               />
               <FormField
                 control={control}
                 name="images"
-                label={t("broadcast.roomOwner.fields.images.label")}
+                label={t("broadcast.room-owner.fields.images.label")}
                 required
                 rules={{
                   validate: (v) =>
-                    (v as string[]).length > 0 || t("broadcast.roomOwner.fields.images.error"),
+                    (v as string[]).length > 0 || t("broadcast.room-owner.fields.images.error"),
                 }}
                 render={(field) => (
                   <ImageUpload value={field.value as string[]} onChange={field.onChange} />
@@ -162,10 +162,10 @@ export function RoomOwnerModal({
             <div className="relative flex shrink-0 gap-3 px-6 py-4">
               <div className="absolute inset-x-6 top-0 h-px bg-white/6" />
               <Button type="button" variant="cancel" className="flex-1" onClick={handleCancel}>
-                {t("broadcast.roomOwner.actions.cancel")}
+                {t("broadcast.room-owner.actions.cancel")}
               </Button>
               <Button type="submit" variant="gradient" className="flex-1">
-                {t("broadcast.roomOwner.actions.save")}
+                {t("broadcast.room-owner.actions.save")}
               </Button>
             </div>
           </form>

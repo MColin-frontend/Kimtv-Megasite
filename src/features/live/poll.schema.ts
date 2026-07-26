@@ -10,10 +10,10 @@ export function createPollSchema(t: (key: TranslationKey) => string) {
       pollType: z.nativeEnum(PollTypeEnum),
       question: z
         .string()
-        .min(1, t("live.poll.errors.questionRequired"))
-        .max(POLL_QUESTION_MAX, t("live.poll.errors.questionMax")),
+        .min(1, t("live.poll.errors.question-required"))
+        .max(POLL_QUESTION_MAX, t("live.poll.errors.question-max")),
       options: z.array(z.object({ value: z.string() })),
-      duration: z.string().min(1, t("live.poll.errors.durationRequired")),
+      duration: z.string().min(1, t("live.poll.errors.duration-required")),
       customDuration: z.string().optional(),
       minSelect: z.number().optional(),
       maxSelect: z.number().optional(),
@@ -24,7 +24,7 @@ export function createPollSchema(t: (key: TranslationKey) => string) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["options"],
-            message: t("live.poll.errors.optionsMin"),
+            message: t("live.poll.errors.options-min"),
           })
         }
         data.options.forEach((opt, i) => {
@@ -32,7 +32,7 @@ export function createPollSchema(t: (key: TranslationKey) => string) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               path: ["options", i, "value"],
-              message: t("live.poll.errors.optionRequired"),
+              message: t("live.poll.errors.option-required"),
             })
           }
         })
@@ -43,21 +43,21 @@ export function createPollSchema(t: (key: TranslationKey) => string) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["minSelect"],
-            message: t("live.poll.errors.minSelectRequired"),
+            message: t("live.poll.errors.min-select-required"),
           })
         }
         if (data.maxSelect == null) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["maxSelect"],
-            message: t("live.poll.errors.maxSelectRequired"),
+            message: t("live.poll.errors.max-select-required"),
           })
         }
         if (data.minSelect != null && data.maxSelect != null && data.minSelect > data.maxSelect) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["maxSelect"],
-            message: t("live.poll.errors.maxSelectGteMin"),
+            message: t("live.poll.errors.max-select-gte-min"),
           })
         }
         if (
@@ -68,7 +68,7 @@ export function createPollSchema(t: (key: TranslationKey) => string) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["maxSelect"],
-            message: t("live.poll.errors.maxSelectExceed"),
+            message: t("live.poll.errors.max-select-exceed"),
           })
         }
       }

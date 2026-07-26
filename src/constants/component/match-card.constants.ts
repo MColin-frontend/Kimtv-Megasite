@@ -1,7 +1,7 @@
 import icCornerFlag from "@assets/icons/match/ic-corner-flag.svg"
-import icFootball from "@assets/icons/match/ic-football.png"
 import icRedCardV2 from "@assets/icons/match/ic-red-card-v2.svg"
 import icYellowCardV2 from "@assets/icons/match/ic-yellow-card-v2.svg"
+import imgFootball from "@assets/images/match/img-football.png"
 
 /** Map halfLabel → i18n key dùng với t() */
 export const MATCH_HALF_LABEL_I18N_KEY: Record<string, string> = {
@@ -46,7 +46,7 @@ export const MATCH_CARD_I18N_KEYS = {
 } as const
 
 export const MATCH_STAT_ICONS = {
-  football: icFootball,
+  football: imgFootball,
   yellowCard: icYellowCardV2,
   redCard: icRedCardV2,
   cornerFlag: icCornerFlag,

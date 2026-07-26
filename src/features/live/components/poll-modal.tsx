@@ -27,12 +27,12 @@ import {
   POLL_MIN_OPTIONS,
   POLL_QUESTION_MAX,
   POLL_RATING_SCALE_PRESETS,
+  POLL_TYPE_API_MAP,
   POLL_TYPE_CONFIG,
   PollTypeEnum,
   type PollTypeValue,
 } from "@/features/live/poll.constants"
 import type { PollInterface } from "@/features/live/poll.models"
-import { POLL_TYPE_API_MAP } from "@/features/live/poll.models"
 import { createPollSchema, POLL_DEFAULTS, type PollFormType } from "@/features/live/poll.schema"
 import { Button } from "@/components/ui/button"
 import { FormField } from "@/components/ui/form/form-field"
@@ -42,15 +42,13 @@ import { Typography } from "@/components/ui/typography"
 
 /* ── Poll type card ──────────────────────────────────────── */
 
-function PollTypeCard({
-  type,
-  selected,
-  onClick,
-}: {
+interface PollTypeCardProps {
   type: PollTypeValue
   selected: boolean
   onClick: () => void
-}) {
+}
+
+function PollTypeCard({ type, selected, onClick }: PollTypeCardProps) {
   const { t } = useTranslation()
   const { icon: Icon, labelKey, descKey } = POLL_TYPE_CONFIG[type]
   const label = t(labelKey as Parameters<typeof t>[0])
@@ -128,21 +126,16 @@ function PollTypeCard({
 
 /* ── Step ────────────────────────────────────────────────── */
 
-function Step({
-  index,
-  label,
-  required,
-  extra,
-  isLast,
-  children,
-}: {
+interface StepProps {
   index: string
   label: string
   required?: boolean
   extra?: React.ReactNode
   isLast?: boolean
   children: React.ReactNode
-}) {
+}
+
+function Step({ index, label, required, extra, isLast, children }: StepProps) {
   return (
     <div className="flex gap-4">
       <div className="flex flex-col items-center">
@@ -189,8 +182,8 @@ interface PollModalProps {
 export function PollModal({ open, onOpenChange, onSubmit, activePoll, onEndPoll }: PollModalProps) {
   const { t } = useTranslation()
   const schema = useMemo(() => createPollSchema(t), [t])
-  const [customMinutes, setCustomMinutes] = useState(1)
-  const [ending, setEnding] = useState(false)
+  const [customMinutes, setCustomMinutes] = useState<number>(1)
+  const [ending, setEnding] = useState<boolean>(false)
 
   const isActive = !!activePoll && activePoll.status === "ACTIVE"
 
@@ -480,13 +473,13 @@ export function PollModal({ open, onOpenChange, onSubmit, activePoll, onEndPoll 
                       >
                         <Plus className="size-3" />
                         <Typography as="span" variant="body-sm">
-                          {t("live.poll.actions.addOption")}
+                          {t("live.poll.actions.add-option")}
                         </Typography>
                       </button>
                     )}
                     <Typography as="p" variant="body-sm" className="mt-1.5 text-white/25">
                       ①{" "}
-                      {t("live.poll.labels.optionHint")
+                      {t("live.poll.labels.option-hint")
                         .replace("{min}", String(POLL_MIN_OPTIONS))
                         .replace("{max}", String(maxOptions))}
                     </Typography>
@@ -497,7 +490,9 @@ export function PollModal({ open, onOpenChange, onSubmit, activePoll, onEndPoll 
                 {stepMM && (
                   <Step
                     index={stepMM}
-                    label={t(hasOptions ? "live.poll.steps.minMax" : "live.poll.steps.ratingScale")}
+                    label={t(
+                      hasOptions ? "live.poll.steps.min-max" : "live.poll.steps.rating-scale"
+                    )}
                     required
                     isLast={isLast(stepMM)}
                   >
@@ -539,7 +534,7 @@ export function PollModal({ open, onOpenChange, onSubmit, activePoll, onEndPoll 
                     <div className="flex items-center gap-2">
                       <Typography as="span" variant="body-sm" className="shrink-0 text-white/75">
                         {t(
-                          hasOptions ? "live.poll.labels.minSelect" : "live.poll.labels.minRating"
+                          hasOptions ? "live.poll.labels.min-select" : "live.poll.labels.min-rating"
                         )}
                       </Typography>
                       <FormField
@@ -567,7 +562,7 @@ export function PollModal({ open, onOpenChange, onSubmit, activePoll, onEndPoll 
 
                       <Typography as="span" variant="body-sm" className="shrink-0 text-white/75">
                         {t(
-                          hasOptions ? "live.poll.labels.maxSelect" : "live.poll.labels.maxRating"
+                          hasOptions ? "live.poll.labels.max-select" : "live.poll.labels.max-rating"
                         )}
                       </Typography>
                       <FormField
@@ -591,7 +586,7 @@ export function PollModal({ open, onOpenChange, onSubmit, activePoll, onEndPoll 
 
                       {hasOptions && hasMinMax && (
                         <Typography as="span" variant="body-sm" className="shrink-0 text-white/40">
-                          / {fields.length} {t("live.poll.labels.optionCount")}
+                          / {fields.length} {t("live.poll.labels.option-count")}
                         </Typography>
                       )}
                     </div>
@@ -629,7 +624,7 @@ export function PollModal({ open, onOpenChange, onSubmit, activePoll, onEndPoll 
                             weight="500"
                             className={active ? "text-gold" : "text-white/50"}
                           >
-                            {preset.label}
+                            {t(preset.labelKey)}
                           </Typography>
                         </button>
                       )
@@ -638,7 +633,7 @@ export function PollModal({ open, onOpenChange, onSubmit, activePoll, onEndPoll 
                   {isCustom && (
                     <div className="mt-3 flex flex-col gap-2">
                       <Typography as="span" variant="body-sm" className="text-white/40">
-                        {t("live.poll.labels.customDuration")}
+                        {t("live.poll.labels.custom-duration")}
                       </Typography>
                       <div className="flex items-center gap-2">
                         <button
@@ -680,7 +675,7 @@ export function PollModal({ open, onOpenChange, onSubmit, activePoll, onEndPoll 
                         </button>
                       </div>
                       <Typography as="span" variant="body-sm" className="text-white/25">
-                        {t("live.poll.labels.maxDuration")}
+                        {t("live.poll.labels.max-duration")}
                       </Typography>
                     </div>
                   )}

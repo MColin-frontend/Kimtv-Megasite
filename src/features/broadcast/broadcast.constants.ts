@@ -86,49 +86,55 @@ export const LEAGUE_OPTIONS = [
 ]
 
 export const getScheduledOptions = (t: T) => [
-  { value: ScheduledEnum.NO, label: t("broadcast.streamSettings.options.no") },
-  { value: ScheduledEnum.YES, label: t("broadcast.streamSettings.options.yes") },
+  { value: ScheduledEnum.NO, label: t("broadcast.stream-settings.options.no") },
+  { value: ScheduledEnum.YES, label: t("broadcast.stream-settings.options.yes") },
 ]
 
 export const getLiveModeOptions = (t: T) => [
-  { value: LiveModeEnum.MATCH, label: t("broadcast.streamSettings.options.liveMode.match") },
-  { value: LiveModeEnum.FREE, label: t("broadcast.streamSettings.options.liveMode.free") },
+  { value: LiveModeEnum.MATCH, label: t("broadcast.stream-settings.options.live-mode.match") },
+  { value: LiveModeEnum.FREE, label: t("broadcast.stream-settings.options.live-mode.free") },
 ]
 
 export const getSportOptions = (t: T) => [
-  { value: SportEnum.SOCCER, label: t("broadcast.streamSettings.options.sport.soccer") },
+  { value: SportEnum.SOCCER, label: t("broadcast.stream-settings.options.sport.soccer") },
 ]
 
 export const getLiveStatusOptions = (t: T) => [
-  { value: LiveStatusEnum.LIVE, label: t("broadcast.streamSettings.options.liveStatus.live") },
+  { value: LiveStatusEnum.LIVE, label: t("broadcast.stream-settings.options.live-status.live") },
 ]
 
 export const getStreamTypeOptions = (t: T) => [
-  { value: StreamTypeEnum.ANCHOR, label: t("broadcast.streamSettings.options.streamType.anchor") },
-  { value: StreamTypeEnum.BOT, label: t("broadcast.streamSettings.options.streamType.bot") },
+  {
+    value: StreamTypeEnum.ANCHOR,
+    label: t("broadcast.stream-settings.options.stream-type.anchor"),
+  },
+  { value: StreamTypeEnum.BOT, label: t("broadcast.stream-settings.options.stream-type.bot") },
 ]
 
 export const getLoginRequiredOptions = (t: T) => [
-  { value: LoginRequiredEnum.NO, label: t("broadcast.streamSettings.options.loginRequired.no") },
-  { value: LoginRequiredEnum.YES, label: t("broadcast.streamSettings.options.loginRequired.yes") },
+  { value: LoginRequiredEnum.NO, label: t("broadcast.stream-settings.options.login-required.no") },
+  {
+    value: LoginRequiredEnum.YES,
+    label: t("broadcast.stream-settings.options.login-required.yes"),
+  },
   {
     value: LoginRequiredEnum.COIN,
-    label: t("broadcast.streamSettings.options.loginRequired.coin"),
+    label: t("broadcast.stream-settings.options.login-required.coin"),
   },
   {
     value: LoginRequiredEnum.LEVEL,
-    label: t("broadcast.streamSettings.options.loginRequired.level"),
+    label: t("broadcast.stream-settings.options.login-required.level"),
   },
 ]
 
 export const getExternalCommentOptions = (t: T) => [
   {
     value: ExternalCommentEnum.NONE,
-    label: t("broadcast.streamSettings.options.externalComment.none"),
+    label: t("broadcast.stream-settings.options.external-comment.none"),
   },
   {
     value: ExternalCommentEnum.CONNECTED,
-    label: t("broadcast.streamSettings.options.externalComment.connected"),
+    label: t("broadcast.stream-settings.options.external-comment.connected"),
   },
 ]
 
@@ -167,18 +173,18 @@ export function convertMatchGroupsToLeagueOptions(groups: BroadcastMatchGroup[])
 export const getMatchStatusOptions = (t: T) => [
   {
     value: MatchStatusBroadcastEnum.UPCOMING,
-    label: t("broadcast.streamSettings.options.matchStatus.upcoming"),
+    label: t("broadcast.stream-settings.options.match-status.upcoming"),
   },
   {
     value: MatchStatusBroadcastEnum.LIVE,
-    label: t("broadcast.streamSettings.options.matchStatus.live"),
+    label: t("broadcast.stream-settings.options.match-status.live"),
   },
 ]
 
 export const getCustomBroadcastTypeOptions = (t: T) => [
   {
     value: CustomBroadcastTypeEnum.CUSTOM_LIVE,
-    label: t("broadcast.streamSettings.options.customType.customLive"),
+    label: t("broadcast.stream-settings.options.custom-type.custom-live"),
   },
 ]
 
@@ -307,12 +313,12 @@ export interface BroadcastCenterMenuItemInterface {
 export const BROADCAST_CENTER_MAIN_MENU: BroadcastCenterMenuItemInterface[] = [
   {
     tab: BroadcastCenterTabEnum.SETTINGS,
-    labelKey: "broadcastCenter.menu.settings",
+    labelKey: "broadcast-center.menu.settings",
     icon: Settings2,
   },
   {
     tab: BroadcastCenterTabEnum.RESERVATION,
-    labelKey: "broadcastCenter.menu.reservation",
+    labelKey: "broadcast-center.menu.reservation",
     icon: CalendarClock,
   },
 ]
@@ -320,13 +326,13 @@ export const BROADCAST_CENTER_MAIN_MENU: BroadcastCenterMenuItemInterface[] = [
 export const BROADCAST_CENTER_GUEST_MENU: BroadcastCenterMenuItemInterface[] = [
   {
     tab: BroadcastCenterTabEnum.REGISTRATION,
-    labelKey: "broadcastCenter.menu.registration",
+    labelKey: "broadcast-center.menu.registration",
     icon: Mic2,
   },
 ]
 
 export const BROADCAST_CENTER_SUB_MENU: BroadcastCenterMenuItemInterface[] = [
-  { tab: BroadcastCenterTabEnum.GUIDE, labelKey: "broadcastCenter.menu.guide", icon: BookOpen },
+  { tab: BroadcastCenterTabEnum.GUIDE, labelKey: "broadcast-center.menu.guide", icon: BookOpen },
 ]
 
 /* ── Anchor registration form ─────────────────────────────── */

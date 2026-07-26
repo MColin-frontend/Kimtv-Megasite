@@ -21,12 +21,27 @@ export enum PollTypeEnum {
 export const POLL_TYPES = [PollTypeEnum.SINGLE, PollTypeEnum.MULTIPLE, PollTypeEnum.RATING] as const
 export type PollTypeValue = PollTypeEnum
 
+/** Khớp với field `type` từ API response */
+export enum PollTypeApiEnum {
+  SINGLE_CHOICE = "SINGLE_CHOICE",
+  MULTIPLE_CHOICE = "MULTIPLE_CHOICE",
+  RATING = "RATING",
+}
+export type PollTypeApiValue = `${PollTypeApiEnum}`
+
+/** Trạng thái poll từ API */
+export enum PollStatusEnum {
+  ACTIVE = "ACTIVE",
+  ENDED = "ENDED",
+}
+export type PollStatusValue = `${PollStatusEnum}`
+
 export const POLL_DURATION_PRESETS = [
-  { label: "30s", value: "30" },
-  { label: "1 phút", value: "60" },
-  { label: "2 phút", value: "120" },
-  { label: "5 phút", value: "300" },
-  { label: "Tùy chỉnh", value: "custom" },
+  { labelKey: "live.poll.duration-presets.30s", value: "30" },
+  { labelKey: "live.poll.duration-presets.1min", value: "60" },
+  { labelKey: "live.poll.duration-presets.2min", value: "120" },
+  { labelKey: "live.poll.duration-presets.5min", value: "300" },
+  { labelKey: "live.poll.duration-presets.custom", value: "custom" },
 ] as const
 
 export const POLL_RATING_SCALE_PRESETS = [
@@ -43,16 +58,38 @@ export const POLL_TYPE_CONFIG: PollTypeConfig = {
   [PollTypeEnum.SINGLE]: {
     icon: Target,
     labelKey: "live.poll.type.single",
-    descKey: "live.poll.type.singleDesc",
+    descKey: "live.poll.type.single-desc",
   },
   [PollTypeEnum.MULTIPLE]: {
     icon: Layers,
     labelKey: "live.poll.type.multiple",
-    descKey: "live.poll.type.multipleDesc",
+    descKey: "live.poll.type.multiple-desc",
   },
   [PollTypeEnum.RATING]: {
     icon: Trophy,
     labelKey: "live.poll.type.rating",
-    descKey: "live.poll.type.ratingDesc",
+    descKey: "live.poll.type.rating-desc",
+  },
+}
+
+/** Map API type → local PollTypeValue */
+export const POLL_TYPE_API_MAP: Record<PollTypeApiValue, PollTypeValue> = {
+  [PollTypeApiEnum.SINGLE_CHOICE]: PollTypeEnum.SINGLE,
+  [PollTypeApiEnum.MULTIPLE_CHOICE]: PollTypeEnum.MULTIPLE,
+  [PollTypeApiEnum.RATING]: PollTypeEnum.RATING,
+}
+
+export const POLL_TYPE_BADGE_CONFIG: Record<PollTypeApiValue, { label: string; cls: string }> = {
+  [PollTypeApiEnum.SINGLE_CHOICE]: {
+    label: "SINGLE CHOICE",
+    cls: "text-green-400 bg-green-400/10 border border-green-400/25",
+  },
+  [PollTypeApiEnum.MULTIPLE_CHOICE]: {
+    label: "MULTIPLE CHOICE",
+    cls: "text-violet-400 bg-violet-400/10 border border-violet-400/25",
+  },
+  [PollTypeApiEnum.RATING]: {
+    label: "RATING",
+    cls: "text-gold bg-gold/10 border border-gold/25",
   },
 }

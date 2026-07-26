@@ -103,10 +103,10 @@ export function AnchorRegistrationPage() {
         </div>
         <div className="flex flex-col gap-2">
           <Typography variant="h3" className="text-white">
-            {t("broadcast.registration.form.successTitle")}
+            {t("broadcast.registration.form.success-title")}
           </Typography>
           <Typography variant="body" className="text-white/50">
-            {t("broadcast.registration.form.successDesc")}
+            {t("broadcast.registration.form.success-desc")}
           </Typography>
         </div>
       </div>
@@ -127,7 +127,7 @@ export function AnchorRegistrationPage() {
       <div className="card-glow rounded-16 flex flex-col gap-6 p-6 max-sm:p-4">
         <div className="flex flex-col gap-4">
           <Typography variant="body-sm" weight="600" className="text-white/60">
-            {t("broadcast.registration.form.sectionInfo")}
+            {t("broadcast.registration.form.section-info")}
           </Typography>
           <div className="grid grid-cols-3 gap-4 max-sm:grid-cols-1">
             <FormField
@@ -136,7 +136,7 @@ export function AnchorRegistrationPage() {
               label={t("broadcast.registration.form.name")}
               required
               render={(field) => (
-                <Input {...field} placeholder={t("broadcast.registration.form.namePlaceholder")} />
+                <Input {...field} placeholder={t("broadcast.registration.form.name-placeholder")} />
               )}
             />
             <FormField
@@ -148,7 +148,7 @@ export function AnchorRegistrationPage() {
                 <Input
                   {...field}
                   inputMode="numeric"
-                  placeholder={t("broadcast.registration.form.phonePlaceholder")}
+                  placeholder={t("broadcast.registration.form.phone-placeholder")}
                   onChange={(e) => field.onChange(e.target.value.replace(/\D/g, ""))}
                 />
               )}
@@ -156,12 +156,12 @@ export function AnchorRegistrationPage() {
             <FormField
               control={control}
               name="idNumber"
-              label={t("broadcast.registration.form.idNumber")}
+              label={t("broadcast.registration.form.id-number")}
               required
               render={(field) => (
                 <Input
                   {...field}
-                  placeholder={t("broadcast.registration.form.idNumberPlaceholder")}
+                  placeholder={t("broadcast.registration.form.id-number-placeholder")}
                 />
               )}
             />
@@ -179,7 +179,7 @@ export function AnchorRegistrationPage() {
                 {...field}
                 rows={3}
                 maxLength={40}
-                placeholder={t("broadcast.registration.form.briefPlaceholder")}
+                placeholder={t("broadcast.registration.form.brief-placeholder")}
                 className="pr-14"
               />
               <span className="text-12 absolute right-3 bottom-2 text-white/30">
@@ -192,17 +192,17 @@ export function AnchorRegistrationPage() {
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-baseline gap-1.5">
             <Typography variant="body-sm" weight="600" className="text-white/60">
-              {t("broadcast.registration.form.sectionId")}
+              {t("broadcast.registration.form.section-id")}
             </Typography>
             <Typography variant="caption" className="text-white/30">
-              {t("broadcast.registration.form.sectionIdHint")}
+              {t("broadcast.registration.form.section-id-hint")}
             </Typography>
           </div>
           <div className="grid grid-cols-3 gap-4 max-sm:grid-cols-1">
             <FormField
               control={control}
               name="idFront"
-              label={t("broadcast.registration.form.idFront")}
+              label={t("broadcast.registration.form.id-front")}
               required
               render={(field) => (
                 <ImageUpload
@@ -216,7 +216,7 @@ export function AnchorRegistrationPage() {
             <FormField
               control={control}
               name="idBack"
-              label={t("broadcast.registration.form.idBack")}
+              label={t("broadcast.registration.form.id-back")}
               required
               render={(field) => (
                 <ImageUpload
@@ -230,7 +230,7 @@ export function AnchorRegistrationPage() {
             <FormField
               control={control}
               name="idHolding"
-              label={t("broadcast.registration.form.idHolding")}
+              label={t("broadcast.registration.form.id-holding")}
               required
               render={(field) => (
                 <ImageUpload

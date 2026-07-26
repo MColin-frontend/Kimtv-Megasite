@@ -322,11 +322,11 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
     if (step === BroadcastStepEnum.STREAMING) {
       await doDowncast(liveId)
       setStep(BroadcastStepEnum.CREATED)
-      toast.success(t("broadcast.streamSettings.actions.endStreamSuccess"))
+      toast.success(t("broadcast.stream-settings.actions.end-stream-success"))
     } else {
       await doStart(liveId)
       setStep(BroadcastStepEnum.STREAMING)
-      toast.success(t("broadcast.streamSettings.actions.startStreamSuccess"))
+      toast.success(t("broadcast.stream-settings.actions.start-stream-success"))
     }
     queryClient.invalidateQueries({ queryKey: ["is-broadcast"] })
   }
@@ -375,14 +375,14 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
         <div className="card-glow rounded-12 flex flex-col gap-4 p-5">
           <div className="flex items-center justify-between">
             <Typography variant="h5" className="text-white">
-              {t("broadcast.streamSettings.title")}
+              {t("broadcast.stream-settings.title")}
             </Typography>
             <GuideButton />
           </div>
 
           <div className="rounded-8 flex items-center justify-between border border-white/6 bg-white/[0.02] px-4 py-2.5">
             <Typography variant="body-sm" className="text-white/60">
-              {t("broadcast.streamSettings.liveId")}
+              {t("broadcast.stream-settings.live-id")}
             </Typography>
             <Typography variant="body-sm" weight="600" className="text-white">
               {liveId}
@@ -402,7 +402,7 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
                   <div className="flex flex-1 flex-col items-start text-left">
                     <div className="flex items-center gap-1.5">
                       <Typography variant="body-sm" weight="500" className="text-white/90">
-                        {t("broadcast.roomOwner.preview.label")}
+                        {t("broadcast.room-owner.preview.label")}
                       </Typography>
                       <span
                         role="button"
@@ -423,7 +423,7 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
                       </span>
                     </div>
                     <Typography variant="caption" className="text-white/35">
-                      {t("broadcast.streamSettings.ownerInfo.subtitle")}
+                      {t("broadcast.stream-settings.owner-info.subtitle")}
                     </Typography>
                   </div>
                   <ChevronDown className="size-4 shrink-0 text-white/40 transition-transform duration-200 group-data-[open]/item:rotate-180" />
@@ -435,13 +435,13 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
                   <FormField
                     control={control}
                     name="intro"
-                    label={t("broadcast.roomOwner.fields.intro.label")}
+                    label={t("broadcast.room-owner.fields.intro.label")}
                     required
                     disabled
                     render={(field) => (
                       <Input
                         {...field}
-                        placeholder={t("broadcast.roomOwner.fields.intro.placeholder")}
+                        placeholder={t("broadcast.room-owner.fields.intro.placeholder")}
                         inputSize="default"
                       />
                     )}
@@ -449,35 +449,35 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
                   <FormField
                     control={control}
                     name="introDetail"
-                    label={t("broadcast.roomOwner.fields.introDetail.label")}
+                    label={t("broadcast.room-owner.fields.intro-detail.label")}
                     required
                     disabled
                     render={(field) => (
                       <TextEditor
                         value={field.value}
                         onChange={field.onChange}
-                        placeholder={t("broadcast.roomOwner.fields.introDetail.placeholder")}
+                        placeholder={t("broadcast.room-owner.fields.intro-detail.placeholder")}
                       />
                     )}
                   />
                   <FormField
                     control={control}
                     name="announcement"
-                    label={t("broadcast.roomOwner.fields.announcement.label")}
+                    label={t("broadcast.room-owner.fields.announcement.label")}
                     required
                     disabled
                     render={(field) => (
                       <TextEditor
                         value={field.value}
                         onChange={field.onChange}
-                        placeholder={t("broadcast.roomOwner.fields.announcement.placeholder")}
+                        placeholder={t("broadcast.room-owner.fields.announcement.placeholder")}
                       />
                     )}
                   />
                   <FormField
                     control={control}
                     name="images"
-                    label={t("broadcast.roomOwner.fields.images.label")}
+                    label={t("broadcast.room-owner.fields.images.label")}
                     required
                     disabled
                     render={(field) => (
@@ -491,10 +491,10 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
 
           {/* Admin */}
           <div className="flex flex-col gap-4">
-            <Label required>{t("broadcast.streamSettings.admin.label")} (0)</Label>
+            <Label required>{t("broadcast.stream-settings.admin.label")} (0)</Label>
             <div className="rounded-8 flex items-center justify-between border border-white/8 bg-white/[0.03] px-3 py-2.5">
               <Typography variant="body-sm" className="text-white/40">
-                {t("broadcast.streamSettings.admin.empty")}
+                {t("broadcast.stream-settings.admin.empty")}
               </Typography>
             </div>
           </div>
@@ -503,13 +503,13 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
           <FormField
             control={control}
             name="title"
-            label={t("broadcast.streamSettings.fields.title.label")}
+            label={t("broadcast.stream-settings.fields.title.label")}
             required
             render={(field) => (
               <div className="relative">
                 <Input
                   {...field}
-                  placeholder={t("broadcast.streamSettings.fields.title.placeholder")}
+                  placeholder={t("broadcast.stream-settings.fields.title.placeholder")}
                 />
                 <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2">
                   <Typography variant="caption" className="text-white/30">
@@ -523,14 +523,14 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
           {/* Cover image */}
           <div className="flex flex-col gap-4">
             <Typography variant="body-sm" weight="500" className="text-white/80">
-              {t("broadcast.streamSettings.fields.cover.label")}
+              {t("broadcast.stream-settings.fields.cover.label")}
             </Typography>
             <ImageUpload
               value={coverUrl ? [coverUrl] : []}
               onChange={(urls) => setCoverUrl(urls[0] || null)}
               multiple={false}
               max={1}
-              description={t("broadcast.streamSettings.fields.cover.hint")}
+              description={t("broadcast.stream-settings.fields.cover.hint")}
             />
           </div>
 
@@ -539,7 +539,7 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
             <FormField
               control={control}
               name="scheduled"
-              label={t("broadcast.streamSettings.fields.scheduled.label")}
+              label={t("broadcast.stream-settings.fields.scheduled.label")}
               render={(field) => (
                 <Select
                   value={field.value ? ScheduledEnum.YES : ScheduledEnum.NO}
@@ -561,13 +561,13 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
             <FormField
               control={control}
               name="scheduledAt"
-              label={t("broadcast.streamSettings.fields.scheduledAt.label")}
+              label={t("broadcast.stream-settings.fields.scheduled-at.label")}
               required={scheduled}
               render={(field) => (
                 <DatePicker
                   value={field.value as Date | null}
                   onChange={field.onChange}
-                  placeholder={t("broadcast.streamSettings.fields.scheduledAt.placeholder")}
+                  placeholder={t("broadcast.stream-settings.fields.scheduled-at.placeholder")}
                   disabled={!scheduled}
                   triggerClassName="w-full"
                   minDate={new Date()}
@@ -600,7 +600,7 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
                     className="flex-1 text-left text-white/90"
                   >
                     <span className="mr-0.5 text-red-400">*</span>
-                    {t("broadcast.streamSettings.fields.liveMode.label")}
+                    {t("broadcast.stream-settings.fields.live-mode.label")}
                   </Typography>
                   <ChevronDown className="size-4 shrink-0 text-white/40 transition-transform duration-200 group-data-[open]/item:rotate-180" />
                 </AccordionPrimitive.Trigger>
@@ -611,7 +611,7 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
                   <FormField
                     control={control}
                     name="liveMode"
-                    label={t("broadcast.streamSettings.fields.liveMode.label")}
+                    label={t("broadcast.stream-settings.fields.live-mode.label")}
                     required
                     render={(field) => (
                       <Select
@@ -629,7 +629,7 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
                     <FormField
                       control={control}
                       name="sport"
-                      label={t("broadcast.streamSettings.fields.sport.label")}
+                      label={t("broadcast.stream-settings.fields.sport.label")}
                       render={(field) => (
                         <Select
                           value={field.value as string}
@@ -641,7 +641,7 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
                               match: "",
                             }))
                           }}
-                          placeholder={t("broadcast.streamSettings.fields.sport.placeholder")}
+                          placeholder={t("broadcast.stream-settings.fields.sport.placeholder")}
                           options={getSportOptions(t)}
                           variant="dark"
                         />
@@ -651,12 +651,12 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
                     <FormField
                       control={control}
                       name="customType"
-                      label={t("broadcast.streamSettings.options.liveMode.free")}
+                      label={t("broadcast.stream-settings.options.live-mode.free")}
                       render={(field) => (
                         <Select
                           value={field.value as string}
                           onValueChange={(v) => field.onChange(v || null)}
-                          placeholder={t("broadcast.streamSettings.options.liveMode.free")}
+                          placeholder={t("broadcast.stream-settings.options.live-mode.free")}
                           options={getCustomBroadcastTypeOptions(t)}
                           variant="dark"
                         />
@@ -669,7 +669,7 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
                       <FormField
                         control={control}
                         name="league"
-                        label={t("broadcast.streamSettings.fields.league.placeholder")}
+                        label={t("broadcast.stream-settings.fields.league.placeholder")}
                         required
                         render={(field) => (
                           <SelectAsync
@@ -691,7 +691,7 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
                                 (raw as BroadcastMatchGroup[]) || []
                               )
                             }
-                            placeholder={t("broadcast.streamSettings.fields.league.placeholder")}
+                            placeholder={t("broadcast.stream-settings.fields.league.placeholder")}
                             disabled={!sport}
                             variant="dark"
                             clearable
@@ -706,7 +706,7 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
                       <FormField
                         control={control}
                         name="matchStatus"
-                        label={t("broadcast.streamSettings.fields.matchStatus.label")}
+                        label={t("broadcast.stream-settings.fields.match-status.label")}
                         render={(field) => (
                           <Select
                             value={field.value as string}
@@ -725,7 +725,7 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
                       <FormField
                         control={control}
                         name="match"
-                        label={t("broadcast.streamSettings.fields.match.label")}
+                        label={t("broadcast.stream-settings.fields.match.label")}
                         required
                         render={(field) => (
                           <SelectAsync
@@ -744,7 +744,7 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
                                 matchStatus || undefined
                               )
                             }
-                            placeholder={t("broadcast.streamSettings.fields.match.placeholder")}
+                            placeholder={t("broadcast.stream-settings.fields.match.placeholder")}
                             disabled={!sport}
                             variant="dark"
                             defaultOption={
@@ -767,7 +767,7 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
             <FormField
               control={control}
               name="streamType"
-              label={t("broadcast.streamSettings.fields.streamType.label")}
+              label={t("broadcast.stream-settings.fields.stream-type.label")}
               required
               disabled
               render={(field) => (
@@ -783,7 +783,7 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
             <FormField
               control={control}
               name="loginRequired"
-              label={t("broadcast.streamSettings.fields.loginRequired.label")}
+              label={t("broadcast.stream-settings.fields.login-required.label")}
               render={(field) => (
                 <Select
                   value={field.value as string}
@@ -797,7 +797,7 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
               <FormField
                 control={control}
                 name="externalComment"
-                label={t("broadcast.streamSettings.fields.externalComment.label")}
+                label={t("broadcast.stream-settings.fields.external-comment.label")}
                 render={(field) => (
                   <Select
                     value={field.value as string}
@@ -812,12 +812,12 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
               <FormField
                 control={control}
                 name="m3u8Url"
-                label={t("broadcast.streamSettings.fields.m3u8Url.label")}
+                label={t("broadcast.stream-settings.fields.m3u8-url.label")}
                 required
                 render={(field) => (
                   <Input
                     {...field}
-                    placeholder={t("broadcast.streamSettings.fields.m3u8Url.placeholder")}
+                    placeholder={t("broadcast.stream-settings.fields.m3u8-url.placeholder")}
                   />
                 )}
               />
@@ -826,7 +826,7 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
 
           {/* Banned users */}
           <div className="flex items-center justify-between">
-            <Label required>{t("broadcast.streamSettings.bannedUsers.label")}: 0</Label>
+            <Label required>{t("broadcast.stream-settings.banned-users.label")}: 0</Label>
           </div>
 
           {/* OBS fields — hiện khi có giá trị */}
@@ -855,13 +855,13 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
                   <div className="grid grid-cols-2 gap-3 p-4">
                     {rtmpPushUrl && (
                       <StreamField
-                        label={t("broadcast.streamPanel.fields.rtmpUrl")}
+                        label={t("broadcast.stream-panel.fields.rtmp-url")}
                         value={rtmpPushUrl}
                       />
                     )}
                     {streamingKey && (
                       <StreamField
-                        label={t("broadcast.streamPanel.fields.streamKey")}
+                        label={t("broadcast.stream-panel.fields.stream-key")}
                         value={streamingKey}
                         masked
                       />
@@ -870,13 +870,13 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
                       <Fragment key={i}>
                         {item.liveUrl && (
                           <StreamField
-                            label={t("broadcast.streamPanel.fields.liveUrlHls")}
+                            label={t("broadcast.stream-panel.fields.live-url-hls")}
                             value={item.liveUrl}
                           />
                         )}
                         {item.liveUrlFlv && (
                           <StreamField
-                            label={t("broadcast.streamPanel.fields.liveUrlFlv")}
+                            label={t("broadcast.stream-panel.fields.live-url-flv")}
                             value={item.liveUrlFlv}
                           />
                         )}
@@ -901,9 +901,9 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
               ) : step === BroadcastStepEnum.CREATED ||
                 step === BroadcastStepEnum.STREAMING ||
                 step === BroadcastStepEnum.RESERVATION ? (
-                t("broadcast.streamSettings.actions.edit")
+                t("broadcast.stream-settings.actions.edit")
               ) : (
-                t("broadcast.streamSettings.actions.cancel")
+                t("broadcast.stream-settings.actions.cancel")
               )}
             </Button>
             {step === BroadcastStepEnum.RESERVATION && (
@@ -914,7 +914,7 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
                 disabled={isAnyLoading}
                 onClick={() => setCancelResOpen(true)}
               >
-                {t("broadcast.streamSettings.actions.cancelReservation")}
+                {t("broadcast.stream-settings.actions.cancel-reservation")}
               </Button>
             )}
             <Button
@@ -927,11 +927,11 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
               {isRightLoading ? (
                 <Loader2 className="size-4 animate-spin" />
               ) : step === BroadcastStepEnum.STREAMING ? (
-                t("broadcast.streamSettings.actions.endStream")
+                t("broadcast.stream-settings.actions.end-stream")
               ) : step === BroadcastStepEnum.CREATED ? (
-                t("broadcast.streamSettings.actions.startStream")
+                t("broadcast.stream-settings.actions.start-stream")
               ) : (
-                t("broadcast.streamSettings.actions.confirm")
+                t("broadcast.stream-settings.actions.confirm")
               )}
             </Button>
           </div>
@@ -948,10 +948,10 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
         <ConfirmModal
           open={cancelResOpen}
           onOpenChange={setCancelResOpen}
-          title={t("broadcast.streamSettings.actions.cancelReservation")}
-          content={t("broadcast.streamSettings.actions.cancelReservationConfirm")}
-          confirmLabel={t("broadcast.streamSettings.actions.confirm")}
-          cancelLabel={t("broadcast.roomOwner.actions.cancel")}
+          title={t("broadcast.stream-settings.actions.cancel-reservation")}
+          content={t("broadcast.stream-settings.actions.cancel-reservation-confirm")}
+          confirmLabel={t("broadcast.stream-settings.actions.confirm")}
+          cancelLabel={t("broadcast.room-owner.actions.cancel")}
           onConfirm={confirmCancelReservation}
           isConfirming={isCancellingRes}
         />

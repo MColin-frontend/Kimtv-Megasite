@@ -1,71 +1,78 @@
 {
   "poll": {
     "title": "Tạo Poll",
-    "viewTitle": "Bình Chọn",
+    "view-title": "Bình Chọn",
     "subtitle": "Tạo câu hỏi và lựa chọn cho bình chọn",
     "type": {
       "label": "Loại Poll",
       "single": "Chọn 1",
-      "singleDesc": "Chọn duy nhất 1 đáp án",
+      "single-desc": "Chọn duy nhất 1 đáp án",
       "multiple": "Chọn nhiều",
-      "multipleDesc": "Chọn một hoặc nhiều đáp án",
+      "multiple-desc": "Chọn một hoặc nhiều đáp án",
       "rating": "Đánh giá",
-      "ratingDesc": "Đánh giá theo thang điểm"
+      "rating-desc": "Đánh giá theo thang điểm"
     },
     "steps": {
       "question": "Câu hỏi",
       "options": "Lựa chọn",
-      "minMax": "Số lựa chọn",
-      "ratingScale": "Thang điểm",
+      "min-max": "Số lựa chọn",
+      "rating-scale": "Thang điểm",
       "duration": "Thời gian"
+    },
+    "duration-presets": {
+      "30s": "30s",
+      "1min": "1 phút",
+      "2min": "2 phút",
+      "5min": "5 phút",
+      "custom": "Tùy chỉnh"
     },
     "placeholder": {
       "question": "Nhập câu hỏi poll...",
       "option": "Lựa chọn",
       "duration": "Số phút hiển thị poll",
-      "customDuration": "Nhập số phút..."
+      "custom-duration": "Nhập số phút..."
     },
     "labels": {
       "minutes": "phút",
       "seconds": "giây",
-      "minSelect": "Tối thiểu",
-      "maxSelect": "Tối đa",
-      "minRating": "Điểm tối thiểu",
-      "maxRating": "Điểm tối đa",
-      "optionCount": "lựa chọn",
-      "addOption": "Thêm lựa chọn",
-      "optionHint": "Tối thiểu {min} lựa chọn, tối đa {max} lựa chọn",
-      "customDuration": "Thời gian tuỳ chỉnh",
-      "maxDuration": "Tối đa 24 giờ",
-      "totalVotes": "{count} lượt bình chọn",
-      "hintSingle": "Chọn 1 đáp án",
-      "hintMultiple": "Bạn có thể chọn nhiều đáp án",
-      "shareTitle": "Chia sẻ nhanh:",
+      "min-select": "Tối thiểu",
+      "max-select": "Tối đa",
+      "min-rating": "Điểm tối thiểu",
+      "max-rating": "Điểm tối đa",
+      "option-count": "lựa chọn",
+      "add-option": "Thêm lựa chọn",
+      "option-hint": "Tối thiểu {min} lựa chọn, tối đa {max} lựa chọn",
+      "custom-duration": "Thời gian tuỳ chỉnh",
+      "max-duration": "Tối đa 24 giờ",
+      "total-votes": "{count} lượt bình chọn",
+      "hint-single": "Chọn 1 đáp án",
+      "hint-multiple": "Bạn có thể chọn nhiều đáp án",
+      "share-title": "Chia sẻ nhanh:",
       "votes": "phiếu bình chọn",
-      "youVoted": "Bạn đã chọn:",
-      "timeLeft": "Thời gian còn lại",
+      "you-voted": "Bạn đã chọn:",
+      "time-left": "Thời gian còn lại",
       "disclaimer": "Bình chọn của bạn là ẩn danh và không ảnh hưởng đến kết quả trận đấu."
     },
     "actions": {
-      "addOption": "Thêm lựa chọn",
+      "add-option": "Thêm lựa chọn",
       "cancel": "Hủy",
       "submit": "Tạo Poll",
       "end": "Kết thúc Poll",
       "vote": "Bình chọn",
       "voted": "Đã bình chọn",
-      "viewResult": "Xem kết quả"
+      "view-result": "Xem kết quả"
     },
     "errors": {
-      "questionRequired": "Vui lòng nhập câu hỏi",
-      "questionMax": "Tối đa 120 ký tự",
-      "optionRequired": "Vui lòng nhập lựa chọn",
-      "optionsMin": "Cần ít nhất 2 lựa chọn",
-      "durationRequired": "Vui lòng nhập thời gian",
-      "durationPositive": "Thời gian phải lớn hơn 0",
-      "minSelectRequired": "Vui lòng nhập số tối thiểu",
-      "maxSelectRequired": "Vui lòng nhập số tối đa",
-      "maxSelectGteMin": "Tối đa phải ≥ tối thiểu",
-      "maxSelectExceed": "Tối đa không được vượt quá số lựa chọn"
+      "question-required": "Vui lòng nhập câu hỏi",
+      "question-max": "Tối đa 120 ký tự",
+      "option-required": "Vui lòng nhập lựa chọn",
+      "options-min": "Cần ít nhất 2 lựa chọn",
+      "duration-required": "Vui lòng nhập thời gian",
+      "duration-positive": "Thời gian phải lớn hơn 0",
+      "min-select-required": "Vui lòng nhập số tối thiểu",
+      "max-select-required": "Vui lòng nhập số tối đa",
+      "max-select-gte-min": "Tối đa phải ≥ tối thiểu",
+      "max-select-exceed": "Tối đa không được vượt quá số lựa chọn"
     },
     "status": {
       "active": "Đang diễn ra",
@@ -74,7 +81,7 @@
     },
     "confirm": {
       "close": "Tắt bình chọn sẽ không thể mở lại để chọn lần nữa",
-      "closeTitle": "Xác nhận thoát",
+      "close-title": "Xác nhận thoát",
       "cancel": "Ở lại",
       "confirm": "Xác nhận thoát"
     }

@@ -5,10 +5,8 @@ import { DEFAULT_LOCALE, LOCALES, type LocaleType } from "@/i18n/config"
 import { SLUG_TO_VI } from "@/i18n/slug-map"
 
 /**
- * 1. Đọc locale từ pathname [/vi/..., /en/...] và ghi vào header `x-locale`.
- * 2. Rewrite slug đã localize về slug canonical vi để Next.js routing hoạt động.
- *    Ví dụ: /en/news/123 → rewrite nội bộ thành /en/tin-tuc/123.
- *    URL hiển thị trên browser vẫn là /en/news/123 (transparent rewrite).
+ * Đọc locale từ pathname [/vi/...] và ghi vào header `x-locale`.
+ * Hiện chỉ hỗ trợ vi — rewrite slug localize sẽ được thêm khi có locale mới.
  */
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
