@@ -27,9 +27,9 @@ import {
   POLL_MIN_OPTIONS,
   POLL_QUESTION_MAX,
   POLL_RATING_SCALE_PRESETS,
-  POLL_TYPE_API_MAP,
   POLL_TYPE_CONFIG,
   PollTypeEnum,
+  pollTypeFromApi,
   type PollTypeValue,
 } from "@/features/live/poll.constants"
 import type { PollInterface } from "@/features/live/poll.models"
@@ -205,7 +205,7 @@ export function PollModal({ open, onOpenChange, onSubmit, activePoll, onEndPoll 
       reset(POLL_DEFAULTS)
       return
     }
-    const pollType = POLL_TYPE_API_MAP[activePoll.type]
+    const pollType = pollTypeFromApi(activePoll.type)
     reset({
       pollType,
       question: activePoll.question,

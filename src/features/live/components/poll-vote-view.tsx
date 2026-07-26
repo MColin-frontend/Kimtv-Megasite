@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 
 import { useTranslation } from "@/i18n"
 
-import { POLL_TYPE_API_MAP, PollTypeEnum } from "@/features/live/poll.constants"
+import { PollTypeEnum, pollTypeFromApi } from "@/features/live/poll.constants"
 import type { PollInterface } from "@/features/live/poll.models"
 import { isPollActive, isPollVoted } from "@/features/live/poll.models"
 import { Button } from "@/components/ui/button"
@@ -201,7 +201,7 @@ export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewP
   const mm = String(Math.floor(remainingSec / 60)).padStart(2, "0")
   const ss = String(remainingSec % 60).padStart(2, "0")
 
-  const pollType = POLL_TYPE_API_MAP[poll.type]
+  const pollType = pollTypeFromApi(poll.type)
   const isMultiple = pollType === PollTypeEnum.MULTIPLE
   const active = isPollActive(poll)
   const voted = isPollVoted(poll) || !active

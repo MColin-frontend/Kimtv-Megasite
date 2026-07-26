@@ -22,7 +22,7 @@ import type { MatchInterface } from "@/models/match.models"
 import { closePollApi, createPollApi, getActivePollApi } from "@/features/live/api/poll.api"
 import { PollHistoryModal } from "@/features/live/components/poll-history-modal"
 import { PollModal } from "@/features/live/components/poll-modal"
-import { POLL_TYPE_TO_API_MAP, PollTypeEnum } from "@/features/live/poll.constants"
+import { POLL_TYPE_MAP, PollTypeEnum } from "@/features/live/poll.constants"
 import type { CreatePollPayloadInterface, PollInterface } from "@/features/live/poll.models"
 import type { PollFormType } from "@/features/live/poll.schema"
 import { AvatarWithTooltip } from "@/components/ui/avatar"
@@ -171,7 +171,7 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
     const gameId = isAnchor ? 0 : (match.gameId ?? 0)
     const durationSec =
       data.duration === "custom" ? Number(data.customDuration ?? 60) : Number(data.duration)
-    const type = POLL_TYPE_TO_API_MAP[data.pollType]
+    const type = POLL_TYPE_MAP[data.pollType]
 
     const payload: CreatePollPayloadInterface = {
       chatroomId,
