@@ -72,11 +72,18 @@ export const POLL_TYPE_CONFIG: PollTypeConfig = {
   },
 }
 
-/** Map API type → local PollTypeValue */
-export const POLL_TYPE_API_MAP: Record<PollTypeApiValue, PollTypeValue> = {
-  [PollTypeApiEnum.SINGLE_CHOICE]: PollTypeEnum.SINGLE,
-  [PollTypeApiEnum.MULTIPLE_CHOICE]: PollTypeEnum.MULTIPLE,
-  [PollTypeApiEnum.RATING]: PollTypeEnum.RATING,
+/** local ↔ API poll type */
+export const POLL_TYPE_MAP = {
+  [PollTypeEnum.SINGLE]: PollTypeApiEnum.SINGLE_CHOICE,
+  [PollTypeEnum.MULTIPLE]: PollTypeApiEnum.MULTIPLE_CHOICE,
+  [PollTypeEnum.RATING]: PollTypeApiEnum.RATING,
+} as const satisfies Record<PollTypeValue, PollTypeApiValue>
+
+export function pollTypeFromApi(type: PollTypeApiValue): PollTypeValue {
+  const entry = (Object.entries(POLL_TYPE_MAP) as [PollTypeValue, PollTypeApiValue][]).find(
+    ([, api]) => api === type
+  )
+  return entry?.[0] ?? PollTypeEnum.SINGLE
 }
 
 export const POLL_TYPE_BADGE_CONFIG: Record<PollTypeApiValue, { label: string; cls: string }> = {

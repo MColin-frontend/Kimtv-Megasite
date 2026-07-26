@@ -1,9 +1,4 @@
-import {
-  PollStatusEnum,
-  type PollStatusValue,
-  type PollTypeApiValue,
-  type PollTypeValue,
-} from "./poll.constants"
+import { PollStatusEnum, type PollStatusValue, type PollTypeApiValue } from "./poll.constants"
 
 export interface PollOptionInterface {
   optionKey: string // "A", "B", "C"...
@@ -46,14 +41,16 @@ export function isPollVoted(poll: PollInterface): boolean {
 
 export interface CreatePollPayloadInterface {
   chatroomId: string | number
-  gameId?: number
-  pollType: PollTypeValue
+  gameId: number
+  type: PollTypeApiValue
   question: string
-  options: string[]
-  /** Thời gian tính bằng giây */
-  duration: number
+  durationSec: number
+  requireLogin: boolean
+  showRealtime: boolean
+  options?: string[]
   minSelect?: number
   maxSelect?: number
+  scaleMax?: number
 }
 
 export interface VotePayloadInterface {
