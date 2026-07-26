@@ -93,13 +93,18 @@ export function MatchStatusLabel({ type, label, className }: MatchStatusLabelPro
         {type === "upcoming" && (
           <Clock className="text-gold size-[22px] shrink-0 drop-shadow-[0_0_8px_rgba(246,195,67,0.9)] max-sm:size-[11px]" />
         )}
-        {type === "finished" && <Flag className="size-[22px] shrink-0 text-white/35 max-sm:size-[11px]" />}
+        {type === "finished" && (
+          <Flag className="size-[22px] shrink-0 text-white/35 max-sm:size-[11px]" />
+        )}
 
         <Typography
           as="span"
           size="20"
           weight="700"
-          className={cn("tracking-4 whitespace-nowrap uppercase max-sm:!text-10 max-sm:tracking-1", config.textClass)}
+          className={cn(
+            "tracking-4 max-sm:!text-10 max-sm:tracking-1 whitespace-nowrap uppercase",
+            config.textClass
+          )}
         >
           {label ?? defaultLabel}
         </Typography>
@@ -111,7 +116,7 @@ export function MatchStatusLabel({ type, label, className }: MatchStatusLabelPro
           as="span"
           size="14"
           weight="700"
-          className="tracking-2 whitespace-nowrap uppercase max-sm:!text-10 max-sm:tracking-1"
+          className="tracking-2 max-sm:!text-10 max-sm:tracking-1 whitespace-nowrap uppercase"
         >
           {config.badge}
         </Typography>

@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation"
 
+import { createMetadata } from "@/lib/metadata"
+
 import { LOCALES, type LocaleType } from "@/i18n"
 
 import { Footer } from "@/components/layout/footer"
@@ -10,6 +12,20 @@ import { Toaster } from "@/components/ui/toast"
 
 export function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }))
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params
+  return createMetadata({
+    title: {
+      default: "KimTV — Bóng đá trực tiếp & tỉ số online",
+      template: "%s | KimTV",
+    },
+    description:
+      "KimTV — xem bóng đá trực tiếp, tỉ số online, lịch thi đấu, tin tức và highlight thể thao mới nhất.",
+    alternates: { canonical: `/${lang}` },
+    openGraph: { url: `/${lang}` },
+  })
 }
 
 export default async function LangLayout({
@@ -26,7 +42,7 @@ export default async function LangLayout({
   return (
     <>
       <Header />
-      <main className="flex-1 max-md:h-full max-lg:pb-[72px]">{children}</main>
+      <main className="flex-1 max-lg:pb-[72px] max-md:h-full">{children}</main>
       <div className="max-md:hidden">
         <Footer />
       </div>

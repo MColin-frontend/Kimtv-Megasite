@@ -8,8 +8,9 @@ import { useRouter } from "./useRouter"
 export function useLiveNavigate() {
   const { push, pathname } = useRouter()
 
-  return function navigateToLive(matchId: string | number, gameId: number) {
+  return function navigateToLive(matchId: string | number, gameId: number, roomId?: number | null) {
     const locale = (pathname.split("/")[1] || "vi") as LocaleType
-    push(getRoutes(locale).live(matchId, gameId))
+    const base = getRoutes(locale).live(matchId, gameId)
+    push(roomId ? `${base}&room_id=${roomId}` : base)
   }
 }

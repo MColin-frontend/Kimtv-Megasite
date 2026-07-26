@@ -10,36 +10,24 @@ import { DEFAULT_LOCALE } from "./config"
  */
 export const SLUG_MAP: Record<string, Partial<Record<NonViLocale, string>>> = {
   // Sports
-  "lich-thi-dau": { en: "schedule" },
-  "ti-so-truc-tuyen": { en: "live-score" },
-  "ket-qua": { en: "results" },
-  bxh: { en: "standings" },
-  "tin-tuc": { en: "news" },
-  video: { en: "video" },
-  "du-lieu": { en: "data" },
+  "lich-thi-dau": {},
+  "ti-so-truc-tuyen": {},
+  "ket-qua": {},
+  bxh: {},
+  "tin-tuc": {},
+  video: {},
+  "du-lieu": {},
   // Auth
-  "dang-nhap": { en: "login" },
-  "dang-ky": { en: "register" },
+  "dang-nhap": {},
+  "dang-ky": {},
   // Other
-  "moi-ban": { en: "invited-friend" },
+  "moi-ban": {},
 }
 
 export type ViSlug = keyof typeof SLUG_MAP
 
 /** SLUG_TO_VI[locale][localized-slug] → vi canonical slug — dùng trong proxy */
-export const SLUG_TO_VI: Partial<Record<NonViLocale, Record<string, string>>> = Object.entries(
-  SLUG_MAP
-).reduce(
-  (acc, [viSlug, translations]) => {
-    for (const [locale, localSlug] of Object.entries(translations)) {
-      const key = locale as NonViLocale
-      if (!acc[key]) acc[key] = {}
-      acc[key]![localSlug] = viSlug
-    }
-    return acc
-  },
-  {} as Partial<Record<NonViLocale, Record<string, string>>>
-)
+export const SLUG_TO_VI = {} as Partial<Record<NonViLocale, Record<string, string>>>
 
 /** Tạo path theo locale — fallback về vi slug nếu chưa có translation */
 export function localePath(locale: LocaleType, viSlug: ViSlug, suffix?: string): string {

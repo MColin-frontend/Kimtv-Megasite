@@ -26,7 +26,7 @@ import icYellowCardV2 from "@assets/icons/match/ic-yellow-card-v2.svg"
 import imgStadiumBg from "@assets/images/common/img-stadium-card-bg.png"
 import imgVs from "@assets/images/common/img-vs.png"
 
-import { MatchPeriodBadge } from "./parts/match-period-badge"
+import { MatchStatusBadge } from "./parts/match-status-badge"
 
 /* ── Type ─────────────────────────────────────────────────── */
 
@@ -88,13 +88,13 @@ function StatItem({
           width={20}
           height={20}
           objectFit="contain"
-          className="max-md:!size-3.5 max-sm:!size-3.5"
+          className="max-md:!size-3.5 max-sm:!size-[10px]"
         />
         <Typography
           as="span"
           variant="body"
           weight="700"
-          className="max-md:text-12 max-sm:text-12 text-white tabular-nums"
+          className="max-md:text-12 max-sm:!text-10 text-white tabular-nums"
         >
           {value}
         </Typography>
@@ -103,7 +103,7 @@ function StatItem({
         as="span"
         size="14"
         weight="500"
-        className="max-md:text-10 max-sm:text-10 text-white"
+        className="max-md:text-10 whitespace-nowrap text-white max-sm:!text-[9px]"
       >
         {label}
       </Typography>
@@ -143,7 +143,7 @@ export function MatchCardLive({
 
   function handleClick() {
     if (!match.matchId || !match.gameId) return
-    navigateToLive(match.matchId, match.gameId)
+    navigateToLive(match.matchId, match.gameId, match.roomId)
   }
 
   return (
@@ -326,7 +326,7 @@ export function MatchCardLive({
                       as="span"
                       variant="label"
                       weight="700"
-                      className="truncate text-white drop-shadow-[0_0_12px_rgba(0,0,0,1),0_2px_16px_rgba(0,0,0,1),0_0_4px_rgba(0,0,0,1)]"
+                      className="truncate text-white"
                     >
                       {match.anchorName}
                     </Typography>
@@ -343,7 +343,7 @@ export function MatchCardLive({
         {/* Row 3: Teams + Score */}
         <div className="flex flex-1 items-center justify-between gap-2">
           <div className="flex basis-2/5 flex-col items-center gap-1.5">
-            <div className="flex size-[80px] shrink-0 items-center justify-center drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)] max-md:size-[60px] max-sm:size-[44px]">
+            <div className="flex size-[80px] shrink-0 items-center justify-center max-md:size-[60px] max-sm:size-[44px]">
               <Img
                 src={match.homeLogo}
                 alt={match.homeName ?? ""}
@@ -358,7 +358,7 @@ export function MatchCardLive({
                   as="span"
                   variant="label"
                   weight="500"
-                  className="max-md:text-10 max-sm:text-10 line-clamp-1 w-full text-center text-white drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)]"
+                  className="max-md:text-10 max-sm:text-10 line-clamp-1 w-full text-center text-white"
                 >
                   {match.homeName}
                 </Typography>
@@ -392,7 +392,7 @@ export function MatchCardLive({
                     as="span"
                     size="30"
                     weight="500"
-                    className="text-gold/60 max-md:!text-20 max-sm:!text-16 px-0.5 leading-100 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]"
+                    className="text-gold/60 max-md:!text-20 max-sm:!text-16 px-0.5 leading-100"
                   >
                     :
                   </Typography>
@@ -405,13 +405,13 @@ export function MatchCardLive({
                     {match.awayScore ?? 0}
                   </Typography>
                 </div>
-                {isLive && <MatchPeriodBadge label={periodLabel} />}
+                {isLive && <MatchStatusBadge type="live" label={periodLabel} />}
               </>
             )}
           </div>
 
           <div className="flex basis-2/5 flex-col items-center gap-1.5">
-            <div className="flex size-[80px] shrink-0 items-center justify-center drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)] max-md:size-[60px] max-sm:size-[44px]">
+            <div className="flex size-[80px] shrink-0 items-center justify-center max-md:size-[60px] max-sm:size-[44px]">
               <Img
                 src={match.awayLogo}
                 alt={match.awayName ?? ""}
@@ -426,7 +426,7 @@ export function MatchCardLive({
                   as="span"
                   variant="label"
                   weight="500"
-                  className="max-md:text-10 max-sm:text-10 line-clamp-1 w-full text-center text-white drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)]"
+                  className="max-md:text-10 max-sm:text-10 line-clamp-1 w-full text-center text-white"
                 >
                   {match.awayName}
                 </Typography>
@@ -438,7 +438,7 @@ export function MatchCardLive({
 
         {/* Row 4: Stats bar */}
         {!isUpcoming && (
-          <div className="rounded-8 flex items-center justify-between gap-1 bg-white/[0.06] px-3 py-2 backdrop-blur-2xl max-md:px-2 max-md:py-1 max-sm:px-2 max-sm:py-1">
+          <div className="rounded-8 flex items-center justify-between gap-1 bg-white/[0.06] px-3 py-2 backdrop-blur-2xl max-md:px-2 max-md:py-1 max-sm:px-1 max-sm:py-0.5">
             {[
               {
                 icon: icYellowCardV2,
@@ -460,7 +460,7 @@ export function MatchCardLive({
               },
             ].map((s, i) => (
               <div key={s.alt} className="flex flex-1 items-center">
-                {i > 0 && <div className="h-4 w-px shrink-0 bg-white/20" />}
+                {i > 0 && <div className="h-4 w-px shrink-0 bg-white/20 max-sm:h-2.5" />}
                 <StatItem
                   icon={s.icon}
                   alt={s.alt}
@@ -488,12 +488,12 @@ export function MatchCardLive({
               <Trophy className="text-gold size-3.5 shrink-0 max-sm:size-3" />
             )}
             <Tooltip>
-              <TooltipTrigger className="block min-w-0 flex-1 overflow-hidden">
+              <TooltipTrigger className="block max-w-[120px] min-w-0 overflow-hidden">
                 <Typography
                   as="span"
                   variant="caption"
                   weight="500"
-                  className="max-md:!text-10 max-sm:!text-10 block truncate text-left text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]"
+                  className="max-md:!text-10 max-sm:!text-10 block truncate text-left text-white"
                 >
                   {match.leagueName}
                 </Typography>
@@ -503,12 +503,12 @@ export function MatchCardLive({
           </div>
           {match.startTime && (
             <div className="flex shrink-0 items-center gap-1 max-md:gap-0.5 max-sm:gap-0.5">
-              <Calendar className="size-3 shrink-0 text-white/90 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)] max-md:size-2.5 max-sm:size-2.5" />
+              <Calendar className="size-3 shrink-0 text-white/90 max-md:size-2.5 max-sm:size-2.5" />
               <Typography
                 as="span"
                 variant="caption"
                 weight="500"
-                className="max-md:!text-10 max-sm:!text-10 text-white/90 tabular-nums drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]"
+                className="max-md:!text-10 max-sm:!text-10 text-white/90 tabular-nums"
               >
                 {formatMatchTime(match.startTime)}
                 <span className="mx-1 inline-block h-2.5 w-px bg-white/30 align-middle" />

@@ -13,10 +13,9 @@ import { Typography } from "@/components/ui/typography"
 
 import "xgplayer/dist/index.min.css"
 
-import icLiveSmall from "@/assets/images/common/ic-live-small.gif"
-import imgNoSource from "@/assets/images/common/img-no-source.png"
-
-const videoBanner = "/videos/video-banner.mp4"
+import imgLiveSmall from "@assets/images/common/img-live-small.gif"
+import imgNoSource from "@assets/images/common/img-no-source.png"
+import videoBanner from "@assets/videos/common/video-banner.mp4"
 
 const AdBanner = dynamic(() => import("@/components/ui/ad-banner").then((m) => m.AdBanner), {
   ssr: false,
@@ -240,9 +239,9 @@ export function VideoPlayer({
       <AdBanner
         src={playerOverlay?.[1]?.mediaPc || null}
         href={playerOverlay?.[1]?.jumpUrl || null}
-        fallback={icLiveSmall}
-        className="video-ad-banner absolute top-1 left-1 z-10 w-32 max-md:w-24 max-sm:w-16"
-        skeletonClassName="aspect-[128/54]"
+        fallback={imgLiveSmall}
+        className="video-ad-banner absolute top-1 left-1 z-10 w-16 max-md:w-12 max-sm:w-8"
+        skeletonClassName="aspect-[60/25]"
       />
     </div>
   )

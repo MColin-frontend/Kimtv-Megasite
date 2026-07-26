@@ -1,3 +1,7 @@
+import { Suspense } from "react"
+
+import { createMetadata } from "@/lib/metadata"
+
 import { fetchAnchorLiveData, fetchMatchLiveData } from "@/features/live/api/live.api"
 import { LivePage } from "@/features/live/components"
 
@@ -8,6 +12,43 @@ interface Props {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
+export async function generateMetadata({ params, searchParams }: Props) {
+  const { lang, id } = await params
+  const sp = await searchParams
+  const gameId = sp.game_id ? Number(sp.game_id) : null
+
+  const data = gameId ? await fetchMatchLiveData(id, gameId) : await fetchAnchorLiveData(id)
+
+  const match = data.match
+  const home = match?.homeName?.trim()
+  const away = match?.awayName?.trim()
+  const league = match?.leagueName?.trim()
+  const title =
+    home && away ? `${home} vs ${away}${league ? ` — ${league}` : ""}` : "Xem bóng đá trực tiếp"
+
+  const description =
+    home && away
+      ? `Xem trực tiếp ${home} vs ${away}${league ? ` (${league})` : ""} trên KimTV — tỉ số live, bình luận và phòng chat.`
+      : "Xem bóng đá trực tiếp trên KimTV — tỉ số live, bình luận viên và phòng chat."
+
+  const path = `/${lang}/truc-tiep/${id}`
+
+  return createMetadata({
+    title,
+    description,
+    keywords: [
+      "bóng đá trực tiếp",
+      "xem live",
+      "KimTV",
+      ...(home ? [home] : []),
+      ...(away ? [away] : []),
+      ...(league ? [league] : []),
+    ],
+    alternates: { canonical: path },
+    openGraph: { url: path, title, description },
+  })
+}
+
 export default async function TrucTiepPage({ params, searchParams }: Props) {
   const { id } = await params
   const sp = await searchParams
@@ -16,11 +57,13 @@ export default async function TrucTiepPage({ params, searchParams }: Props) {
   const liveType = sp.liveType ? Number(sp.liveType) : undefined
   const anchorLiveId = sp.anchorLiveId ? Number(sp.anchorLiveId) : undefined
 
-  // Có gameId → match live (từ fixture list hoặc /soccer/matchId)
-  // Không có → anchor live (link trực tiếp vào roomId như /live/528)
   const data = gameId
     ? await fetchMatchLiveData(id, gameId, { liveType, anchorLiveId })
     : await fetchAnchorLiveData(id)
 
-  return <LivePage match={data.match} />
+  return (
+    <Suspense>
+      <LivePage match={data.match} />
+    </Suspense>
+  )
 }

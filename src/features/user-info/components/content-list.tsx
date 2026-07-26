@@ -134,7 +134,7 @@ function HeroCard({
             </Typography>
           )}
           <Button variant="gradient" tabIndex={-1} className="w-fit">
-            {t("common.user-info.readMore")}
+            {t("common.user-info.read-more")}
           </Button>
         </div>
       </Link>

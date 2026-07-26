@@ -52,9 +52,9 @@ export function NewsItemRow({ item, href, categoryLabel, className }: NewsItemRo
           )}
         </div>
         <Typography
-          variant="body-sm"
+          size="14"
           weight="600"
-          className="group-hover:text-gold mt-1 line-clamp-2 text-white transition-colors"
+          className="group-hover:text-gold max-sm:!text-12 mt-1 line-clamp-2 leading-150 text-white transition-colors"
         >
           {item.title}
         </Typography>

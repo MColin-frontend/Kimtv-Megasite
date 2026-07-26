@@ -1,18 +1,31 @@
 export const siteConfig = {
-  name: "Mega Site",
-  description: "Mô tả trang web của bạn tại đây — tối đa 160 ký tự cho SEO tốt nhất.",
-  url: "https://example.com",
+  name: "KimTV",
+  description:
+    "KimTV — xem bóng đá trực tiếp, tỉ số online, lịch thi đấu, tin tức và highlight thể thao mới nhất.",
+  url: "https://kimtv.net",
   locale: "vi_VN",
-  authors: [{ name: "Mega Site Team" }],
-  keywords: ["mega site", "next.js", "react"],
+  authors: [{ name: "KimTV" }],
+  keywords: [
+    "KimTV",
+    "bóng đá trực tiếp",
+    "xem bóng đá online",
+    "tỉ số trực tuyến",
+    "lịch thi đấu",
+    "highlight bóng đá",
+    "tin tức bóng đá",
+    "World Cup",
+    "phát sóng trực tiếp",
+    "dự đoán tỷ số",
+  ],
 
   og: {
     width: 1200,
     height: 630,
+    image: "/icon.png",
   },
 
   links: {
-    twitter: "https://twitter.com/megasite",
+    twitter: "https://twitter.com/kimtv",
     promotion: "https://www.kim66.plus/pc/?dl=7t1fn4",
   },
 } as const

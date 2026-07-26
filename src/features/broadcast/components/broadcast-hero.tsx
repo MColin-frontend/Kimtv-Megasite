@@ -45,7 +45,7 @@ export function BroadcastHero() {
     }
   }, [streaming, streamStartMs])
 
-  const displayName = user?.name ?? t("broadcast.hero.fallbackName")
+  const displayName = user?.name ?? t("broadcast.hero.fallback-name")
 
   return (
     <div className="card-glow rounded-16 relative overflow-hidden p-6">
@@ -91,7 +91,7 @@ export function BroadcastHero() {
           <span className="rounded-4 flex items-center gap-1.5 bg-white/5 px-2.5 py-1 max-sm:mx-auto">
             <span className="size-1.5 rounded-full bg-white/30" />
             <Typography variant="caption" className="text-white/50">
-              {t("broadcast.streamSettings.status.idle")}
+              {t("broadcast.stream-settings.status.idle")}
             </Typography>
           </span>
         )}

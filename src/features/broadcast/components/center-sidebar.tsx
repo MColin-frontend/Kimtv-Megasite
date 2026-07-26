@@ -149,7 +149,7 @@ export function BroadcastCenterSidebar() {
                   <Radio className="size-3 text-amber-400" />
                 </div>
                 <Typography variant="overline" className="text-white/50">
-                  {t("broadcastCenter.sectionManage")}
+                  {t("broadcast-center.section-manage")}
                 </Typography>
               </div>
               <ChevronDown className="size-3.5 text-white/30 transition-transform duration-200 group-data-[open]/nav:rotate-180" />
@@ -204,7 +204,7 @@ export function BroadcastCenterSidebar() {
                     <CalendarClock className="size-3 text-amber-400" />
                   </div>
                   <Typography variant="overline" className="text-white/50">
-                    {t("broadcastCenter.reservation.activeTitle")}
+                    {t("broadcast-center.reservation.active-title")}
                   </Typography>
                 </div>
                 <ChevronDown className="size-3.5 text-white/30 transition-transform duration-200 group-data-[open]/res:rotate-180" />
@@ -292,7 +292,7 @@ export function BroadcastCenterSidebar() {
                   </div>
                 ) : (
                   <Empty
-                    tip={t("broadcastCenter.reservation.selectMatchHint")}
+                    tip={t("broadcast-center.reservation.select-match-hint")}
                     imageSize={80}
                     className="[&_p]:text-12 py-3 [&_img]:opacity-100 [&_p]:text-white/30"
                   />

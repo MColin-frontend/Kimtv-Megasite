@@ -3,11 +3,10 @@
 import { useParams } from "next/navigation"
 
 import { DEFAULT_LOCALE, type LocaleType } from "./config"
-import en from "./locales/en"
 import type { Dictionary } from "./locales/vi"
 import vi from "./locales/vi"
 
-const dictionaries: Record<LocaleType, Dictionary> = { vi, en }
+const dictionaries: Record<LocaleType, Dictionary> = { vi }
 
 type DotPaths<T, Prefix extends string = ""> = {
   [K in keyof T]: T[K] extends string

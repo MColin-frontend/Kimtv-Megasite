@@ -46,3 +46,14 @@ export interface LivePageDataInterface {
   match: LiveMatchInterface | null
   chatAnnouncement: string[]
 }
+
+export interface AnchorLiveDetailInterface {
+  match: LiveMatchInterface | null
+  userLevel?: number
+}
+
+export interface MatchLiveOptionsInterface {
+  /** liveType=2 + anchorLiveId → API trả stream của anchor cụ thể */
+  liveType?: number
+  anchorLiveId?: number
+}

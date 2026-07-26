@@ -115,7 +115,7 @@ function TabContent() {
         return <BroadcastRules />
       default:
         return (
-          <Empty tip={t("broadcastCenter.empty")} className="min-h-[40vh] [&_p]:text-white/30" />
+          <Empty tip={t("broadcast-center.empty")} className="min-h-[40vh] [&_p]:text-white/30" />
         )
     }
   })()

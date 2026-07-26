@@ -23,16 +23,16 @@
       "videos": "Video",
       "followers": "Lượt follow",
       "joined": "Tham gia",
-      "joinedSuffix": " ngày"
+      "joined-suffix": " ngày"
     },
     "follow": "+ Theo dõi",
     "following": "Đang theo dõi",
-    "hotNews": "Bài viết mới nhất",
+    "hot-news": "Bài viết mới nhất",
     "empty": "Chưa có nội dung",
     "category": "Bóng đá",
-    "readMore": "Đọc thêm",
+    "read-more": "Đọc thêm",
     "video": "Video",
-    "fallbackBio1": "Bình luận viên & Content Creator bóng đá hàng đầu tại KimTV.",
-    "fallbackBio2": "Mang đến góc nhìn sắc bén, phân tích chuyên sâu và tin tức nóng hổi mỗi ngày."
+    "fallback-bio1": "Bình luận viên & Content Creator bóng đá hàng đầu tại KimTV.",
+    "fallback-bio2": "Mang đến góc nhìn sắc bén, phân tích chuyên sâu và tin tức nóng hổi mỗi ngày."
   }
 }

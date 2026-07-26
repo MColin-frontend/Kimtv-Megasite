@@ -3,9 +3,10 @@
 import * as React from "react"
 import Link from "next/link"
 
-import { getRoutes } from "@/config/routes"
-import { useTranslation } from "@/i18n"
 import { cn } from "@/lib/utils"
+
+import { useTranslation } from "@/i18n"
+import { getRoutes } from "@/config/routes"
 
 import { Img } from "./image"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip"
@@ -48,7 +49,16 @@ interface AvatarImageProps {
 }
 
 function AvatarImage({ src, alt, className }: AvatarImageProps) {
-  return <Img src={src} alt={alt || ""} fill wrapperClassName="size-full" className={className} />
+  return (
+    <Img
+      src={src}
+      alt={alt || ""}
+      fill
+      sizes="64px"
+      wrapperClassName="size-full"
+      className={className}
+    />
+  )
 }
 
 /* ── AvatarFallback ──────────────────────────────────────── */
@@ -154,7 +164,7 @@ function AvatarWithTooltip({
           className="relative cursor-pointer transition-transform duration-150 hover:z-10 hover:-translate-y-1"
           style={{ marginLeft: index > 0 ? `-${overlap}px` : 0 }}
         >
-          <Avatar size={size} className={cn("ring-2 ring-[#0c1526]", className)} userId={userId}>
+          <Avatar size={size} className={className} userId={userId}>
             {src ? (
               <AvatarImage src={src} alt={alt ?? ""} />
             ) : (

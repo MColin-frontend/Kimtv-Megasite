@@ -53,14 +53,14 @@ function AvatarDropdown({ user, userId, onLogout }: AvatarDropdownProps) {
         className="border-gradient-gold-radiant flex items-center justify-center rounded-full transition-all"
         aria-label={t("header.user.aria-label")}
       >
-        <Avatar size={50}>
+        <Avatar size={50} className="max-sm:!size-[38px]">
           <AvatarImage src={user?.avatar} />
         </Avatar>
       </button>
 
       <div
         className={cn(
-          "absolute top-full right-0 z-50 mt-2 w-52",
+          "absolute top-full right-0 z-50 mt-2 w-52 max-sm:w-44",
           "panel-news rounded-xl p-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.6)]",
           "origin-top-right transition-all duration-150",
           state.dropdown
@@ -69,9 +69,9 @@ function AvatarDropdown({ user, userId, onLogout }: AvatarDropdownProps) {
         )}
       >
         {/* User info */}
-        <div className="flex items-center gap-2 border-b border-white/8 px-3.5 py-4">
+        <div className="flex items-center gap-2 border-b border-white/8 px-3.5 py-4 max-sm:px-2.5 max-sm:py-3">
           <div className="border-gradient-gold-radiant flex items-center justify-center rounded-full transition-all">
-            <Avatar size={48}>
+            <Avatar size={48} className="max-sm:!size-9">
               <AvatarImage src={user?.avatar} />
             </Avatar>
           </div>
@@ -80,7 +80,7 @@ function AvatarDropdown({ user, userId, onLogout }: AvatarDropdownProps) {
               <Typography
                 variant="body"
                 weight="800"
-                className="line-clamp-2 text-center text-white"
+                className="max-sm:text-14 line-clamp-2 text-center text-white"
               >
                 {user.name ?? t("header.user.fallback-name")}
               </Typography>
@@ -105,12 +105,12 @@ function AvatarDropdown({ user, userId, onLogout }: AvatarDropdownProps) {
           {userId && (
             <Link
               href={routes.userInfo(String(userId))}
-              className="group flex items-center gap-2.5 rounded-lg px-3.5 py-2.5 transition-colors hover:bg-white/5"
+              className="group flex items-center gap-2.5 rounded-lg px-3.5 py-2.5 transition-colors hover:bg-white/5 max-sm:px-2.5 max-sm:py-2"
             >
               <UserRound className="text-primary size-4 shrink-0 transition-colors" />
               <Typography
                 variant="body-sm"
-                className="text-muted whitespace-nowrap transition-colors group-hover:text-white"
+                className="text-muted max-sm:text-12 whitespace-nowrap transition-colors group-hover:text-white"
               >
                 {t("header.user.menu.profile")}
               </Typography>
@@ -120,12 +120,12 @@ function AvatarDropdown({ user, userId, onLogout }: AvatarDropdownProps) {
             <Link
               key={item.key}
               href={item.getHref(routes)}
-              className="group flex items-center gap-2.5 rounded-lg px-3.5 py-2.5 transition-colors hover:bg-white/5"
+              className="group flex items-center gap-2.5 rounded-lg px-3.5 py-2.5 transition-colors hover:bg-white/5 max-sm:px-2.5 max-sm:py-2"
             >
               <item.icon className={cn("size-4 shrink-0 transition-colors", item.iconColor)} />
               <Typography
                 variant="body-sm"
-                className="text-muted whitespace-nowrap transition-colors group-hover:text-white"
+                className="text-muted max-sm:text-12 whitespace-nowrap transition-colors group-hover:text-white"
               >
                 {t(item.labelKey)}
               </Typography>
@@ -142,12 +142,12 @@ function AvatarDropdown({ user, userId, onLogout }: AvatarDropdownProps) {
               close("dropdown")
               open("confirm")
             }}
-            className="group flex w-full items-center gap-2.5 rounded-lg px-3.5 py-2.5 transition-colors hover:bg-red-500/8"
+            className="group flex w-full items-center gap-2.5 rounded-lg px-3.5 py-2.5 transition-colors hover:bg-red-500/8 max-sm:px-2.5 max-sm:py-2"
           >
             <LogOut className="size-4 shrink-0 text-red-400" />
             <Typography
               variant="body-sm"
-              className="whitespace-nowrap text-red-400/80 transition-colors group-hover:text-red-400"
+              className="max-sm:text-12 whitespace-nowrap text-red-400/80 transition-colors group-hover:text-red-400"
             >
               {t("header.user.logout.label")}
             </Typography>
@@ -338,9 +338,9 @@ function DesktopNav({
                 />
               ) : null}
               {item.badge && (
-                <span className="absolute -top-0.5 -right-0.5 flex size-[7px]">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
-                  <span className="relative inline-flex size-[7px] rounded-full bg-red-500 shadow-[0_0_4px_rgba(239,68,68,0.8)]" />
+                <span className="absolute -top-0.5 -right-0.5 flex size-2.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-600 opacity-90" />
+                  <span className="relative inline-flex size-2.5 rounded-full bg-red-600 shadow-[0_0_6px_2px_rgba(220,38,38,1),0_0_12px_4px_rgba(220,38,38,0.6)]" />
                 </span>
               )}
             </div>
@@ -400,14 +400,13 @@ export function Header() {
               height={48}
               priority
               objectFit="contain"
-              style={{ height: "auto" }}
-              className="max-sm:w-[55px]"
+              className="max-sm:!h-[37px] max-sm:!w-[100px]"
             />
           </Link>
 
           <DesktopNav items={MAIN_NAV_ITEMS} isActive={isActive} t={t} />
 
-          <div className="ml-auto flex shrink-0 items-center gap-3">
+          <div className="ml-auto flex shrink-0 items-center gap-3 max-sm:gap-2">
             {/* TODO: restore search */}
             {/* <SearchInput /> */}
 

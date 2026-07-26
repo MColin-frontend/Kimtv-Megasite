@@ -125,6 +125,9 @@
   --transition-hover: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   --hover-transform: translateY(-6px) scale(1.01);
 
+  /* ─── Poll ─── */
+  --bg-poll-modal: #0f1219;
+
   /* ─── Chat ─── */
   --chat-bg: #18191f;
   --chat-surface: #1e2030;
@@ -147,7 +150,7 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-inter), Arial, Helvetica, sans-serif;
+  --font-sans: var(--font-oswald), var(--font-inter), Arial, Helvetica, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
@@ -200,6 +203,7 @@
   --color-live-green: var(--live-green);
   --color-live-green-bg: var(--live-green-bg);
   --color-divider: var(--divider);
+  --color-bg-poll-modal: var(--bg-poll-modal);
   --color-chat-bg: var(--chat-bg);
   --color-chat-surface: var(--chat-surface);
   --color-chat-text: var(--chat-text);
@@ -318,11 +322,12 @@
 /* ─── Base ───────────────────────────────────────────────────── */
 @layer base {
   html {
-    @apply font-sans;
+    font-family: var(--font-oswald), var(--font-inter), Arial, Helvetica, sans-serif !important;
   }
   body {
     background: linear-gradient(180deg, #091320 0%, #0b1628 35%, #0d1830 70%, #091320 100%);
     background-attachment: fixed;
+    font-family: var(--font-oswald), var(--font-inter), Arial, Helvetica, sans-serif !important;
     @apply text-foreground;
   }
 
@@ -554,7 +559,6 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-
 @utility bg-gradient-button {
   background: var(--gradient-button);
 }
@@ -571,7 +575,6 @@
   background: var(--banner-bg);
 }
 
-/* ─── Button utilities ───────────────────────────────────────── */
 @utility btn-secondary {
   background: var(--btn-secondary);
   &:hover {
@@ -778,6 +781,47 @@
 @utility shadow-gold-glow {
   box-shadow: 0 0 8px rgba(245, 197, 24, 0.3);
 }
+@utility shadow-poll-border {
+  box-shadow:
+    0 0 0 1px rgba(246, 195, 67, 0.08),
+    0 0 12px rgba(246, 195, 67, 0.25),
+    0 0 32px rgba(246, 195, 67, 0.12),
+    inset 0 0 20px rgba(246, 195, 67, 0.03);
+}
+
+/* Gradient border ánh kim cho poll card */
+.border-poll-gold {
+  position: relative;
+  border: none !important;
+}
+.border-poll-gold::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    #ffd75a 0%,
+    #f6c343 18%,
+    #c8872a 35%,
+    #fffbf0 50%,
+    #c8872a 65%,
+    #f6c343 82%,
+    #ffd75a 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+}
+@utility shadow-modal-gold {
+  box-shadow:
+    0 0 40px rgba(246, 195, 67, 0.08),
+    inset 0 1px 0 rgba(246, 195, 67, 0.12);
+}
 @utility shadow-live-label {
   box-shadow:
     0 0 40px color-mix(in srgb, var(--color-red-600) 45%, transparent),
@@ -840,12 +884,23 @@
   filter: drop-shadow(0 0 4px rgba(74, 222, 128, 0.6));
 }
 
+@utility text-shadow-gold {
+  text-shadow: 0 0 8px rgba(246, 195, 67, 0.4);
+}
+@utility filter-poll-icon {
+  filter: invert(80%) sepia(60%) saturate(500%) hue-rotate(2deg) brightness(1.05);
+}
+
 /* ─── Scrollbar hide ─────────────────────────────────────────── */
 @utility scrollbar-none {
   scrollbar-width: none;
   &::-webkit-scrollbar {
     display: none;
   }
+}
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
 }
 
 /* ─── xgplayer overrides ────────────────────────────────────── */
@@ -927,6 +982,8 @@
   height: auto !important;
   align-items: center !important;
   bottom: 10px !important;
+  left: 0 !important;
+  right: 0 !important;
 }
 
 .xgplayer .xg-left-grid,
@@ -946,6 +1003,72 @@
   pointer-events: none;
 }
 
+/* ── xgplayer mobile responsive (< 640px) ─────────────────── */
+@media (width < 640px) {
+  .xgplayer .xgplayer-controls {
+    padding: 4px 8px !important;
+  }
+
+  .xgplayer .xg-inner-controls {
+    bottom: 4px !important;
+  }
+
+  /* Icon tap target + margin */
+  .xgplayer xg-icon {
+    height: 28px !important;
+    margin-left: 4px !important;
+    margin-right: 4px !important;
+  }
+
+  /* SVG bên trong các nút control */
+  .xgplayer xg-icon svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  /* FLV source selector + playback rate — thu nhỏ pill text */
+  .xgplayer .btn-text {
+    font-size: 10px !important;
+    height: 20px !important;
+  }
+  .xgplayer .btn-text span,
+  .xgplayer .icon-text {
+    min-width: 32px !important;
+    height: 20px !important;
+    line-height: 20px !important;
+    font-size: 10px !important;
+    padding: 0 4px !important;
+  }
+
+  /* Thời gian phát */
+  .xgplayer .xg-cur,
+  .xgplayer .xg-separator,
+  .xgplayer .xg-dur {
+    font-size: 11px !important;
+  }
+
+  /* Mũi tên seek (double-tap forward/back) */
+  .xgplayer .xg-seek-icon svg {
+    width: 13px !important;
+    height: 6px !important;
+  }
+
+  /* Nhãn 2× / forward */
+  .xgplayer .xg-playbackrate span {
+    font-size: 12px !important;
+  }
+
+  /* Thanh tiến trình — giảm vùng click */
+  .xgplayer .xgplayer-progress {
+    height: 14px !important;
+  }
+
+  /* Icon play giữa màn hình khi pause */
+  .xgplayer.xgplayer-pause::after {
+    background-size: 50px !important;
+  }
+}
+
 /* ─── News sidebar (home fixtures) ──────────────────────────── */
 .news-sidebar {
   @media (width < 1024px) {
@@ -956,6 +1079,37 @@
   @media (width < 640px) {
     order: 1;
     width: 100%;
+  }
+}
+
+@keyframes bell-shake {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  10% {
+    transform: rotate(18deg);
+  }
+  20% {
+    transform: rotate(-16deg);
+  }
+  30% {
+    transform: rotate(12deg);
+  }
+  40% {
+    transform: rotate(-10deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
+  60% {
+    transform: rotate(-4deg);
+  }
+  70% {
+    transform: rotate(2deg);
+  }
+  80% {
+    transform: rotate(-1deg);
   }
 }
 
@@ -1067,6 +1221,15 @@
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
     inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+@utility panel-poll {
+  background:
+    radial-gradient(ellipse at 100% 0%, rgba(246, 195, 67, 0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 0% 100%, rgba(246, 195, 67, 0.08) 0%, transparent 45%),
+    rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 @utility panel-popular {

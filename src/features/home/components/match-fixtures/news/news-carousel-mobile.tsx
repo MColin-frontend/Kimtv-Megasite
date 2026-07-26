@@ -33,6 +33,7 @@ export function NewsCarouselMobile({ items, categoryLabel }: NewsCarouselMobileP
       <CarouselInfinity
         items={items}
         slideClassName="basis-full"
+        gapClassName="gap-3"
         keyExtractor={(item) => String(item.newsId)}
         onApiReady={handleApiReady}
         renderItem={(item) => (

@@ -90,20 +90,20 @@ export function StreamPanel() {
 
   async function handleRefresh() {
     await invalidate()
-    toast.success(t("broadcast.streamPanel.refreshSuccess"))
+    toast.success(t("broadcast.stream-panel.refresh-success"))
   }
 
   if (isLoading) {
     return (
       <div className="card-glow rounded-12 flex flex-col gap-5 p-5">
         <div className="flex items-center justify-between">
-          <Skeleton className="h-6 w-36 rounded-8" />
-          <Skeleton className="h-8 w-24 rounded-8" />
+          <Skeleton className="rounded-8 h-6 w-36" />
+          <Skeleton className="rounded-8 h-8 w-24" />
         </div>
         {Array.from({ length: 2 }).map((_, i) => (
           <div key={i} className="flex flex-col gap-1.5">
-            <Skeleton className="h-4 w-20 rounded-4" />
-            <Skeleton className="h-9 w-full rounded-8" />
+            <Skeleton className="rounded-4 h-4 w-20" />
+            <Skeleton className="rounded-8 h-9 w-full" />
           </div>
         ))}
       </div>
@@ -116,7 +116,7 @@ export function StreamPanel() {
     <div className="card-glow rounded-12 flex flex-col gap-5 p-5">
       <div className="flex items-center justify-between">
         <Typography variant="h5" className="text-white">
-          {t("broadcast.streamPanel.title")}
+          {t("broadcast.stream-panel.title")}
         </Typography>
         <Button
           type="button"
@@ -127,28 +127,28 @@ export function StreamPanel() {
           className="rounded-8 text-12 font-500 bg-white/5 px-3 py-1.5 text-white/60 hover:bg-white/10 hover:text-white"
         >
           <RefreshCw className={cn("size-3.5", isFetching && "animate-spin")} />
-          {t("broadcast.streamPanel.refresh")}
+          {t("broadcast.stream-panel.refresh")}
         </Button>
       </div>
 
       <div className="flex flex-col gap-3">
         <StreamField
-          label={t("broadcast.streamPanel.fields.rtmpUrl")}
+          label={t("broadcast.stream-panel.fields.rtmp-url")}
           value={liveResult?.rtmpPushUrl ?? ""}
         />
         <StreamField
-          label={t("broadcast.streamPanel.fields.streamKey")}
+          label={t("broadcast.stream-panel.fields.stream-key")}
           value={liveResult?.streamingKey ?? ""}
           masked
         />
         {liveUrlItem && (
           <>
             <StreamField
-              label={t("broadcast.streamPanel.fields.liveUrlHls")}
+              label={t("broadcast.stream-panel.fields.live-url-hls")}
               value={liveUrlItem.liveUrl ?? ""}
             />
             <StreamField
-              label={t("broadcast.streamPanel.fields.liveUrlFlv")}
+              label={t("broadcast.stream-panel.fields.live-url-flv")}
               value={liveUrlItem.liveUrlFlv ?? ""}
             />
           </>
@@ -166,7 +166,7 @@ export function StreamPanel() {
             invalidate()
           }}
         >
-          {t("broadcast.streamSettings.actions.endStream")}
+          {t("broadcast.stream-settings.actions.end-stream")}
         </Button>
       )}
     </div>

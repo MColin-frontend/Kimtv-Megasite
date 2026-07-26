@@ -34,6 +34,10 @@ import {
   CHAT_USER_ROLE,
 } from "@/constants/ui/ui-chat.constants"
 
+import { getActivePollApi, votePollApi } from "@/features/live/api/poll.api"
+import { PollVoteView } from "@/features/live/components/poll-vote-view"
+import { PollChannelEnum } from "@/features/live/poll.constants"
+import type { PollInterface } from "@/features/live/poll.models"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Img } from "@/components/ui/image"
@@ -41,14 +45,15 @@ import { MessageInput } from "@/components/ui/message-input"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Typography } from "@/components/ui/typography"
 
-import icBlacklist from "@assets/icons/chat/ic-blacklist.png"
-import icCrown from "@assets/icons/chat/ic-crown.png"
-import icPinImg from "@assets/icons/chat/ic-pin.png"
-import icRemove from "@assets/icons/chat/ic-remove.png"
-import icRestriction from "@assets/icons/chat/ic-restriction.png"
-import icFacebook from "@assets/icons/layout/ic-facebook.png"
-import icTele from "@assets/icons/layout/ic-tele.png"
-import icZalo from "@assets/icons/layout/ic-zalo.png"
+import imgBlacklist from "@assets/images/chat/img-blacklist.png"
+import imgCrown from "@assets/images/chat/img-crown.png"
+import imgPin from "@assets/images/chat/img-pin.png"
+import imgRemove from "@assets/images/chat/img-remove.png"
+import imgRestriction from "@assets/images/chat/img-restriction.png"
+import imgChat from "@assets/images/common/img-chat.png"
+import imgFacebook from "@assets/images/layout/img-facebook.png"
+import imgTele from "@assets/images/layout/img-tele.png"
+import imgZalo from "@assets/images/layout/img-zalo.png"
 
 /* ── Types ───────────────────────────────────────────────── */
 
@@ -85,11 +90,15 @@ export interface ChatProps {
   onBanRoom?: (message: ChatMessage, mute: boolean) => void
   onBanAll?: (message: ChatMessage, mute: boolean) => void
   onSetManager?: (message: ChatMessage, set: boolean) => void
+  onPollMessage?: (channel: string, data: unknown) => void
   inputSuffix?: React.ReactNode
+  topContent?: React.ReactNode
   className?: string
-  /** Truyền trực tiếp để tránh phụ thuộc URL param khi dùng trên home page */
+  /** Home page truyền trực tiếp để tránh timing issue. Live page dùng URL. */
   chatroomId?: string | number
   gameId?: number
+  /** Khi true — Chat không tự quản lý poll (parent tự xử lý qua onPollMessage) */
+  externalPoll?: boolean
 }
 
 const WS_RECONNECT_DELAY = 2000
@@ -103,7 +112,7 @@ function ChatAvatar({ message, size = 48 }: { message: ChatMessage; size?: numbe
   const wrapperCls = message.hasAnchorMe
     ? "bg-gradient-to-br from-[#ffd75a] to-[#f6c343] shadow-[0_0_8px_2px_rgba(246,195,67,0.45)]"
     : message.hasFictitious
-      ? "bg-gradient-to-b from-[#ff20da] to-[#d911a0] shadow-[0_0_8px_2px_rgba(255,32,218,0.35)]"
+      ? ""
       : "bg-white"
 
   return (
@@ -137,10 +146,7 @@ function RoleBadge({ message, t }: { message: ChatMessage; t: TFunc }) {
         as="span"
         size="10"
         weight="600"
-        className={cn(
-          "mr-1 inline-block rounded-full px-1.5 py-px align-middle text-white",
-          CHAT_CLASSES.adminGradient
-        )}
+        className="rounded-4 mr-1 inline-block bg-fuchsia-500/15 px-1.5 py-0.5 align-middle text-fuchsia-400 backdrop-blur-sm"
       >
         {t("chat.role.admin")}
       </Typography>
@@ -172,7 +178,7 @@ function WelcomeMessageItem({
           <div className="max-sm:origin-top-left max-sm:scale-[0.64]">
             {message.hasAnchorMe && (
               <div className="border-gold-hover absolute -top-2 -right-1 z-11 flex size-6 items-center justify-center rounded-full border-[0.5px] bg-black/70 p-[2px]">
-                <Img src={icCrown} alt="crown" width={14} height={14} objectFit="contain" />
+                <Img src={imgCrown} alt="crown" width={14} height={14} objectFit="contain" />
               </div>
             )}
             <ChatAvatar message={message} size={48} />
@@ -188,7 +194,7 @@ function WelcomeMessageItem({
                     variant="body-sm"
                     weight="600"
                     className={cn(
-                      "max-sm:text-12 block max-w-48 cursor-pointer truncate",
+                      "max-sm:text-10 block max-w-48 cursor-pointer truncate",
                       CHAT_CLASSES.username
                     )}
                   >
@@ -220,7 +226,7 @@ function WelcomeMessageItem({
               </Typography>
             )}
           </div>
-          <Typography as="span" variant="body-sm" className="text-muted max-sm:text-12">
+          <Typography as="span" variant="body-sm" className="text-muted max-sm:text-10">
             {t("chat.welcome")}
           </Typography>
         </div>
@@ -279,7 +285,7 @@ function MessageItem({
         <div className="max-sm:origin-top-left max-sm:scale-[0.64]">
           {message.hasAnchorMe && (
             <div className="border-gold-hover absolute -top-2 -right-1 z-10 flex size-6 items-center justify-center rounded-full border-[0.5px] bg-black/70 p-[2px]">
-              <Img src={icCrown} alt="crown" width={14} height={14} objectFit="contain" />
+              <Img src={imgCrown} alt="crown" width={14} height={14} objectFit="contain" />
             </div>
           )}
           <ChatAvatar message={message} size={48} />
@@ -392,7 +398,7 @@ function UserPopup({
           <div className="relative shrink-0">
             {message.hasAnchorMe && (
               <div className="border-gold/70 absolute -top-1 -right-0.5 z-10 flex size-6 items-center justify-center rounded-full border-[0.5px] bg-black/80">
-                <Img src={icCrown} alt="crown" width={13} height={13} objectFit="contain" />
+                <Img src={imgCrown} alt="crown" width={13} height={13} objectFit="contain" />
               </div>
             )}
             <ChatAvatar message={message} size={64} />
@@ -480,7 +486,7 @@ function UserPopup({
                 }}
                 className="flex flex-col items-center gap-2 transition-transform active:scale-90"
               >
-                <Img src={icBlacklist} alt="" width={40} height={40} objectFit="contain" />
+                <Img src={imgBlacklist} alt="" width={40} height={40} objectFit="contain" />
                 <span className="text-12 font-600 w-16 text-center leading-tight text-white/80">
                   {t("chat.actions.ban-all")}
                 </span>
@@ -494,7 +500,7 @@ function UserPopup({
                 }}
                 className="flex flex-col items-center gap-2 transition-transform active:scale-90"
               >
-                <Img src={icRestriction} alt="" width={40} height={40} objectFit="contain" />
+                <Img src={imgRestriction} alt="" width={40} height={40} objectFit="contain" />
                 <span className="text-12 font-600 w-16 text-center leading-tight text-white/80">
                   {t("chat.actions.ban-room")}
                 </span>
@@ -507,12 +513,12 @@ function UserPopup({
               }}
               className="flex flex-col items-center gap-2 transition-transform active:scale-90"
             >
-              <Img src={icRemove} alt="" width={40} height={40} objectFit="contain" />
+              <Img src={imgRemove} alt="" width={40} height={40} objectFit="contain" />
               <span className="text-12 font-600 w-16 text-center leading-tight text-white/80">
                 {t("chat.actions.delete")}
               </span>
             </button>
-            {message.type !== CHAT_MESSAGE_TYPE.VIRTUAL && (
+            {message.hasFictitious && (
               <button
                 onClick={() => {
                   if (isPinned) onUnpin?.(message)
@@ -522,7 +528,7 @@ function UserPopup({
                 className="flex flex-col items-center gap-2 transition-transform active:scale-90"
               >
                 <Img
-                  src={icPinImg}
+                  src={imgPin}
                   alt=""
                   width={40}
                   height={40}
@@ -553,7 +559,7 @@ function UserPopup({
               className="flex flex-col items-center gap-2 transition-transform active:scale-90"
             >
               <Img
-                src={icRestriction}
+                src={imgRestriction}
                 alt=""
                 width={40}
                 height={40}
@@ -791,9 +797,12 @@ export function Chat({
   onBanRoom,
   onBanAll,
   onSetManager,
+  onPollMessage,
+  topContent,
   className,
   chatroomId: chatroomIdProp,
   gameId: gameIdProp,
+  externalPoll = false,
 }: ChatProps) {
   const { t } = useTranslation()
   const { getParam, pathname } = useRouter()
@@ -804,7 +813,7 @@ export function Chat({
   /* ── Internal state ──────────────────────────────────────── */
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [pinnedMessages, setPinnedMessages] = useState<ChatMessage[]>([])
-  const [activePoll, _setActivePoll] = useState<PollData | null>(null) // TODO: set từ API khi có
+  const [poll, setPoll] = useState<PollInterface | null>(null)
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
     CHAT_CONNECTION_STATUS.DISCONNECTED
   )
@@ -830,20 +839,39 @@ export function Chat({
   const listRef = useRef<HTMLDivElement>(null)
   const isAtBottomRef = useRef(true)
   const wsRef = useRef<WebSocket | null>(null)
-  const heartbeatRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const onPollMessageRef = useRef(onPollMessage)
+  // eslint-disable-next-line react-hooks/refs
+  onPollMessageRef.current = onPollMessage
+  const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  async function handlePollVote(optionKeys: string[]) {
+    if (!poll?.pollId) return
+    const updated = await votePollApi(poll.pollId, optionKeys)
+    if (updated) return updated
+  }
   const reconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const reconnectCountRef = useRef(0)
   const pageIndexRef = useRef(0)
   const loadingMoreRef = useRef(false)
 
-  // Props được ưu tiên (home page truyền trực tiếp tránh timing issue)
-  // Fallback về path segment hoặc URL param
+  // Dùng window.location.search để tránh useSearchParams() hydration timing issue
   const pathLastSegment = pathname.split("/").filter(Boolean).pop() ?? ""
-  const chatroomIdFromUrl = /^\d+$/.test(pathLastSegment)
+  const _urlParams =
+    typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null
+  const roomIdFromUrl = _urlParams?.get("room_id") ?? getParam("room_id")
+  const matchIdFromUrl = /^\d+$/.test(pathLastSegment)
     ? pathLastSegment
-    : getParam(HERO_VIDEO_PARAMS.MATCH_ID)
-  const chatroomId = chatroomIdProp != null ? String(chatroomIdProp) : chatroomIdFromUrl
-  const gameId = gameIdProp ?? Number(getParam(HERO_VIDEO_PARAMS.GAME_ID) ?? 0)
+    : (_urlParams?.get(HERO_VIDEO_PARAMS.MATCH_ID) ?? getParam(HERO_VIDEO_PARAMS.MATCH_ID))
+  // isAnchor: có room_id → dùng roomId + game_id=0 (giống kimtvpc)
+  // else: dùng matchId + gameId từ URL
+  const isAnchor = !!roomIdFromUrl
+  const chatroomId = isAnchor
+    ? roomIdFromUrl!
+    : (matchIdFromUrl ?? (chatroomIdProp != null ? String(chatroomIdProp) : undefined))
+  const pollChatroomId = chatroomId
+  const _gameIdFromUrl =
+    _urlParams?.get(HERO_VIDEO_PARAMS.GAME_ID) ?? getParam(HERO_VIDEO_PARAMS.GAME_ID)
+  const gameId = isAnchor ? 0 : Number(_gameIdFromUrl ?? 0) || gameIdProp || 0
 
   const mergedSocials = { ...DEFAULT_SOCIALS, ...socials }
 
@@ -851,7 +879,7 @@ export function Chat({
 
   const clearHeartbeat = useCallback(() => {
     if (heartbeatRef.current) {
-      clearTimeout(heartbeatRef.current)
+      clearInterval(heartbeatRef.current)
       heartbeatRef.current = null
     }
   }, [])
@@ -865,15 +893,11 @@ export function Chat({
 
   const startHeartbeat = useCallback(() => {
     clearHeartbeat()
-    const scheduleNext = () => {
-      heartbeatRef.current = setTimeout(() => {
-        if (wsRef.current?.readyState === WebSocket.OPEN) {
-          wsRef.current.send(JSON.stringify({ op_type: 9 }))
-          scheduleNext()
-        }
-      }, WS_HEARTBEAT_INTERVAL)
-    }
-    scheduleNext()
+    heartbeatRef.current = setInterval(() => {
+      if (wsRef.current?.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({ op_type: 9 }))
+      }
+    }, WS_HEARTBEAT_INTERVAL)
   }, [clearHeartbeat])
 
   const closeWs = useCallback(() => {
@@ -885,7 +909,11 @@ export function Chat({
     if (wsRef.current) {
       const ws = wsRef.current
       wsRef.current = null
-      ws.close()
+      if (ws.readyState === WebSocket.CONNECTING) {
+        ws.addEventListener("open", () => ws.close(), { once: true })
+      } else {
+        ws.close()
+      }
     }
   }, [clearHeartbeat])
 
@@ -918,12 +946,53 @@ export function Chat({
           setConnectionStatus(CHAT_CONNECTION_STATUS.CONNECTED)
           startHeartbeat()
           reconnectCountRef.current = 0
+          console.log(`[chat] connected ✓ chatroom_id: ${cId}, game_id: ${gId}`)
         })
 
         ws.addEventListener("message", ({ data: raw }) => {
           if (ws !== wsRef.current || raw === "ping") return
+
           try {
             const res = JSON.parse(raw) as Record<string, unknown>
+
+            console.log("[chat] raw:", raw)
+
+            if (Object.values(PollChannelEnum).includes(res.channel as PollChannelEnum)) {
+              console.log("[chat] poll event →", res.channel, res.data)
+              onPollMessageRef.current?.(res.channel as string, res.data)
+              if (!externalPoll) {
+                const p = res.data as PollInterface
+                if (res.channel === PollChannelEnum.START) {
+                  setPoll(p)
+                } else if (res.channel === PollChannelEnum.ACTIVE) {
+                  setPoll((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          remainingSec: p.remainingSec,
+                          options: p.options,
+                          totalVotes: p.totalVotes,
+                          status: p.status,
+                        }
+                      : p
+                  )
+                } else if (res.channel === PollChannelEnum.UPDATE) {
+                  setPoll((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          options: p.options ?? prev.options,
+                          totalVotes: p.totalVotes ?? prev.totalVotes,
+                        }
+                      : p
+                  )
+                } else if (res.channel === PollChannelEnum.CLOSED) {
+                  setPoll(null)
+                }
+              }
+              return
+            }
+
             const data = res.data as Record<string, unknown> | undefined
             if (!data || (data.code as number) === 10) return
             if (res.channel === "CHATROOM" && data.content) {
@@ -1024,6 +1093,16 @@ export function Chat({
       setPinnedMessages(pinned)
     })
   }, [chatroomId, gameId])
+
+  /* ── Poll: fetch active + reset khi chatroom đổi ────────── */
+  useEffect(() => {
+    if (!pollChatroomId || externalPoll) return
+    console.log("[poll] fetching — pollChatroomId:", pollChatroomId, "chatroomId:", chatroomId)
+    getActivePollApi(pollChatroomId).then((p) => {
+      console.log("[poll] active poll response:", p)
+      if (p) setPoll(p)
+    })
+  }, [pollChatroomId, externalPoll])
 
   /* ── WebSocket: reconnect khi chatroom đổi hoặc auth đổi ── */
   useEffect(() => {
@@ -1137,7 +1216,7 @@ export function Chat({
             className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#2aabee] py-1.5 no-underline shadow-[0_2px_8px_rgba(42,171,238,0.3)] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(42,171,238,0.45)] hover:brightness-110 active:scale-95 max-sm:gap-1 max-sm:px-2 max-sm:py-1"
           >
             <Img
-              src={icTele.src}
+              src={imgTele.src}
               alt=""
               width={14}
               height={14}
@@ -1161,7 +1240,7 @@ export function Chat({
             className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#1877f2] py-1.5 no-underline shadow-[0_2px_8px_rgba(24,119,242,0.3)] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(24,119,242,0.45)] hover:brightness-110 active:scale-95 max-sm:gap-1 max-sm:px-2 max-sm:py-1"
           >
             <Img
-              src={icFacebook.src}
+              src={imgFacebook.src}
               alt=""
               width={14}
               height={14}
@@ -1185,7 +1264,7 @@ export function Chat({
             className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#0068ff] py-1.5 no-underline shadow-[0_2px_8px_rgba(0,104,255,0.3)] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(0,104,255,0.45)] hover:brightness-110 active:scale-95 max-sm:gap-1 max-sm:px-2 max-sm:py-1"
           >
             <Img
-              src={icZalo.src}
+              src={imgZalo.src}
               alt=""
               width={14}
               height={14}
@@ -1202,22 +1281,29 @@ export function Chat({
           </a>
         )}
       </div>
+      {/* Poll slot */}
+      {!externalPoll && poll && (
+        <PollVoteView poll={poll} onVote={handlePollVote} onClose={() => setPoll(null)} />
+      )}
+      {topContent && <div className="shrink-0">{topContent}</div>}
+
       {/* Messages section */}
       <div className="rounded-6 relative flex min-h-0 flex-1 flex-col overflow-hidden bg-white/[0.03] backdrop-blur-xl">
-        <div className="flex shrink-0 items-center justify-between border-b border-white/8 px-3 py-2.5">
+        <div className="flex shrink-0 items-center justify-between border-b border-white/8 px-3 pt-2.5 pb-1.5">
           <div className="flex items-center gap-2">
-            {/* Live dot với ping animation */}
-            <span className="relative flex size-2 shrink-0">
-              <span className="bg-live-green absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
-              <span className="bg-live-green relative inline-flex size-2 rounded-full" />
-            </span>
+            <div className="border-gold/30 rounded-full border p-1">
+              <div className="border-gold/60 bg-gold rounded-full border p-1">
+                <Img src={imgChat} alt="chat" width={16} height={16} objectFit="contain" />
+              </div>
+            </div>
             <Typography
               as="span"
-              variant="body-sm"
-              weight="700"
-              className="tracking-widest text-white uppercase"
+              variant="h4"
+              weight="800"
+              className="tracking-widest uppercase italic"
             >
-              Live Chat
+              <span className="text-gold drop-shadow-gold">Live</span>
+              <span className="text-white"> Chat</span>
             </Typography>
           </div>
           {/* Live badge */}
@@ -1315,8 +1401,6 @@ export function Chat({
             ))}
           </div>
         )}
-
-        {activePoll && <ChatPoll poll={activePoll} />}
 
         {/* Message list */}
         <div

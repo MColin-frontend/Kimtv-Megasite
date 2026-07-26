@@ -1,11 +1,20 @@
-import type { Metadata } from "next"
+import { createMetadata } from "@/lib/metadata"
 
 import { BroadcastPage } from "@/features/broadcast/components"
 
 export const dynamic = "force-dynamic"
 
-export const metadata: Metadata = {
-  title: "Phát trực tiếp",
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params
+  const path = `/${lang}/phat-truc-tiep`
+  return createMetadata({
+    title: "Phát trực tiếp",
+    description:
+      "Đăng ký và quản lý buổi phát sóng bình luận bóng đá trực tiếp trên KimTV — trở thành BLV, xây cộng đồng riêng.",
+    keywords: ["phát trực tiếp", "bình luận viên", "BLV bóng đá", "livestream thể thao", "KimTV"],
+    alternates: { canonical: path },
+    openGraph: { url: path },
+  })
 }
 
 export default function Page() {
