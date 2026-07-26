@@ -282,7 +282,7 @@ export function PollModal({ open, onOpenChange, onSubmit, activePoll, onEndPoll 
         <Dialog.Viewport className="fixed inset-0 z-50 flex items-center justify-center p-4 max-sm:items-end max-sm:p-0">
           <Dialog.Popup
             className={cn(
-              "panel-news w-[90vw] max-w-[600px] overflow-hidden",
+              "panel-news w-[90vw] max-w-[720px] overflow-hidden",
               "border-gold/20 shadow-modal-gold border",
               "rounded-12 max-sm:rounded-t-12 max-sm:rounded-b-none",
               "data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 max-sm:data-open:slide-in-from-bottom-4",
@@ -360,7 +360,7 @@ export function PollModal({ open, onOpenChange, onSubmit, activePoll, onEndPoll 
             <form onSubmit={handleSubmit(onValid)}>
               <div
                 className={cn(
-                  "h-[65vh] overflow-y-auto px-5 pt-5 pb-3",
+                  "h-[48vh] overflow-y-auto px-5 pt-5 pb-3",
                   isActive && "pointer-events-none opacity-60"
                 )}
                 style={{

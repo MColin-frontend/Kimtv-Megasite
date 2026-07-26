@@ -22,7 +22,8 @@ import type { MatchInterface } from "@/models/match.models"
 import { closePollApi, createPollApi, getActivePollApi } from "@/features/live/api/poll.api"
 import { PollHistoryModal } from "@/features/live/components/poll-history-modal"
 import { PollModal } from "@/features/live/components/poll-modal"
-import type { PollInterface } from "@/features/live/poll.models"
+import { POLL_TYPE_TO_API_MAP, PollTypeEnum } from "@/features/live/poll.constants"
+import type { CreatePollPayloadInterface, PollInterface } from "@/features/live/poll.models"
 import type { PollFormType } from "@/features/live/poll.schema"
 import { AvatarWithTooltip } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -129,7 +130,7 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
   const { t } = useTranslation()
   const navigateToLive = useLiveNavigate()
   const { user } = useAuth()
-  const [pollOpen, setPollOpen] = useState(false)
+  const [pollOpen, setPollOpen] = useState(true) // TODO: revert — tạm mở để CSS
   const [historyOpen, setHistoryOpen] = useState(false)
   const [activePoll, setActivePoll] = useState<PollInterface | null>(null)
 
@@ -168,22 +169,30 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
     const isAnchor = !!firstAnchor
     const chatroomId = isAnchor ? (firstAnchor?.roomId ?? match.matchId) : match.matchId
     const gameId = isAnchor ? 0 : (match.gameId ?? 0)
-
-    const duration =
+    const durationSec =
       data.duration === "custom" ? Number(data.customDuration ?? 60) : Number(data.duration)
+    const type = POLL_TYPE_TO_API_MAP[data.pollType]
 
-    const payload = {
+    const payload: CreatePollPayloadInterface = {
       chatroomId,
       gameId,
-      pollType: data.pollType,
-      question: data.question,
-      options: data.options.map((o) => o.value).filter(Boolean),
-      duration,
-      ...(data.minSelect != null && { minSelect: data.minSelect }),
-      ...(data.maxSelect != null && { maxSelect: data.maxSelect }),
+      type,
+      question: data.question.trim(),
+      durationSec,
+      requireLogin: true,
+      showRealtime: true,
     }
 
-    console.log("[poll] create payload:", payload)
+    if (data.pollType === PollTypeEnum.RATING) {
+      payload.scaleMax = data.maxSelect ?? 5
+    } else {
+      payload.options = data.options.map((o) => o.value.trim()).filter(Boolean)
+      if (data.pollType === PollTypeEnum.MULTIPLE) {
+        payload.minSelect = data.minSelect
+        payload.maxSelect = data.maxSelect
+      }
+    }
+
     await createPollApi(payload)
   }
 

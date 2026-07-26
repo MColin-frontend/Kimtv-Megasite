@@ -79,6 +79,13 @@ export const POLL_TYPE_API_MAP: Record<PollTypeApiValue, PollTypeValue> = {
   [PollTypeApiEnum.RATING]: PollTypeEnum.RATING,
 }
 
+/** Map local PollTypeValue → API type */
+export const POLL_TYPE_TO_API_MAP: Record<PollTypeValue, PollTypeApiValue> = {
+  [PollTypeEnum.SINGLE]: PollTypeApiEnum.SINGLE_CHOICE,
+  [PollTypeEnum.MULTIPLE]: PollTypeApiEnum.MULTIPLE_CHOICE,
+  [PollTypeEnum.RATING]: PollTypeApiEnum.RATING,
+}
+
 export const POLL_TYPE_BADGE_CONFIG: Record<PollTypeApiValue, { label: string; cls: string }> = {
   [PollTypeApiEnum.SINGLE_CHOICE]: {
     label: "SINGLE CHOICE",
