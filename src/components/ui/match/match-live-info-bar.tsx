@@ -7,6 +7,7 @@ import { formatFootballGameTime, formatMatchDate, formatMatchTime } from "@/lib/
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/use-auth"
 import { useLiveNavigate } from "@/hooks/use-live-navigate"
+import { useDisclosure } from "@/hooks/useDisclosure"
 import { useFakeGameMinute } from "@/hooks/useFakeGameMinute"
 
 import { useTranslation } from "@/i18n"
@@ -130,8 +131,7 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
   const { t } = useTranslation()
   const navigateToLive = useLiveNavigate()
   const { user } = useAuth()
-  const [pollOpen, setPollOpen] = useState(true) // TODO: revert — tạm mở để CSS
-  const [historyOpen, setHistoryOpen] = useState(false)
+  const { state, open, setOpen } = useDisclosure("poll", "history")
   const [activePoll, setActivePoll] = useState<PollInterface | null>(null)
 
   const isRoomOwner =
@@ -154,7 +154,7 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
       const poll = await getActivePollApi(chatroomId)
       setActivePoll(poll)
     }
-    setPollOpen(true)
+    open("poll")
   }
 
   async function handleEndPoll() {
@@ -336,7 +336,7 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
             <Button
               onClick={(e) => {
                 e.stopPropagation()
-                setHistoryOpen(true)
+                open("history")
               }}
               className="group flex h-[30px] items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 text-white/80 backdrop-blur-sm transition-all hover:border-white/40 hover:bg-white/[0.18] hover:text-white max-sm:h-6 max-sm:px-2"
             >
@@ -561,18 +561,18 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
           )}
         </div>
       </div>
-      {pollOpen && (
+      {state.poll && (
         <PollModal
-          open={pollOpen}
-          onOpenChange={setPollOpen}
+          open={state.poll}
+          onOpenChange={(v) => setOpen("poll", v)}
           onSubmit={handlePollSubmit}
           activePoll={activePoll}
           onEndPoll={handleEndPoll}
         />
       )}
       <PollHistoryModal
-        open={historyOpen}
-        onOpenChange={setHistoryOpen}
+        open={state.history}
+        onOpenChange={(v) => setOpen("history", v)}
         chatroomId={match.anchorRoomVos?.[0]?.roomId ?? match.matchId}
       />
     </div>
