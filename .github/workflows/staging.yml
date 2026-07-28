@@ -28,12 +28,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Install Node first without yarn cache — setup-node probes yarn for
+      # cache and would hit global Yarn 1 before Corepack is enabled.
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: yarn
 
-      # Lockfile is Yarn Berry (v4); enable Corepack so CI does not use Yarn 1.
       - name: Enable Corepack
         run: |
           corepack enable
