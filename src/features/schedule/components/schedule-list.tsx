@@ -49,7 +49,7 @@ export default function ScheduleList() {
         <div className="bg-gold mr-5 h-8 w-0.5 shrink-0 shadow-[0_0_12px_4px_rgba(246,195,67,0.6)] max-sm:mr-3 max-sm:h-6" />
 
         {/* Text */}
-        <div className="flex flex-col gap-1">
+        <div className="flex min-w-0 flex-col gap-1 overflow-visible">
           <Typography variant="h1" className="text-gradient-white max-sm:text-24">
             {t("schedule.page-title")} {t("schedule.header-suffix")}
           </Typography>
