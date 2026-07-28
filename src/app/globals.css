@@ -513,6 +513,11 @@
   text-transform: uppercase;
   font-style: italic;
   line-height: 1.4 !important;
+  /* Italic glyphs overhang the box; expand paint area so the tail isn't clipped */
+  display: inline-block;
+  max-width: 100%;
+  padding-inline-end: 0.3em;
+  overflow: visible;
 }
 
 @utility fixture-row-bg {
