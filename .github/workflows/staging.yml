@@ -33,8 +33,14 @@ jobs:
           node-version: 22
           cache: yarn
 
+      # Lockfile is Yarn Berry (v4); enable Corepack so CI does not use Yarn 1.
+      - name: Enable Corepack
+        run: |
+          corepack enable
+          corepack prepare yarn@4.17.1 --activate
+
       - name: Install deps
-        run: yarn --frozen-lockfile
+        run: yarn install --immutable
         env:
           HUSKY: 0
 
