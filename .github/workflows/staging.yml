@@ -40,15 +40,86 @@ jobs:
           corepack prepare yarn@4.17.1 --activate
 
       - name: Install deps
+        id: install
         run: yarn install --immutable
         env:
           HUSKY: 0
 
       - name: Lint
+        id: lint
         run: yarn lint
 
       - name: Typecheck
+        id: typecheck
         run: yarn typecheck
+
+      - name: Notify Lark on failure
+        if: failure()
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [[ "${{ steps.install.outcome }}" == "failure" ]]; then
+            FAILED_STEP="📦 Install dependencies"
+          elif [[ "${{ steps.lint.outcome }}" == "failure" ]]; then
+            FAILED_STEP="🔍 Lint (ESLint)"
+          elif [[ "${{ steps.typecheck.outcome }}" == "failure" ]]; then
+            FAILED_STEP="🔎 Typecheck (TypeScript)"
+          else
+            FAILED_STEP="❓ Unknown step"
+          fi
+
+          PAYLOAD=$(jq -n \
+            --arg step "$FAILED_STEP" \
+            --arg branch "${{ github.ref_name }}" \
+            --arg actor "${{ github.actor }}" \
+            --arg commit "$COMMIT_MSG" \
+            --arg sha "${GITHUB_SHA::7}" \
+            --arg url "$RUN_URL" \
+            '{
+              msg_type: "interactive",
+              card: {
+                header: {
+                  title: { tag: "plain_text", content: "❌ CI thất bại — Lint & Typecheck" },
+                  template: "red"
+                },
+                elements: [
+                  {
+                    tag: "div",
+                    text: { tag: "lark_md", content: ("**Bước lỗi:** " + $step) }
+                  },
+                  { tag: "hr" },
+                  {
+                    tag: "div",
+                    fields: [
+                      { is_short: true, text: { tag: "lark_md", content: ("**📌 Branch**\n`" + $branch + "`") } },
+                      { is_short: true, text: { tag: "lark_md", content: ("**👤 Author**\n" + $actor) } }
+                    ]
+                  },
+                  {
+                    tag: "div",
+                    fields: [
+                      { is_short: true, text: { tag: "lark_md", content: ("**🔑 Commit**\n`" + $sha + "`") } },
+                      { is_short: true, text: { tag: "lark_md", content: ("**💬 Message**\n" + $commit) } }
+                    ]
+                  },
+                  { tag: "hr" },
+                  {
+                    tag: "action",
+                    actions: [{
+                      tag: "button",
+                      text: { tag: "plain_text", content: "Xem log chi tiết →" },
+                      url: $url,
+                      type: "danger"
+                    }]
+                  }
+                ]
+              }
+            }')
+
+          curl -s -X POST "${{ secrets.LARK_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
 
   # --------------------------------------------------------------------------
   build-and-push:
@@ -66,6 +137,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Log in to GHCR
+        id: login
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -85,6 +157,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build & push
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -96,6 +169,72 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Notify Lark on failure
+        if: failure()
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [[ "${{ steps.login.outcome }}" == "failure" ]]; then
+            FAILED_STEP="🔐 Login GHCR"
+          elif [[ "${{ steps.build.outcome }}" == "failure" ]]; then
+            FAILED_STEP="🐳 Build & Push Docker image"
+          else
+            FAILED_STEP="❓ Unknown step"
+          fi
+
+          PAYLOAD=$(jq -n \
+            --arg step "$FAILED_STEP" \
+            --arg branch "${{ github.ref_name }}" \
+            --arg actor "${{ github.actor }}" \
+            --arg commit "$COMMIT_MSG" \
+            --arg sha "${GITHUB_SHA::7}" \
+            --arg url "$RUN_URL" \
+            '{
+              msg_type: "interactive",
+              card: {
+                header: {
+                  title: { tag: "plain_text", content: "❌ Build thất bại — Docker Image" },
+                  template: "red"
+                },
+                elements: [
+                  {
+                    tag: "div",
+                    text: { tag: "lark_md", content: ("**Bước lỗi:** " + $step) }
+                  },
+                  { tag: "hr" },
+                  {
+                    tag: "div",
+                    fields: [
+                      { is_short: true, text: { tag: "lark_md", content: ("**📌 Branch**\n`" + $branch + "`") } },
+                      { is_short: true, text: { tag: "lark_md", content: ("**👤 Author**\n" + $actor) } }
+                    ]
+                  },
+                  {
+                    tag: "div",
+                    fields: [
+                      { is_short: true, text: { tag: "lark_md", content: ("**🔑 Commit**\n`" + $sha + "`") } },
+                      { is_short: true, text: { tag: "lark_md", content: ("**💬 Message**\n" + $commit) } }
+                    ]
+                  },
+                  { tag: "hr" },
+                  {
+                    tag: "action",
+                    actions: [{
+                      tag: "button",
+                      text: { tag: "plain_text", content: "Xem log chi tiết →" },
+                      url: $url,
+                      type: "danger"
+                    }]
+                  }
+                ]
+              }
+            }')
+
+          curl -s -X POST "${{ secrets.LARK_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
+
   # --------------------------------------------------------------------------
   deploy:
     name: Deploy to server (SSH)
@@ -104,6 +243,7 @@ jobs:
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
       - name: SSH → pull & restart container
+        id: ssh
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -125,3 +265,67 @@ jobs:
           GHCR_USER: ${{ github.actor }}
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEPLOY_DIR: ${{ vars.DEPLOY_DIR }}
+
+      - name: Notify Lark on failure
+        if: failure()
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [[ "${{ steps.ssh.outcome }}" == "failure" ]]; then
+            FAILED_STEP="🚀 SSH Deploy (docker compose up)"
+          else
+            FAILED_STEP="❓ Unknown step"
+          fi
+
+          PAYLOAD=$(jq -n \
+            --arg step "$FAILED_STEP" \
+            --arg branch "${{ github.ref_name }}" \
+            --arg actor "${{ github.actor }}" \
+            --arg commit "$COMMIT_MSG" \
+            --arg sha "${GITHUB_SHA::7}" \
+            --arg url "$RUN_URL" \
+            '{
+              msg_type: "interactive",
+              card: {
+                header: {
+                  title: { tag: "plain_text", content: "❌ Deploy thất bại — Staging Server" },
+                  template: "red"
+                },
+                elements: [
+                  {
+                    tag: "div",
+                    text: { tag: "lark_md", content: ("**Bước lỗi:** " + $step) }
+                  },
+                  { tag: "hr" },
+                  {
+                    tag: "div",
+                    fields: [
+                      { is_short: true, text: { tag: "lark_md", content: ("**📌 Branch**\n`" + $branch + "`") } },
+                      { is_short: true, text: { tag: "lark_md", content: ("**👤 Author**\n" + $actor) } }
+                    ]
+                  },
+                  {
+                    tag: "div",
+                    fields: [
+                      { is_short: true, text: { tag: "lark_md", content: ("**🔑 Commit**\n`" + $sha + "`") } },
+                      { is_short: true, text: { tag: "lark_md", content: ("**💬 Message**\n" + $commit) } }
+                    ]
+                  },
+                  { tag: "hr" },
+                  {
+                    tag: "action",
+                    actions: [{
+                      tag: "button",
+                      text: { tag: "plain_text", content: "Xem log chi tiết →" },
+                      url: $url,
+                      type: "danger"
+                    }]
+                  }
+                ]
+              }
+            }')
+
+          curl -s -X POST "${{ secrets.LARK_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
