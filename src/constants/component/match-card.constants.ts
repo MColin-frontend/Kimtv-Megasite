@@ -1,4 +1,4 @@
-import icCornerFlag from "@assets/icons/match/ic-corner-flag.svg"
+import icCornerFlag from "@assets/icons/match/ic-corner-flag.png"
 import icRedCardV2 from "@assets/icons/match/ic-red-card-v2.svg"
 import icYellowCardV2 from "@assets/icons/match/ic-yellow-card-v2.svg"
 import imgFootball from "@assets/images/match/img-football.png"

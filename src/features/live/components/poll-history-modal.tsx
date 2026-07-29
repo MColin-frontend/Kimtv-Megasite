@@ -290,7 +290,7 @@ export function PollHistoryModal({ open, onOpenChange, chatroomId }: PollHistory
 
             {/* Body */}
             <div className="flex min-h-0 flex-1 flex-col p-3.5">
-              <div className="min-h-0 flex-1 scrollbar-none overflow-y-auto">
+              <div className="flex min-h-0 flex-1 scrollbar-none flex-col overflow-y-auto">
                 {loading ? (
                   <div className="grid grid-cols-3 gap-3 max-md:grid-cols-2 max-sm:grid-cols-1">
                     {Array.from({ length: 6 }).map((_, i) => (
@@ -319,7 +319,7 @@ export function PollHistoryModal({ open, onOpenChange, chatroomId }: PollHistory
                     ))}
                   </div>
                 ) : list.length === 0 ? (
-                  <Empty tip="Chưa có lịch sử bình chọn" />
+                  <Empty tip="Chưa có lịch sử bình chọn" className="flex-1 py-0" />
                 ) : (
                   <div className="grid grid-cols-3 gap-3 max-md:grid-cols-2 max-sm:grid-cols-1">
                     {list.map((poll, i) => (

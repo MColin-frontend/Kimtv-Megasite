@@ -1147,7 +1147,7 @@ export function Chat({
         <div
           ref={listRef}
           onScroll={handleScroll}
-          className="flex-1 overflow-y-auto py-2 pt-7"
+          className="flex-1 overflow-y-auto py-2"
           style={CHAT_SCROLLBAR_STYLE}
         >
           {connectionStatus === CHAT_CONNECTION_STATUS.CONNECTING && (

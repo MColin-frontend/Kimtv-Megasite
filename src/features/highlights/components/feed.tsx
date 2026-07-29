@@ -13,6 +13,7 @@ import {
   Pause,
   Play,
   RotateCcw,
+  Share2,
   Volume2,
   VolumeX,
 } from "lucide-react"
@@ -1255,7 +1256,7 @@ export function HighlightsFeed({
               </div>
 
               {/* Rail */}
-              <aside className="flex flex-col items-center justify-center gap-7 self-stretch py-4 max-md:absolute max-md:top-1/2 max-md:right-1 max-md:z-15 max-md:-translate-y-1/2 max-md:gap-4 max-md:py-0">
+              <aside className="flex flex-col items-center justify-center gap-4 self-stretch py-4 max-md:absolute max-md:top-1/2 max-md:right-1 max-md:z-15 max-md:-translate-y-1/2 max-md:gap-3 max-md:py-0">
                 {/* Avatar + Follow */}
                 <div className="relative">
                   {currentItem?.authorId ? (
@@ -1336,10 +1337,7 @@ export function HighlightsFeed({
                   aria-label={t("video.actions.share")}
                 >
                   <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[rgba(84,84,84,0.72)] max-md:h-11 max-md:w-11">
-                    <ReactSVG
-                      src={svgSrc(icShare)}
-                      className="size-8 text-white [&_svg]:h-8! [&_svg]:w-8! [&>div]:flex [&>div]:size-full [&>div]:items-center [&>div]:justify-center"
-                    />
+                    <Share2 className="size-7 text-white max-md:size-6" strokeWidth={2} />
                   </span>
                 </Button>
               </aside>
