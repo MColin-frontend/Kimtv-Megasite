@@ -52,7 +52,7 @@ export function BroadcastHero() {
       <div className="pointer-events-none absolute -top-20 left-1/2 h-64 w-96 -translate-x-1/2 rounded-full bg-amber-400/5 blur-3xl" />
 
       <div className="relative flex items-center gap-5 max-sm:flex-col max-sm:text-center">
-        <div className="border-gradient-gold-radiant flex h-fit w-fit shrink-0 items-center justify-center rounded-full p-0.5">
+        <div className="border-gradient-gold-radiant flex h-fit w-fit shrink-0 items-center justify-center rounded-full !border-[4px] p-0.5">
           <Avatar size={90}>
             <AvatarImage src={user?.avatar} alt={displayName} />
           </Avatar>

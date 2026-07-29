@@ -63,7 +63,6 @@ import { Input } from "@/components/ui/input"
 import { ConfirmModal } from "@/components/ui/modal/confirm"
 import { Select } from "@/components/ui/select/select"
 import { SelectAsync } from "@/components/ui/select/select-async"
-import { Skeleton } from "@/components/ui/skeleton"
 import { TextEditor } from "@/components/ui/text-editor"
 import { toast } from "@/components/ui/toast"
 import { Typography } from "@/components/ui/typography"
@@ -72,6 +71,7 @@ import icLiveMode from "@assets/icons/broadcast/ic-live-mode.svg"
 
 import { GuideButton } from "./modals/broadcast-guide"
 import { RoomOwnerModal } from "./modals/room-owner"
+import { BroadcastStreamSettingsSkeleton } from "./skeleton"
 import { StreamField } from "./stream-panel"
 
 function Label({ required, children }: { required?: boolean; children: React.ReactNode }) {
@@ -332,41 +332,7 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
   }
 
   if (isBroadcastLoading || anchorInfoLoading) {
-    return (
-      <div className="card-glow rounded-12 flex flex-col gap-4 p-5">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <Skeleton className="rounded-8 h-6 w-40" />
-          <Skeleton className="rounded-6 h-6 w-24" />
-        </div>
-        {/* Live ID */}
-        <Skeleton className="rounded-8 h-10 w-full" />
-        {/* Accordion room owner */}
-        <Skeleton className="rounded-10 h-12 w-full" />
-        {/* Fields grid */}
-        <div className="grid grid-cols-2 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="flex flex-col gap-1.5">
-              <Skeleton className="rounded-4 h-4 w-24" />
-              <Skeleton className="rounded-8 h-9 w-full" />
-            </div>
-          ))}
-        </div>
-        {/* Live mode accordion */}
-        <Skeleton className="rounded-10 h-12 w-full" />
-        {/* Stream settings */}
-        <div className="grid grid-cols-2 gap-4">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="flex flex-col gap-1.5">
-              <Skeleton className="rounded-4 h-4 w-20" />
-              <Skeleton className="rounded-8 h-9 w-full" />
-            </div>
-          ))}
-        </div>
-        {/* Submit */}
-        <Skeleton className="h-9 w-full rounded-full" />
-      </div>
-    )
+    return <BroadcastStreamSettingsSkeleton />
   }
 
   return (

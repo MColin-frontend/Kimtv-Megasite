@@ -16,10 +16,12 @@ import {
   fetchReservationList,
 } from "@/features/broadcast/broadcast.api"
 import { ScheduleFilter } from "@/components/ui/filters/schedule-filter"
-import { FixtureList, FixtureListSkeleton, groupMatches } from "@/components/ui/match/fixture-list"
+import { FixtureList, groupMatches } from "@/components/ui/match/fixture-list"
+import { ScheduleSectionHeader } from "@/components/ui/match/schedule-section-header"
 import { buildLeagueGroupsFromApi } from "@/components/ui/select/league-select"
-import { Skeleton } from "@/components/ui/skeleton"
 import { Typography } from "@/components/ui/typography"
+
+import { BroadcastReservationSkeleton } from "./skeleton"
 
 export function BroadcastReservation() {
   const { t } = useTranslation()
@@ -66,20 +68,13 @@ export function BroadcastReservation() {
   }
 
   if (!leaguesData && loading) {
-    return (
-      <section className="card-glow rounded-12 panel-news flex flex-col gap-4 p-5">
-        <div className="flex items-center justify-end gap-2">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="rounded-8 h-9 w-28" />
-          ))}
-        </div>
-        <FixtureListSkeleton />
-      </section>
-    )
+    return <BroadcastReservationSkeleton />
   }
 
   return (
-    <section className="card-glow rounded-12 panel-news flex flex-col gap-4 p-3 sm:p-5">
+    <section className="card-glow rounded-12 flex flex-col gap-4 p-3 sm:p-5">
+      <ScheduleSectionHeader />
+
       <ScheduleFilter
         groups={leagueGroups}
         hotLeagues={hotLeagues}

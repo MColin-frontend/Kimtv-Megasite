@@ -22,6 +22,41 @@ import { Typography } from "@/components/ui/typography"
 
 import kimtvLogo from "@assets/icons/layout/ic-kimtv.svg"
 
+/* ── Gold diamond divider (header dropdown) ──────────────── */
+function GoldDiamondDivider() {
+  return (
+    <div className="flex items-center gap-1" aria-hidden>
+      <div className="h-px flex-1 bg-[linear-gradient(90deg,transparent_0%,rgba(246,195,67,0.15)_25%,rgba(254,227,170,0.95)_100%)] shadow-[0_0_6px_rgba(246,195,67,0.55)]" />
+      <svg
+        width="9"
+        height="13"
+        viewBox="0 0 9 13"
+        className="shrink-0 drop-shadow-[0_0_5px_rgba(246,195,67,0.9)]"
+      >
+        <defs>
+          <linearGradient id="header-diamond-fill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#f4f8ff" />
+            <stop offset="48%" stopColor="#d4e4f7" />
+            <stop offset="52%" stopColor="#3b82f6" />
+            <stop offset="100%" stopColor="#2563eb" />
+          </linearGradient>
+          <linearGradient id="header-diamond-stroke" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#fee3aa" />
+            <stop offset="100%" stopColor="#eac367" />
+          </linearGradient>
+        </defs>
+        <path
+          d="M4.5 1.2 L8 6.5 L4.5 11.8 L1 6.5 Z"
+          fill="url(#header-diamond-fill)"
+          stroke="url(#header-diamond-stroke)"
+          strokeWidth="0.9"
+        />
+      </svg>
+      <div className="h-px flex-1 bg-[linear-gradient(90deg,rgba(254,227,170,0.95)_0%,rgba(246,195,67,0.15)_75%,transparent_100%)] shadow-[0_0_6px_rgba(246,195,67,0.55)]" />
+    </div>
+  )
+}
+
 /* ── Avatar Dropdown ─────────────────────────────────────── */
 interface AvatarDropdownProps {
   user: { name?: string | null; avatar?: string | null; vip99Icon?: string | null }
@@ -46,47 +81,30 @@ function AvatarDropdown({ user, userId, onLogout }: AvatarDropdownProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [state.dropdown, close])
 
+  const displayName = user.name ?? t("header.user.fallback-name")
+
   return (
     <div ref={wrapRef} className="relative">
-      <button
-        onClick={() => toggle("dropdown")}
-        className="border-gradient-gold-radiant flex items-center justify-center rounded-full transition-all"
-        aria-label={t("header.user.aria-label")}
-      >
-        <Avatar size={50} className="max-sm:!size-[38px]">
-          <AvatarImage src={user?.avatar} />
-        </Avatar>
-      </button>
-
-      <div
-        className={cn(
-          "absolute top-full right-0 z-50 mt-2 w-52 max-sm:w-44",
-          "panel-news rounded-xl p-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.6)]",
-          "origin-top-right transition-all duration-150",
-          state.dropdown
-            ? "pointer-events-auto scale-100 opacity-100"
-            : "pointer-events-none scale-95 opacity-0"
-        )}
-      >
-        {/* User info */}
-        <div className="flex items-center gap-2 border-b border-white/8 px-3.5 py-4 max-sm:px-2.5 max-sm:py-3">
-          <div className="border-gradient-gold-radiant flex items-center justify-center rounded-full transition-all">
-            <Avatar size={48} className="max-sm:!size-9">
+      <div className="flex w-full items-center gap-2">
+        <button
+          onClick={() => toggle("dropdown")}
+          className="flex w-fit items-center gap-2 rounded-full transition-all max-sm:gap-1.5"
+          aria-label={t("header.user.aria-label")}
+        >
+          <div className="border-gradient-gold-radiant flex shrink-0 items-center justify-center rounded-full !border-[4px]">
+            <Avatar size={50} className="max-sm:!size-[38px]">
               <AvatarImage src={user?.avatar} />
             </Avatar>
           </div>
-          <Tooltip>
-            <TooltipTrigger>
-              <Typography
-                variant="body"
-                weight="800"
-                className="max-sm:text-14 line-clamp-2 text-center text-white"
-              >
-                {user.name ?? t("header.user.fallback-name")}
-              </Typography>
-            </TooltipTrigger>
-            <TooltipContent>{user.name ?? t("header.user.fallback-name")}</TooltipContent>
-          </Tooltip>
+        </button>
+
+        <div className="flex items-center gap-2">
+          <Typography
+            weight="600"
+            className="max-sm:text-12 min-w-0 truncate text-left text-white [font-style:oblique_8deg]"
+          >
+            {displayName}
+          </Typography>
           {user.vip99Icon && (
             <Img
               src={user.vip99Icon}
@@ -95,9 +113,55 @@ function AvatarDropdown({ user, userId, onLogout }: AvatarDropdownProps) {
               height={32}
               unoptimized
               objectFit="contain"
-              className="shrink-0"
+              className="!h-9 !w-auto shrink-0 max-sm:!h-6"
             />
           )}
+        </div>
+      </div>
+
+      <div
+        className={cn(
+          "absolute top-full right-0 z-50 mt-2 w-54 max-sm:w-44",
+          "panel-news rounded-xl p-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.6)]",
+          "origin-top-right transition-all duration-150",
+          state.dropdown
+            ? "pointer-events-auto scale-100 opacity-100"
+            : "pointer-events-none scale-95 opacity-0"
+        )}
+      >
+        {/* User info */}
+        <div className="flex flex-col gap-1 pb-1.5">
+          <div className="flex items-center gap-1 p-2 pb-1">
+            <div className="border-gradient-gold-radiant flex shrink-0 items-center justify-center rounded-full !border-[4px]">
+              <Avatar size={48} className="max-sm:!size-9">
+                <AvatarImage src={user?.avatar} />
+              </Avatar>
+            </div>
+            <Tooltip>
+              <TooltipTrigger>
+                <Typography
+                  variant="body"
+                  weight="800"
+                  className="max-sm:text-14 line-clamp-1 text-center text-white"
+                >
+                  {displayName}
+                </Typography>
+              </TooltipTrigger>
+              <TooltipContent>{displayName}</TooltipContent>
+            </Tooltip>
+            {user.vip99Icon && (
+              <Img
+                src={user.vip99Icon}
+                alt="vip"
+                width={32}
+                height={32}
+                unoptimized
+                objectFit="contain"
+                className="shrink-0"
+              />
+            )}
+          </div>
+          <GoldDiamondDivider />
         </div>
 
         {/* Menu items */}
@@ -107,10 +171,10 @@ function AvatarDropdown({ user, userId, onLogout }: AvatarDropdownProps) {
               href={routes.userInfo(String(userId))}
               className="group flex items-center gap-2.5 rounded-lg px-3.5 py-2.5 transition-colors hover:bg-white/5 max-sm:px-2.5 max-sm:py-2"
             >
-              <UserRound className="text-primary size-4 shrink-0 transition-colors" />
+              <UserRound className="text-gold size-4 shrink-0 transition-colors" />
               <Typography
                 variant="body-sm"
-                className="text-muted max-sm:text-12 whitespace-nowrap transition-colors group-hover:text-white"
+                className="max-sm:text-12 whitespace-nowrap text-white/85 transition-colors group-hover:text-white"
               >
                 {t("header.user.menu.profile")}
               </Typography>
@@ -125,7 +189,7 @@ function AvatarDropdown({ user, userId, onLogout }: AvatarDropdownProps) {
               <item.icon className={cn("size-4 shrink-0 transition-colors", item.iconColor)} />
               <Typography
                 variant="body-sm"
-                className="text-muted max-sm:text-12 whitespace-nowrap transition-colors group-hover:text-white"
+                className="max-sm:text-12 whitespace-nowrap text-white/85 transition-colors group-hover:text-white"
               >
                 {t(item.labelKey)}
               </Typography>

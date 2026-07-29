@@ -1,5 +1,4 @@
 import type { ElementType } from "react"
-import type { StaticImport } from "next/dist/shared/lib/get-img-props"
 
 import type { TranslationKey } from "@/i18n"
 import type { Routes } from "@/config/routes"
@@ -13,15 +12,9 @@ interface NavI18nItemInterface {
   relatedSlugs?: string[] // additional slugs that should activate this item
 }
 
-interface FooterSocialInterface {
-  name: string
-  icon: StaticImport
-  link: string
-}
-
 interface FooterMenuInterface {
   key: string
   getHref: (r: Routes) => string
 }
 
-export type { NavI18nItemInterface, FooterSocialInterface, FooterMenuInterface }
+export type { NavI18nItemInterface, FooterMenuInterface }

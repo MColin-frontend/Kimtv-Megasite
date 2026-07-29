@@ -27,6 +27,10 @@
     "aria-label": "Tài khoản",
     "account": "Tài khoản của tôi",
     "fallback-name": "Người dùng",
+    "role": {
+      "admin": "Admin",
+      "blv": "BLV"
+    },
     "menu": {
       "broadcast": "Phát trực tiếp",
       "profile": "Hồ sơ cá nhân",

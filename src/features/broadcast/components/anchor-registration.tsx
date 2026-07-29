@@ -19,63 +19,10 @@ import { Button } from "@/components/ui/button"
 import { FormField } from "@/components/ui/form/form-field"
 import { ImageUpload } from "@/components/ui/image-upload"
 import { Input } from "@/components/ui/input"
-import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
 import { Typography } from "@/components/ui/typography"
 
 import anchorHero from "@assets/images/broadcast/img-anchor-registration-hero.png"
-
-export function AnchorRegistrationSkeleton() {
-  return (
-    <div className="flex flex-col gap-5">
-      {/* Hero */}
-      <Skeleton className="rounded-12 h-[350px] w-full" />
-
-      <div className="card-glow rounded-16 flex flex-col gap-6 p-6 max-sm:p-4">
-        {/* Section: thông tin cá nhân */}
-        <div className="flex flex-col gap-4">
-          <Skeleton className="rounded-4 h-4 w-32" />
-          <div className="grid grid-cols-3 gap-4 max-sm:grid-cols-1">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="flex flex-col gap-1.5">
-                <Skeleton className="rounded-4 h-3.5 w-24" />
-                <Skeleton className="rounded-8 h-10 w-full" />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Textarea */}
-        <div className="flex flex-col gap-1.5">
-          <Skeleton className="rounded-4 h-3.5 w-28" />
-          <Skeleton className="rounded-8 h-20 w-full" />
-        </div>
-
-        {/* Section: CMND/CCCD */}
-        <div className="flex flex-col gap-4">
-          <div className="flex items-baseline gap-1.5">
-            <Skeleton className="rounded-4 h-3.5 w-32" />
-            <Skeleton className="rounded-4 h-3 w-48" />
-          </div>
-          <div className="grid grid-cols-3 gap-4 max-sm:grid-cols-1">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="flex flex-col gap-1.5">
-                <Skeleton className="rounded-4 h-3.5 w-24" />
-                <Skeleton className="rounded-8 aspect-video w-full" />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Button */}
-        <div className="flex flex-col items-center gap-2">
-          <Skeleton className="rounded-8 h-11 w-full max-w-sm" />
-          <Skeleton className="rounded-4 h-3 w-56" />
-        </div>
-      </div>
-    </div>
-  )
-}
 
 export function AnchorRegistrationPage() {
   const { t } = useTranslation()

@@ -9,31 +9,24 @@ import { useTranslation } from "@/i18n/use-translation"
 
 import { fetchAnchorInfo } from "@/features/broadcast/broadcast.api"
 import { Empty } from "@/components/ui/empty"
-import { Skeleton } from "@/components/ui/skeleton"
 
 import { BroadcastCenterTabEnum } from "../broadcast.constants"
 import { AnchorRegistrationPage } from "./anchor-registration"
 import { BroadcastHero } from "./broadcast-hero"
 import { BroadcastReservation } from "./broadcast-reservation"
 import { BroadcastRules } from "./broadcast-rules"
-import { BroadcastCenterSidebar, BroadcastCenterSidebarSkeleton } from "./center-sidebar"
+import { BroadcastCenterSidebar } from "./center-sidebar"
+import {
+  AnchorRegistrationSkeleton,
+  BroadcastCenterSidebarSkeleton,
+  BroadcastHeroSkeleton,
+  BroadcastPageSkeleton,
+  BroadcastReservationSkeleton,
+  BroadcastRulesSkeleton,
+  BroadcastSettingsSkeleton,
+} from "./skeleton"
 import { StreamPanel } from "./stream-panel"
 import { StreamSettings } from "./stream-settings"
-
-function BroadcastHeroSkeleton() {
-  return (
-    <div className="card-glow rounded-16 p-6">
-      <div className="flex items-center gap-5">
-        <Skeleton className="size-[90px] shrink-0 rounded-full" />
-        <div className="flex flex-1 flex-col gap-2">
-          <Skeleton className="rounded-8 h-7 w-48" />
-          <Skeleton className="rounded-6 h-4 w-64" />
-        </div>
-        <Skeleton className="rounded-4 h-7 w-24" />
-      </div>
-    </div>
-  )
-}
 
 export function BroadcastPage() {
   const { data: anchorInfo, isLoading } = useQuery({
@@ -42,14 +35,7 @@ export function BroadcastPage() {
     staleTime: 60_000,
   })
 
-  if (isLoading) {
-    return (
-      <div className="container flex flex-col gap-5">
-        <BroadcastHeroSkeleton />
-        <Skeleton className="rounded-16 h-80 w-full" />
-      </div>
-    )
-  }
+  if (isLoading) return <BroadcastPageSkeleton />
 
   if (!anchorInfo?.anchorId) {
     return (
@@ -63,7 +49,7 @@ export function BroadcastPage() {
     <div className="container flex flex-col gap-5">
       <BroadcastHero />
 
-      <div className="grid grid-cols-[7fr_3fr] items-start gap-5 max-lg:grid-cols-1">
+      <div className="grid grid-cols-[7fr_3fr] items-stretch gap-5 max-lg:grid-cols-1">
         <div className="flex flex-col gap-5">
           <StreamPanel />
           <StreamSettings />
@@ -90,12 +76,16 @@ function TabContent() {
 
   const content = (() => {
     if (anchorLoading) {
-      return (
-        <div className="flex flex-col gap-5">
-          <BroadcastHeroSkeleton />
-          <Skeleton className="rounded-16 h-80 w-full" />
-        </div>
-      )
+      switch (tab) {
+        case BroadcastCenterTabEnum.RESERVATION:
+          return <BroadcastReservationSkeleton />
+        case BroadcastCenterTabEnum.GUIDE:
+          return <BroadcastRulesSkeleton />
+        case BroadcastCenterTabEnum.REGISTRATION:
+          return <AnchorRegistrationSkeleton />
+        default:
+          return <BroadcastSettingsSkeleton />
+      }
     }
 
     if (!isBLV || tab === BroadcastCenterTabEnum.REGISTRATION) return <AnchorRegistrationPage />
@@ -112,7 +102,11 @@ function TabContent() {
       case BroadcastCenterTabEnum.RESERVATION:
         return <BroadcastReservation />
       case BroadcastCenterTabEnum.GUIDE:
-        return <BroadcastRules />
+        return (
+          <div className="flex min-h-[calc(100vh-8rem)] flex-col">
+            <BroadcastRules />
+          </div>
+        )
       default:
         return (
           <Empty tip={t("broadcast-center.empty")} className="min-h-[40vh] [&_p]:text-white/30" />
