@@ -4,6 +4,7 @@ import { useState } from "react"
 import { ChartBarStacked, Check, ChevronDown, Users, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { useDisclosure } from "@/hooks/useDisclosure"
 
 import { useTranslation } from "@/i18n"
 
@@ -195,7 +196,6 @@ export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewP
   const [selectedKeys, setSelectedKeys] = useState<string[]>(poll.userVotedOptionKeys ?? [])
   const [loading, setLoading] = useState<boolean>(false)
 
-  // Đọc thẳng từ prop — socket POLL_ACTIVE/UPDATE/START cập nhật qua parent
   const remainingSec = poll.remainingSec
   const isUrgent = remainingSec > 0 && remainingSec <= 10
   const mm = String(Math.floor(remainingSec / 60)).padStart(2, "0")
@@ -219,32 +219,36 @@ export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewP
     })
   }
 
-  const [confirmClose, setConfirmClose] = useState(false)
-  const [collapsed, setCollapsed] = useState(false)
+  const { state, open, toggle, setOpen } = useDisclosure("confirmClose", "collapsed")
 
-  async function handleVote() {
+  function openConfirmClose() {
+    open("confirmClose")
+  }
+
+  function handleVote() {
     if (!selectedKeys.length || loading) return
     setLoading(true)
-    try {
-      const updated = await onVote?.(selectedKeys)
-      if (updated && typeof updated === "object" && "pollId" in updated) {
-        setSelectedKeys((updated as PollInterface).userVotedOptionKeys ?? [])
-      }
-    } finally {
-      setLoading(false)
-    }
+    onVote?.(selectedKeys)
+      .then((updated) => {
+        if (updated && typeof updated === "object" && "pollId" in updated) {
+          setSelectedKeys((updated as PollInterface).userVotedOptionKeys ?? [])
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
   }
 
   return (
     <div className="relative">
       {onClose && (
-        <button
-          type="button"
-          onClick={() => setConfirmClose(true)}
-          className="absolute -top-3.5 -right-2.5 z-10 flex size-7 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white/60 shadow-[0_2px_12px_rgba(0,0,0,0.4)] transition-all duration-150 hover:border-red-500/70 hover:bg-red-500/30 hover:text-red-300"
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={openConfirmClose}
+          className="absolute -top-3.5 -right-2.5 z-10 size-7 rounded-full border border-white/15 bg-white/10 text-white/60 shadow-[0_2px_12px_rgba(0,0,0,0.4)] transition-all duration-150 hover:border-red-500/70 hover:bg-red-500/30 hover:text-red-300"
         >
           <X className="size-4" />
-        </button>
+        </Button>
       )}
       <div
         className={cn(
@@ -291,20 +295,20 @@ export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewP
               )}
               <button
                 type="button"
-                onClick={() => setCollapsed((v) => !v)}
+                onClick={() => toggle("collapsed")}
                 className="border-gold/40 bg-gold/10 text-gold/70 hover:border-gold/60 hover:bg-gold/20 hover:text-gold flex size-6 items-center justify-center rounded-full border transition-all duration-200"
               >
                 <ChevronDown
                   className={cn(
                     "size-4 stroke-[2.5] transition-transform duration-200",
-                    collapsed && "rotate-180"
+                    state.collapsed && "rotate-180"
                   )}
                 />
               </button>
             </div>
           </div>
 
-          {!collapsed && (
+          {!state.collapsed && (
             <>
               {/* Question */}
               <Tooltip>
@@ -321,14 +325,7 @@ export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewP
               </Tooltip>
 
               {/* Options */}
-              <div
-                style={{
-                  maxHeight: "220px",
-                  overflowY: "auto",
-                  scrollbarWidth: "thin",
-                  scrollbarColor: "rgba(255,255,255,0.08) transparent",
-                }}
-              >
+              <div className="max-h-55 [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.08)_transparent] overflow-y-auto">
                 <div className="flex flex-col gap-2 px-0.5 py-0.5">
                   {poll.options.map((opt) => (
                     <OptionRow
@@ -389,24 +386,28 @@ export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewP
                   </div>
                 </div>
 
-                {active && !voted && (
+                {active && (
                   <Button
                     variant="gradient"
                     size="sm"
-                    disabled={!canVote}
+                    disabled={voted || !canVote}
                     onClick={handleVote}
                     className="text-12 font-600 h-7 shrink-0 px-4"
                   >
-                    {loading ? "..." : t("live.poll.actions.vote")}
-                    {!loading && selectedKeys.length > 0 && ` (${selectedKeys.length})`}
+                    {loading
+                      ? "..."
+                      : voted
+                        ? `${t("live.poll.actions.voted")} (${selectedKeys.length})`
+                        : t("live.poll.actions.vote")}
+                    {!loading && !voted && selectedKeys.length > 0 && ` (${selectedKeys.length})`}
                   </Button>
                 )}
 
-                {voted && (
+                {!active && voted && (
                   <div className="flex items-center gap-1.5">
                     <div className="size-1.5 rounded-full bg-green-400 shadow-[0_0_6px_rgba(74,222,128,0.6)]" />
                     <Typography as="span" variant="caption" weight="600" className="text-green-400">
-                      {active ? t("live.poll.actions.voted") : t("live.poll.status.ended")}
+                      {t("live.poll.status.ended")}
                     </Typography>
                   </div>
                 )}
@@ -416,16 +417,18 @@ export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewP
         </div>
       </div>
 
-      <ConfirmModal
-        open={confirmClose}
-        onOpenChange={setConfirmClose}
-        type="destructive"
-        title={t("live.poll.confirm.close-title")}
-        content={t("live.poll.confirm.close")}
-        confirmLabel={t("live.poll.confirm.confirm")}
-        cancelLabel={t("live.poll.confirm.cancel")}
-        onConfirm={() => onClose?.()}
-      />
+      {state.confirmClose && (
+        <ConfirmModal
+          open={state.confirmClose}
+          onOpenChange={(v) => setOpen("confirmClose", v)}
+          type="destructive"
+          title={t("live.poll.confirm.close-title")}
+          content={t("live.poll.confirm.close")}
+          confirmLabel={t("live.poll.confirm.confirm")}
+          cancelLabel={t("live.poll.confirm.cancel")}
+          onConfirm={() => onClose?.()}
+        />
+      )}
     </div>
   )
 }
