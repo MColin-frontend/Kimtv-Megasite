@@ -781,7 +781,7 @@ export function Chat({
           }
         })
 
-        ws.addEventListener("close", (ev) => {
+        ws.addEventListener("close", (_ev) => {
           if (ws !== wsRef.current) return
           setConnectionStatus(CHAT_CONNECTION_STATUS.DISCONNECTED)
           clearHeartbeat()
@@ -793,15 +793,15 @@ export function Chat({
             }, WS_RECONNECT_DELAY)
           }
         })
-        ws.addEventListener("error", (ev) => {
+        ws.addEventListener("error", (_ev) => {
           if (ws !== wsRef.current) return
           setConnectionStatus(CHAT_CONNECTION_STATUS.DISCONNECTED)
         })
-      } catch (err) {
+      } catch {
         setConnectionStatus(CHAT_CONNECTION_STATUS.DISCONNECTED)
       }
     },
-    [closeWs, startHeartbeat, clearHeartbeat]
+    [closeWs, startHeartbeat, clearHeartbeat, externalPoll]
   )
 
   useEffect(() => {

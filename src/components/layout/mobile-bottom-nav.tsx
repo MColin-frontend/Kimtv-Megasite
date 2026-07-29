@@ -10,6 +10,8 @@ import { SLUG_MAP, useTranslation } from "@/i18n"
 import { getRoutes } from "@/config/routes"
 import { MAIN_NAV_ITEMS } from "@/constants/component/layout.constants"
 
+import { Img } from "@/components/ui/image"
+
 const BAR_COLOR = "#111d35" // noticeably lighter than page (#091320) so notch is visible
 const BAR_H = 64
 const CIRCLE_R = 35
@@ -135,11 +137,14 @@ export function MobileBottomNav() {
                   {/* Icon */}
                   <div className="relative z-10">
                     {item.iconSrc ? (
-                      <img
+                      <Img
                         src={item.iconSrc}
                         alt=""
+                        width={28}
+                        height={28}
+                        objectFit="contain"
                         className={cn(
-                          "object-contain transition-all duration-300",
+                          "transition-all duration-300",
                           active ? "size-[26px]" : "size-[22px] opacity-55 group-hover:opacity-80"
                         )}
                         style={

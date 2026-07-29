@@ -374,11 +374,14 @@ function DesktopNav({
           >
             <div className="relative z-10">
               {item.iconSrc ? (
-                <img
+                <Img
                   src={item.iconSrc}
                   alt=""
+                  width={20}
+                  height={20}
+                  objectFit="contain"
                   className={cn(
-                    "size-5 object-contain transition-all duration-200",
+                    "size-5 transition-all duration-200",
                     active ? "" : "opacity-45 group-hover:opacity-65"
                   )}
                   style={

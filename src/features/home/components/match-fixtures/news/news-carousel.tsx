@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { ArrowRight, Heart, MessageCircle } from "lucide-react"
+import { Heart, MessageCircle } from "lucide-react"
 
 import type { LocaleType } from "@/i18n"
 import { localePath, useTranslation } from "@/i18n"
