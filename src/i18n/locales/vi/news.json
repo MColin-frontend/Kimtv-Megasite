@@ -1,0 +1,28 @@
+{
+  "title": "Tin tức xu hướng",
+  "page-title": "Tin tức",
+  "latest": "Tin tức mới nhất",
+  "popular": "Tin tức phổ biến",
+  "category": "Bóng đá",
+  "view-all": "Xem tất cả",
+  "empty": "Không có tin tức",
+  "subtitle": "Cập nhật tin tức bóng đá mới nhất, nhanh chóng và chính xác",
+  "read-more": "Đọc thêm",
+  "back-to-list": "Trở về tin tức",
+  "published-by": "Đăng bởi",
+  "hot-videos": "Video nổi bật",
+  "author": {
+    "follow": "Theo dõi",
+    "following": "Đang theo dõi"
+  },
+  "comment": {
+    "title": "Bình luận",
+    "placeholder": "Viết bình luận...",
+    "reply": "Trả lời",
+    "delete": "Xóa",
+    "submit": "Đăng",
+    "empty": "Chưa có bình luận nào",
+    "login-to-comment": "Đăng nhập để bình luận",
+    "view-more": "Xem thêm"
+  }
+}

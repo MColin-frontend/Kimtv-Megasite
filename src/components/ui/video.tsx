@@ -1,11 +1,25 @@
 "use client"
 
 import { useEffect, useId, useRef } from "react"
+import dynamic from "next/dynamic"
 import type { SimplePlayer } from "xgplayer"
 
 import { cn } from "@/lib/utils"
+import { useAdPlacements } from "@/hooks/tanstack/use-ad-placements"
+
+import { useTranslation } from "@/i18n"
+
+import { Typography } from "@/components/ui/typography"
 
 import "xgplayer/dist/index.min.css"
+
+import imgLiveSmall from "@assets/images/common/img-live-small.gif"
+import imgNoSource from "@assets/images/common/img-no-source.png"
+import videoBanner from "@assets/videos/common/video-banner.mp4"
+
+const AdBanner = dynamic(() => import("@/components/ui/ad-banner").then((m) => m.AdBanner), {
+  ssr: false,
+})
 
 export interface VideoSource {
   url: string
@@ -63,6 +77,10 @@ export function VideoPlayer({
   const mountId = id ?? `xgp-${generatedId.replace(/[^a-z0-9]/gi, "")}`
   const playerRef = useRef<SimplePlayer | null>(null)
 
+  const { t } = useTranslation()
+  const { data: ads } = useAdPlacements()
+  const playerOverlay = ads?.playerOverlay || []
+
   useEffect(() => {
     let destroyed = false
 
@@ -70,12 +88,14 @@ export function VideoPlayer({
       const activeUrl = url ?? sources?.[0]?.url
       if (!activeUrl) return
 
-      const format = detectFormat(activeUrl)
+      // Detect formats across ALL sources to load correct plugins
+      const allUrls = [url, ...(sources?.map((s) => s.url) ?? [])].filter(Boolean) as string[]
+      const formats = new Set(allUrls.map(detectFormat))
 
       const [xgMod, hlsMod, flvMod] = await Promise.all([
         import("xgplayer"),
-        format === "hls" ? import("xgplayer-hls") : Promise.resolve(null),
-        format === "flv" ? import("xgplayer-flv") : Promise.resolve(null),
+        formats.has("hls") ? import("xgplayer-hls") : Promise.resolve(null),
+        formats.has("flv") ? import("xgplayer-flv") : Promise.resolve(null),
       ])
 
       if (destroyed) return
@@ -169,9 +189,60 @@ export function VideoPlayer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url, sources?.map((s) => s.url).join(",")])
 
+  const hasSource = !!(url ?? sources?.[0]?.url)
+
   return (
-    <div className={cn("relative h-full w-full rounded-lg bg-black", className)}>
-      <div id={mountId} className="h-full w-full overflow-hidden rounded-[inherit]" />
+    <div
+      className={cn(
+        "panel-news rounded-8 relative min-h-0 flex-1 overflow-hidden max-lg:aspect-video max-lg:flex-none",
+        className
+      )}
+    >
+      {!hasSource && (
+        <div>
+          <div
+            className="absolute inset-0 z-0 opacity-30"
+            style={{
+              backgroundImage: `url(${imgNoSource.src})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          />
+
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 text-center">
+            <div className="card-gold rounded-8 relative overflow-hidden px-8 py-5 max-sm:scale-50">
+              <div className="via-gold/50 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent" />
+              <Typography variant="body" weight="700" className="text-gold drop-shadow-gold">
+                {t("video.no-source.title")}
+              </Typography>
+              <Typography variant="caption" className="text-gold/50 mt-1.5 block">
+                {t("video.no-source.description")}
+              </Typography>
+            </div>
+          </div>
+        </div>
+      )}
+      <div
+        id={mountId}
+        className="xg-mount relative h-full w-full overflow-hidden rounded-[inherit]"
+      />
+
+      {/* Vị trí 0: full overlay phủ toàn video */}
+      <AdBanner
+        src={playerOverlay?.[0]?.mediaPc || null}
+        href={playerOverlay?.[0]?.jumpUrl || null}
+        fallback={videoBanner}
+        className="video-ad-banner absolute bottom-0 left-0 z-10 w-full"
+        skeletonClassName="aspect-[1200/58]"
+      />
+      {/* Vị trí 1: banner góc trái trên */}
+      <AdBanner
+        src={playerOverlay?.[1]?.mediaPc || null}
+        href={playerOverlay?.[1]?.jumpUrl || null}
+        fallback={imgLiveSmall}
+        className="video-ad-banner absolute top-1 left-1 z-10 w-16 max-md:w-12 max-sm:w-8"
+        skeletonClassName="aspect-[60/25]"
+      />
     </div>
   )
 }

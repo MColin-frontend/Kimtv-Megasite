@@ -4,15 +4,15 @@
   "disconnected": "Phòng chat ngắt kết nối",
   "reconnecting": "Đang thử kết nối lại...",
   "reconnect": "Kết nối lại",
-  "newMessages": "Tin nhắn mới",
+  "new-messages": "Tin nhắn mới",
   "placeholder": "Nhập tin nhắn...",
   "login": "Đăng nhập",
-  "loginPrompt": "để tham gia chat",
+  "login-prompt": "để tham gia chat",
   "welcome": "đã vào phòng",
-  "pinLabel": "Ghim",
+  "pin-label": "Ghim",
   "role": {
-    "streamer": "Streamer",
-    "admin": "Admin"
+    "streamer": "Chủ phòng",
+    "admin": "Quản trị"
   },
   "report": {
     "title": "Phát biểu",
@@ -27,12 +27,14 @@
     }
   },
   "actions": {
-    "banAll": "Cấm toàn nền tảng",
-    "banRoom": "Cấm phòng này",
+    "ban-all": "Cấm toàn nền tảng",
+    "ban-room": "Cấm phòng này",
     "delete": "Xóa tin nhắn",
     "pin": "Ghim tin nhắn",
     "unpin": "Bỏ ghim",
-    "setManager": "Đặt làm quản lý"
+    "set-manager": "Đặt làm quản lý"
   },
-  "loginToChat": "Đăng nhập để chat"
+  "login-to-chat": "Đăng nhập để chat",
+  "empty-message": "Tin nhắn không được để trống",
+  "cancel": "Hủy"
 }

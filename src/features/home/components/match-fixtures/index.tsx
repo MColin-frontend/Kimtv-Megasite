@@ -35,7 +35,7 @@ export default async function MatchFixtures() {
 
       {/* News sidebar — mobile: lên trên full width, desktop: sticky sidebar */}
       {showSidebar && (
-        <div className="col-span-3 self-start max-lg:order-1 max-lg:w-full lg:sticky lg:top-[60px]">
+        <div className="news-sidebar col-span-3 self-start lg:sticky lg:top-19">
           <Suspense fallback={<NewsSidebarSkeleton />}>
             <News />
           </Suspense>

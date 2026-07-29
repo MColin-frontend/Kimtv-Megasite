@@ -3,3 +3,8 @@ export enum DateRangeEnum {
   TODAY = "today",
   TOMORROW = "tomorrow",
 }
+
+export enum CommentType {
+  COMMENT = "comment",
+  REPLY = "reply",
+}

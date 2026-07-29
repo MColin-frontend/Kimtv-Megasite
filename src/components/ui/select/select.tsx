@@ -3,9 +3,11 @@
 import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from "react"
 import { Select as SelectPrimitive } from "@base-ui/react/select"
 import { cva, type VariantProps } from "class-variance-authority"
-import { Check, ChevronDown } from "lucide-react"
+import { Check, ChevronDown, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+
+import { Empty } from "@/components/ui/empty"
 
 /* ── Trigger variants ─────────────────────────────────────── */
 const triggerVariants = cva(
@@ -35,7 +37,7 @@ const triggerVariants = cva(
       },
       size: {
         sm: "h-9  gap-2.5 px-3.5 text-13",
-        default: "h-10 gap-3   px-4   text-14",
+        default: "h-9 gap-3 px-4 text-14",
         lg: "h-12 gap-3   px-5   text-16",
       },
     },
@@ -76,9 +78,12 @@ export interface SelectProps extends VariantProps<typeof triggerVariants> {
   disabled?: boolean
   fullWidth?: boolean
   isActive?: boolean
+  clearable?: boolean
   className?: string
   triggerClassName?: string
   popupClassName?: string
+  /** Option luôn hiện đầu tiên, filter duplicate nếu đã có trong options */
+  defaultOption?: SelectOption
 }
 
 /* ── Component ────────────────────────────────────────────── */
@@ -95,9 +100,11 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(
     size,
     fullWidth,
     isActive,
+    clearable,
     className,
     triggerClassName,
     popupClassName,
+    defaultOption,
   },
   ref
 ) {
@@ -118,8 +125,13 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(
     [onValueChange]
   )
 
-  const items = options.map((o) => ({ value: o.value, label: o.label }))
-  const selectedOpt = options.find((o) => o.value === value)
+  const resolvedOptions = (
+    defaultOption
+      ? [defaultOption, ...options.filter((o) => o.value !== defaultOption.value)]
+      : options
+  ).filter((o) => !(o.value === "" && o.label === ""))
+  const items = resolvedOptions.map((o) => ({ value: o.value, label: o.label }))
+  const selectedOpt = resolvedOptions.find((o) => o.value === value)
   const isLiveActive = selectedOpt?.accent === "live"
   const isGoldActive = isActive && !isLiveActive
 
@@ -161,6 +173,18 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(
             <span className="truncate">{selectedOpt?.label ?? placeholder}</span>
             {selectedOpt?.badge && <span className="ml-0.5">{selectedOpt.badge}</span>}
           </span>
+          {clearable && value && (
+            <span
+              role="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                onValueChange?.(null)
+              }}
+              className="hover:bg-danger/20 flex size-4 shrink-0 cursor-pointer items-center justify-center rounded-full text-white/30 transition-colors hover:text-white"
+            >
+              <X className="size-3.5" />
+            </span>
+          )}
           <SelectPrimitive.Icon>
             <ChevronDown
               className={cn(
@@ -189,22 +213,31 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(
                 popupClassName
               )}
             >
-              <SelectPrimitive.List className="p-1">
-                {options.map((opt) => (
+              <SelectPrimitive.List className="flex flex-col gap-1 p-1">
+                {resolvedOptions.length === 0 && (
+                  <Empty
+                    imageSize={80}
+                    tip="Không có kết quả"
+                    className="[&_p]:text-12 py-6 [&_img]:opacity-100 [&_p]:text-white/30"
+                  />
+                )}
+                {resolvedOptions.map((opt) => (
                   <SelectPrimitive.Item
                     key={opt.value}
                     value={opt.value}
                     disabled={opt.disabled}
                     className={cn(
                       "group/item relative flex cursor-pointer items-center gap-2",
-                      "rounded-6 px-3 py-2.5 outline-none select-none",
-                      "text-13 font-400 leading-100",
+                      "rounded-6 px-3 py-2 outline-none select-none",
+                      "text-14 font-400 leading-150",
                       "transition-colors duration-100",
                       opt.accent === "live"
-                        ? "data-selected:font-600 text-red-400 data-highlighted:bg-red-500/10 data-selected:bg-red-500/15"
-                        : opt.accent === "neutral"
-                          ? "data-selected:bg-gold/15 data-selected:text-gold data-selected:font-600 text-white/75 data-highlighted:bg-white/8 data-highlighted:text-white"
-                          : "data-selected:bg-gold/15 data-selected:text-gold data-selected:font-600 text-white/75 data-highlighted:bg-white/8 data-highlighted:text-white",
+                        ? opt.value === value
+                          ? "font-600 bg-red-500/15 text-red-400"
+                          : "text-red-400 hover:bg-red-500/10"
+                        : opt.value === value
+                          ? "bg-gold/15 font-600 text-gold"
+                          : "text-white/50 hover:bg-white/8 hover:text-white",
                       "data-disabled:pointer-events-none data-disabled:opacity-30"
                     )}
                   >

@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils"
 
 import { DEFAULT_PAGE_SIZE } from "@/constants/common.constants"
 
+import { Typography } from "@/components/ui/typography"
+
 /* ── Types ─────────────────────────────────────────────────── */
 export interface PaginationProps {
   page: number
@@ -56,7 +58,7 @@ function PageBtn({
       disabled={disabled}
       title={title}
       className={cn(
-        "rounded-8 text-13 font-500 flex size-8 items-center justify-center transition-all duration-150",
+        "rounded-8 text-13 font-500 max-sm:text-12 flex size-8 items-center justify-center transition-all duration-150 max-sm:size-7",
         "disabled:pointer-events-none",
         active
           ? "bg-blue text-gold font-600 shadow-[0_0_14px_rgba(245,197,24,0.25),0_2px_8px_rgba(67,97,253,0.55)]"
@@ -81,14 +83,14 @@ export function Pagination({
 
   return (
     <div className={cn("flex items-center justify-center", className)}>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 max-sm:gap-1">
         {/* Prev arrows */}
         <div className="flex items-center gap-0.5">
           <PageBtn onClick={() => onPageChange(1)} disabled={page <= 1} title="Trang đầu">
-            <ChevronsLeft className="size-3.5" />
+            <ChevronsLeft className="size-3.5 max-sm:size-3" />
           </PageBtn>
           <PageBtn onClick={() => onPageChange(page - 1)} disabled={page <= 1} title="Trang trước">
-            <ChevronLeft className="size-3.5" />
+            <ChevronLeft className="size-3.5 max-sm:size-3" />
           </PageBtn>
         </div>
 
@@ -96,12 +98,15 @@ export function Pagination({
         <div className="rounded-8 bg-foreground/5 flex items-center gap-0.5 px-1 py-1">
           {pages.map((p, i) =>
             p === "…" ? (
-              <span
+              <Typography
+                as="span"
                 key={`ellipsis-${i}`}
-                className="text-13 text-foreground/30 flex size-8 items-center justify-center select-none"
+                variant="body-sm"
+                color="foreground/30"
+                className="flex size-8 items-center justify-center select-none max-sm:size-7"
               >
                 …
-              </span>
+              </Typography>
             ) : (
               <PageBtn
                 key={p}
@@ -122,14 +127,14 @@ export function Pagination({
             disabled={page >= totalPages}
             title="Trang sau"
           >
-            <ChevronRight className="size-3.5" />
+            <ChevronRight className="size-3.5 max-sm:size-3" />
           </PageBtn>
           <PageBtn
             onClick={() => onPageChange(totalPages)}
             disabled={page >= totalPages}
             title="Trang cuối"
           >
-            <ChevronsRight className="size-3.5" />
+            <ChevronsRight className="size-3.5 max-sm:size-3" />
           </PageBtn>
         </div>
       </div>

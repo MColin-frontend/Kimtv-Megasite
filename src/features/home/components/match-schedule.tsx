@@ -1,65 +1,54 @@
 "use client"
 
-import { useSearchParams } from "next/navigation"
-
-import { useRouter } from "@/hooks/useRouter"
+import { useQuery } from "@tanstack/react-query"
 
 import { useTranslation } from "@/i18n"
-import { DATE_RANGE_OPTIONS, DEFAULT_FILTER_MATCH } from "@/constants/component/home.constants"
-import { DateRangeEnum } from "@/enums/common.enum"
-import type { MatchInterface } from "@/models/match.models"
 
-import { getEndpointByDate } from "@/features/home/home.api"
-import CarouselInfinityApi from "@/components/ui/carousel/carousel-infinity-api"
-import { Img } from "@/components/ui/image"
+import { liveMatchCardQueryOptions } from "@/features/live-schedule/live-schedule.api"
+import CarouselInfinity from "@/components/ui/carousel/carousel-infinity"
+import { Empty } from "@/components/ui/empty"
 import { MatchCard } from "@/components/ui/match/match-card"
-import { Select } from "@/components/ui/select/select"
-import { Typography } from "@/components/ui/typography"
-
-import imgEmpty from "@assets/images/common/img-empty.png"
+import { MatchStatusLabel } from "@/components/ui/match/match-status-label"
+import { MatchCardSkeleton } from "@/components/ui/match/skeleton"
 
 export function MatchSchedule() {
   const { t } = useTranslation()
-  const { setParams } = useRouter()
-  const searchParams = useSearchParams()
-  const date = searchParams.get("date") as DateRangeEnum | null
-
-  const dateOptions = DATE_RANGE_OPTIONS.map(({ value, labelKey }) => ({
-    value,
-    label: t(labelKey),
-  }))
+  const { data: matches = [], isLoading } = useQuery(liveMatchCardQueryOptions())
 
   return (
-    <section className="rounded-12 card-glow flex flex-col gap-4 p-5">
-      <div className="flex items-center justify-between gap-3">
-        <Typography variant="h2">{t("home.match-schedule.title")}</Typography>
-
-        <Select
-          options={dateOptions}
-          value={date ?? DEFAULT_FILTER_MATCH}
-          variant="glass"
-          size="sm"
-          triggerClassName="w-40 min-w-0"
-          onValueChange={(val) => setParams({ date: val }, { scroll: false })}
-        />
+    <section className="card-glow rounded-12 flex flex-col gap-4 p-5 max-sm:gap-3 max-sm:p-3">
+      <div className="flex items-center justify-between gap-3 max-sm:flex-col max-sm:items-start">
+        <MatchStatusLabel type="live" />
       </div>
 
-      <CarouselInfinityApi<MatchInterface>
-        key={date}
-        endpoint={getEndpointByDate(date)}
-        method="POST"
-        params={{ gameId: [] }}
-        renderItem={(match, _, isLoading) => <MatchCard match={match} isLoading={isLoading} />}
-        renderEmpty={() => (
-          <div className="flex flex-col items-center justify-center gap-3 py-8">
-            <Img src={imgEmpty.src} alt="" width={140} height={140} objectFit="contain" />
-            <Typography variant="body-sm" className="text-primary">
-              {t("common.empty")}
-            </Typography>
+      {isLoading ? (
+        <>
+          <div className="hidden max-sm:block">
+            <div className="-ml-4 flex overflow-x-hidden">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="shrink-0 basis-[85vw] pl-4">
+                  <MatchCardSkeleton />
+                </div>
+              ))}
+            </div>
           </div>
-        )}
-        slideClassName="basis-[350px] max-sm:basis-full"
-      />
+          <div className="grid grid-cols-4 gap-4 max-xl:grid-cols-3 max-lg:grid-cols-2 max-sm:hidden">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <MatchCardSkeleton key={i} />
+            ))}
+          </div>
+        </>
+      ) : matches.length > 0 ? (
+        <CarouselInfinity
+          items={matches}
+          renderItem={(match, i) => <MatchCard key={`${match.matchId}-${i}`} match={match} />}
+          slideClassName="basis-1/5 max-lg:basis-1/3 max-sm:basis-full"
+          gapClassName="gap-3"
+          keyExtractor={(m, i) => `${m.matchId}-${i}`}
+        />
+      ) : (
+        <Empty tip={t("common.empty")} />
+      )}
     </section>
   )
 }

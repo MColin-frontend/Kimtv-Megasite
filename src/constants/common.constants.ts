@@ -16,4 +16,15 @@ const MATCH_HALF_LABEL: Partial<Record<MatchFootballStateEnum, string>> = {
 
 export const SKELETON_BG = "bg-gray-200"
 
+export interface PreferenceTagInterface {
+  id: string
+  label: string
+}
+
+export const DEFAULT_PREFERENCE_TAGS: PreferenceTagInterface[] = [
+  { id: "bong-da", label: "Bóng đá" },
+  { id: "nba", label: "NBA" },
+  { id: "epl", label: "EPL" },
+]
+
 export { DEFAULT_PAGE_SIZE, DEFAULT_PAGE, PAGE_SIZE_OPTION, MATCH_HALF_LABEL }

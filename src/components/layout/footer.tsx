@@ -4,9 +4,9 @@ import Link from "next/link"
 
 import { useTranslation } from "@/i18n"
 import { getRoutes } from "@/config/routes"
-import { FOOTER_MENUS, FOOTER_SOCIALS } from "@/constants/component/layout.constants"
-import type { FooterMenuInterface, FooterSocialInterface } from "@/models/footer.models"
+import { FOOTER_MENUS } from "@/constants/component/layout.constants"
 
+import type { FooterMenuInterface } from "@/components/layout/layout.models"
 import { Img } from "@/components/ui/image"
 import { Typography } from "@/components/ui/typography"
 
@@ -17,7 +17,7 @@ export function Footer() {
   const routes = getRoutes(locale)
 
   return (
-    <footer className="border-line w-full border-t pt-8 pb-14">
+    <footer className="border-line border-t">
       <div className="container">
         <div className="border-line flex items-center justify-between gap-4 border-b pb-10 max-lg:flex-col max-lg:pb-7 max-md:pb-5">
           <div className="max-w-[400px] max-lg:flex max-lg:w-full max-lg:max-w-full max-lg:flex-col max-lg:items-center">
@@ -30,27 +30,6 @@ export function Footer() {
             >
               {t("footer.desc")}
             </Typography>
-
-            <div className="mt-7 flex items-center gap-6 max-lg:mt-6 max-lg:gap-5 max-md:mt-4 max-md:justify-center max-md:gap-4">
-              {FOOTER_SOCIALS.map((social: FooterSocialInterface) => (
-                <Link
-                  key={social.name}
-                  href={social.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={social.name}
-                  className="social-btn flex h-8 w-8 items-center justify-center rounded-full"
-                >
-                  <Img
-                    src={social.icon}
-                    alt={social.name}
-                    width={14}
-                    height={14}
-                    className="hover:animation-duration-[0.6s] animate-[scaleBreath_2s_ease-in-out_infinite]"
-                  />
-                </Link>
-              ))}
-            </div>
           </div>
 
           <nav className="flex flex-wrap items-center justify-center gap-9 max-lg:gap-6 max-md:gap-3">

@@ -30,18 +30,6 @@ export const CHAT_SYMBOLS = {
   COLLAPSE: "▲",
 } as const
 
-/* ── VIP icons ───────────────────────────────────────────── */
-
-const CDN = "https://kimtv-oss.99kimtvs.top"
-
-export const CHAT_VIP_ICONS = {
-  /** Từ CDN vì chưa có file local */
-  SVIP: `${CDN}/images/svip_icon.png`,
-  VIP: `${CDN}/images/vip_icon.png`,
-  /** Local public/images/chatroom/vip{0-12}.png — copy từ KIMTV-PC */
-  level: (n: number) => `/images/chatroom/vip${Math.min(12, Math.max(0, Math.floor(n || 0)))}.png`,
-} as const
-
 /* ── Social names ────────────────────────────────────────── */
 
 export const CHAT_SOCIAL_NAMES = {
@@ -51,7 +39,7 @@ export const CHAT_SOCIAL_NAMES = {
 } as const
 
 /* ── Layout ──────────────────────────────────────────────── */
-export const CHAT_INPUT_HEIGHT = "h-[38px]"
+export const CHAT_INPUT_HEIGHT = "h-[46px]"
 export const CHAT_MSG_PADDING = "px-[18px]"
 export const CHAT_POPUP_WIDTH = "w-[418px]"
 export const CHAT_ADMIN_BTN = "h-[50px] w-[220px]"
@@ -77,7 +65,7 @@ export const CHAT_CLASSES = {
   text: "text-chat-text",
   status: "text-chat-status",
   pin: "text-chat-pin",
-  username: "text-[#54aaff]",
+  username: "text-[#3d9aff]",
   muted: "text-chat-muted",
   vipUser: "text-chat-vip-user",
   vipWelcome: "text-chat-vip-welcome",

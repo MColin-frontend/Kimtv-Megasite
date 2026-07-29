@@ -20,6 +20,12 @@ interface AppImageProps extends Omit<ImageProps, "src" | "alt"> {
   wrapperClassName?: string
 }
 
+/** Normalize: null | undefined | "" đều về null → dùng fallback. */
+function normalizeSrc(src: AppImageProps["src"]): ImageProps["src"] | null {
+  if (!src) return null
+  return src
+}
+
 export function Img({
   src,
   alt = "",
@@ -28,31 +34,45 @@ export function Img({
   rounded,
   fill,
   sizes,
+  style,
   className,
   wrapperClassName,
   ...props
 }: AppImageProps) {
-  const [prevSrc, setPrevSrc] = useState(src)
-  const [imgSrc, setImgSrc] = useState<ImageProps["src"]>(src ?? fallback)
+  const resolved = normalizeSrc(src)
+  const [prevSrc, setPrevSrc] = useState(resolved)
+  const [imgSrc, setImgSrc] = useState<ImageProps["src"]>(resolved ?? fallback)
 
-  if (prevSrc !== src) {
-    setPrevSrc(src)
-    setImgSrc(src ?? fallback)
+  if (prevSrc !== resolved) {
+    setPrevSrc(resolved)
+    setImgSrc(resolved ?? fallback)
   }
 
   const roundedClass = rounded ? `rounded-${rounded}` : undefined
 
+  // Khi truyền width/height (không dùng fill), tự enforce CSS size để không cần
+  // thêm className="w-[Xpx] h-[Ypx]" redundant bên ngoài.
+  // Consumer style vẫn có thể override (ví dụ: height: "auto" cho logo).
+  const sizeStyle: React.CSSProperties =
+    !fill && props.width && props.height
+      ? { width: Number(props.width), height: Number(props.height) }
+      : {}
+
+  const mergedStyle: React.CSSProperties = { objectFit, ...sizeStyle, ...style }
+
   const sharedProps = {
     alt,
-    style: { objectFit } as React.CSSProperties,
+    style: mergedStyle,
     onError: () => setImgSrc(fallback),
   }
 
   if (fill) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { width: _w, height: _h, ...fillProps } = props
     return (
       <div className={cn("relative overflow-hidden", roundedClass, wrapperClassName)}>
         <NextImage
-          {...props}
+          {...fillProps}
           {...sharedProps}
           src={imgSrc}
           fill

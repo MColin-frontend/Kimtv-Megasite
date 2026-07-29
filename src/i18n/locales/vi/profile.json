@@ -1,0 +1,37 @@
+{
+  "page-title": "Hồ sơ cá nhân",
+  "subtitle": "Quản lý thông tin tài khoản của bạn",
+  "fallback-name": "Thành viên",
+  "login-prompt": "Vui lòng đăng nhập để xem hồ sơ",
+  "login-button": "Đăng nhập",
+  "empty-tab": "Tính năng đang được phát triển",
+  "nav": {
+    "profile": "Hồ sơ",
+    "my-news": "Tin của tôi",
+    "favorites": "Bóng đá yêu thích",
+    "following": "Theo dõi",
+    "settings": "Cài đặt"
+  },
+  "info": {
+    "title": "Thông tin cá nhân",
+    "edit-profile": "Chỉnh sửa hồ sơ",
+    "phone": "Số điện thoại",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "change": "Thay đổi",
+    "save": "Lưu thay đổi",
+    "cancel": "Hủy",
+    "saving": "Đang lưu...",
+    "save-success": "Cập nhật thành công",
+    "save-error": "Cập nhật thất bại, vui lòng thử lại"
+  },
+  "preferences": {
+    "title": "Sở thích của người dùng",
+    "add-more": "Thêm sở thích"
+  },
+  "security": {
+    "title": "Bảo mật tài khoản",
+    "change-link": "Đổi liên kết",
+    "change-password": "Thay đổi"
+  }
+}

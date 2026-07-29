@@ -1,5 +1,62 @@
 import type { Nullable } from "@/types"
 
+/* ── Sub-interfaces (tái sử dụng riêng lẻ) ──────────────── */
+
+/** Thông tin giải đấu / series */
+interface MatchLeagueInterface {
+  leagueId: Nullable<number>
+  leagueName: Nullable<string>
+  leagueLogo: Nullable<string>
+  leagueLevel: Nullable<number>
+  seriesId: Nullable<number>
+  seriesName: Nullable<string>
+  seriesLogo: Nullable<string>
+  stageId: Nullable<number>
+  stageName: Nullable<string>
+}
+
+/** Thông tin hai đội + tỉ số */
+interface MatchTeamInterface {
+  home: Nullable<number>
+  homeName: Nullable<string>
+  homeLogo: Nullable<string>
+  homeScore: Nullable<number>
+  homeFirstHalfScore: Nullable<number>
+  away: Nullable<number>
+  awayName: Nullable<string>
+  awayLogo: Nullable<string>
+  awayScore: Nullable<number>
+  awayFirstHalfScore: Nullable<number>
+}
+
+/** Thống kê bóng đá (phạt góc, thẻ) */
+interface MatchFootballStatsInterface {
+  homeCornerKick: Nullable<number>
+  awayCornerKick: Nullable<number>
+  homeYellowCard: Nullable<number>
+  awayYellowCard: Nullable<number>
+  homeRedCard: Nullable<number>
+  awayRedCard: Nullable<number>
+}
+
+/** Thống kê esports */
+interface MatchEsportsStatsInterface {
+  homeKill: Nullable<number>
+  awayKill: Nullable<number>
+  homeGoldsDiff: Nullable<number>
+  awayGoldsDiff: Nullable<number>
+  homeWinRate: Nullable<number>
+  awayWinRate: Nullable<number>
+  bo: Nullable<number>
+  bpPhase: Nullable<number>
+}
+
+/** Thống kê bóng rổ */
+interface MatchBasketballStatsInterface {
+  homeThreePointGoals: Nullable<number>
+  awayThreePointGoals: Nullable<number>
+}
+
 /** Link stream trong `match.liveUrls[]`. */
 interface MatchLiveUrlInterface {
   liveUrl: Nullable<string>
@@ -43,7 +100,14 @@ interface AnchorRoomVo {
 }
 
 /** Một trận đấu trả về từ backend KimTV. */
-interface MatchInterface {
+interface MatchInterface
+  extends
+    MatchLeagueInterface,
+    MatchTeamInterface,
+    MatchFootballStatsInterface,
+    MatchEsportsStatsInterface,
+    MatchBasketballStatsInterface {
+  // Core
   matchId: number
   gameId: number
   status: number
@@ -51,51 +115,6 @@ interface MatchInterface {
   isLive: Nullable<boolean>
   startTime: Nullable<number>
   gameTime: Nullable<number>
-
-  // Giải đấu
-  leagueId: Nullable<number>
-  leagueName: Nullable<string>
-  leagueLogo: Nullable<string>
-  leagueLevel: Nullable<number>
-  seriesId: Nullable<number>
-  seriesName: Nullable<string>
-  seriesLogo: Nullable<string>
-  stageId: Nullable<number>
-  stageName: Nullable<string>
-
-  // Đội nhà / khách
-  home: Nullable<number>
-  homeName: Nullable<string>
-  homeLogo: Nullable<string>
-  homeScore: Nullable<number>
-  homeFirstHalfScore: Nullable<number>
-  away: Nullable<number>
-  awayName: Nullable<string>
-  awayLogo: Nullable<string>
-  awayScore: Nullable<number>
-  awayFirstHalfScore: Nullable<number>
-
-  // Thống kê bóng đá
-  homeCornerKick: Nullable<number>
-  awayCornerKick: Nullable<number>
-  homeYellowCard: Nullable<number>
-  awayYellowCard: Nullable<number>
-  homeRedCard: Nullable<number>
-  awayRedCard: Nullable<number>
-
-  // Esports
-  homeKill: Nullable<number>
-  awayKill: Nullable<number>
-  homeGoldsDiff: Nullable<number>
-  awayGoldsDiff: Nullable<number>
-  homeWinRate: Nullable<number>
-  awayWinRate: Nullable<number>
-  bo: Nullable<number>
-  bpPhase: Nullable<number>
-
-  // Bóng rổ
-  homeThreePointGoals: Nullable<number>
-  awayThreePointGoals: Nullable<number>
 
   // Kết quả / vòng đấu
   winTeam: Nullable<number>
@@ -135,6 +154,15 @@ interface MatchInterface {
   hasPro: Nullable<boolean>
   hasLivePro: Nullable<boolean>
   menu: number[]
+  // Anchor / BLV stream fields
+  anchor?: boolean
+  roomId?: Nullable<number>
+  anchorName?: Nullable<string>
+  anchorAvatar?: Nullable<string>
+  anchorTitle?: Nullable<string>
+  liveUrl?: Nullable<string>
+  liveUrlFlv?: Nullable<string>
+  liveImage?: Nullable<string>
 }
 
 /** Body cho `get-pc-game-match-by-condition`. */
@@ -147,7 +175,12 @@ interface GetPcGameMatchByConditionRequestInterface {
 
 export type {
   MatchInterface,
-  GetPcGameMatchByConditionRequestInterface,
+  MatchLeagueInterface,
+  MatchTeamInterface,
+  MatchFootballStatsInterface,
+  MatchEsportsStatsInterface,
+  MatchBasketballStatsInterface,
   MatchLiveUrlInterface,
   AnchorRoomVo,
+  GetPcGameMatchByConditionRequestInterface,
 }

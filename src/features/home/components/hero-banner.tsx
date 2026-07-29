@@ -1,24 +1,28 @@
 "use client"
 
-import { useTranslation } from "@/i18n"
-import type { BannerItem } from "@/models/home.models"
+import dynamic from "next/dynamic"
 
-import { Banner } from "@/components/ui/banner"
+import { useAdPlacements } from "@/hooks/tanstack/use-ad-placements"
 
-import heroBanner1 from "@assets/images/home/img-mockup-banner-1.png"
+import heroBanner from "@assets/videos/common/video-wc-banner.mp4"
 
-const MOCK_BANNERS: BannerItem[] = [
-  { imageUrl: heroBanner1.src, url: "/", width: heroBanner1.width, height: heroBanner1.height },
-  { imageUrl: heroBanner1.src, url: "/", width: heroBanner1.width, height: heroBanner1.height },
-  { imageUrl: heroBanner1.src, url: "/", width: heroBanner1.width, height: heroBanner1.height },
-]
+const AdBanner = dynamic(() => import("@/components/ui/ad-banner").then((m) => m.AdBanner), {
+  ssr: false,
+})
 
-interface HeroBannerProps {
-  data?: BannerItem[]
-}
+export function HeroBanner() {
+  const { data: ads, isLoading } = useAdPlacements()
+  const homeBanner = ads?.homeBanner
 
-export function HeroBanner({ data = MOCK_BANNERS }: HeroBannerProps) {
-  const { t } = useTranslation()
-
-  return <Banner alt={t("home.hero.alt")} data={data} />
+  return (
+    <AdBanner
+      src={homeBanner?.enabled ? homeBanner.mediaPc : null}
+      href={homeBanner?.jumpUrl || null}
+      fallback={heroBanner}
+      isLoading={isLoading}
+      skeletonClassName="aspect-[1660/132]"
+      className="w-full"
+      rounded="rounded-12 max-md:rounded-4"
+    />
+  )
 }

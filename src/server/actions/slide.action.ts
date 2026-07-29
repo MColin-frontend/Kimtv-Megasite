@@ -32,11 +32,11 @@ export async function fetchSlideAction<T>(
   pageSize: number
 ): Promise<T[]> {
   const payload = { ...params, page, pageSize }
-  const res =
+  const data =
     method === "GET"
       ? await getRequest<unknown>(endpoint, { params: payload })
       : await postRequest<unknown>(endpoint, payload)
-  return extractRecords<T>(res.data).data
+  return extractRecords<T>(data).data
 }
 
 /**
@@ -48,11 +48,11 @@ export async function fetchAllAction<T>(
   method: "GET" | "POST",
   params: Record<string, unknown>
 ): Promise<T[]> {
-  const res =
+  const data =
     method === "GET"
       ? await getRequest<unknown>(endpoint, { params })
       : await postRequest<unknown>(endpoint, params)
-  return extractRecords<T>(res.data).data
+  return extractRecords<T>(data).data
 }
 
 /**
@@ -66,9 +66,9 @@ export async function fetchPageAction<T>(
   pageSize: number
 ): Promise<PageResult<T>> {
   const payload = { ...params, page, pageSize }
-  const res =
+  const data =
     method === "GET"
       ? await getRequest<unknown>(endpoint, { params: payload })
       : await postRequest<unknown>(endpoint, payload)
-  return extractRecords<T>(res.data)
+  return extractRecords<T>(data)
 }

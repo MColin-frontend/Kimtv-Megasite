@@ -18,6 +18,7 @@ interface CarouselInfinityApiProps<T> {
   renderItem: (item: T, index: number, isLoading: boolean) => React.ReactNode
   renderEmpty?: () => React.ReactNode
   slideClassName?: string
+  gapClassName?: string
   autoPlayDelay?: number
   keyExtractor?: (item: T, index: number) => string | number
   className?: string
@@ -34,6 +35,7 @@ export default function CarouselInfinityApi<T>({
   renderItem,
   renderEmpty,
   slideClassName,
+  gapClassName,
   autoPlayDelay,
   keyExtractor,
   className,
@@ -88,6 +90,7 @@ export default function CarouselInfinityApi<T>({
       items={isInitialLoading ? skeletonItems : items}
       renderItem={(item, index) => renderItem(item, index, isInitialLoading)}
       slideClassName={slideClassName}
+      gapClassName={gapClassName}
       autoPlayDelay={autoPlayDelay}
       keyExtractor={isInitialLoading ? (_, i) => `skeleton-${i}` : keyExtractor}
       onReachEnd={handleReachEnd}

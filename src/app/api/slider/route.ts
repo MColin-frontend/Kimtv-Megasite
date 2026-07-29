@@ -21,10 +21,10 @@ export async function POST(req: NextRequest) {
 
   const payload = { ...params, page, pageSize }
 
-  const res =
+  const data =
     method === "GET"
       ? await getRequest<unknown[]>(endpoint, { params: payload })
       : await postRequest<unknown[]>(endpoint, payload)
 
-  return NextResponse.json(res.success ? (res.data ?? []) : [])
+  return NextResponse.json(data ?? [])
 }

@@ -1,0 +1,283 @@
+{
+  "registration": {
+    "title": "Đăng ký làm Bình Luận Viên",
+    "description": "Trở thành BLV tại KimTV để phát sóng bình luận trực tiếp các trận đấu thể thao và xây dựng cộng đồng người hâm mộ riêng của bạn.",
+    "benefit1": "Phát sóng bình luận trực tiếp các trận đấu yêu thích",
+    "benefit2": "Xây dựng kênh và cộng đồng người xem riêng",
+    "benefit3": "Được hỗ trợ kỹ thuật và đào tạo từ đội ngũ KimTV",
+    "cta": "Đăng ký làm BLV",
+    "form": {
+      "section-info": "Thông tin cá nhân",
+      "section-id": "CMND / CCCD",
+      "section-id-hint": "(Tải lên ảnh mặt trước, mặt sau và ảnh cầm CMND)",
+      "name": "Tên",
+      "name-placeholder": "Nhập tên hiển thị",
+      "phone": "Số điện thoại",
+      "phone-placeholder": "Nhập số điện thoại",
+      "id-number": "Số CMND / CCCD",
+      "id-number-placeholder": "Nhập số CMND / CCCD",
+      "brief": "Giới thiệu cá nhân",
+      "brief-placeholder": "Mô tả ngắn về bản thân...",
+      "id-front": "Mặt trước",
+      "id-back": "Mặt sau",
+      "id-holding": "Ảnh cầm CMND",
+      "submit": "Đăng ký chủ phòng",
+      "tip": "Nền tảng sẽ trích 20% hoa hồng từ quà tặng.",
+      "success-title": "Đã gửi đơn đăng ký!",
+      "success-desc": "Chúng tôi sẽ xem xét và liên hệ với bạn trong thời gian sớm nhất.",
+      "back-home": "Về trang chủ"
+    }
+  },
+  "hero": {
+    "fallback-name": "Thành viên",
+    "role": "BLV",
+    "subtitle": "Bình luận viên & Content Creator tại KimTV",
+    "channel": "Kênh phát sóng"
+  },
+  "rules": {
+    "title": "Quy định phát sóng",
+    "badge": "Bắt buộc",
+    "count": "{n} quy định",
+    "description": "Ủng hộ môi trường mạng văn minh và xanh. Mọi BLV phải tuân thủ đầy đủ các quy định dưới đây.",
+    "footer": "Tiêu chuẩn nghiêm ngặt được áp dụng. Vi phạm sẽ bị cảnh cáo hoặc cấm phát sóng ngay lập tức.",
+    "items": {
+      "0": {
+        "title": "Cấm phát ngôn chống Đảng và xã hội",
+        "desc": "Nghiêm cấm đăng tải phát ngôn chống Đảng, chống xã hội, hoặc xúc phạm lãnh đạo Đảng và Nhà nước."
+      },
+      "1": {
+        "title": "Cấm quảng bá hành vi bất hợp pháp",
+        "desc": "Nghiêm cấm quảng bá các hành vi bị pháp luật Nhà nước cấm."
+      },
+      "2": {
+        "title": "Cấm biểu diễn tục tĩu và khiêu khích",
+        "desc": "Nghiêm cấm biểu diễn tục tĩu, quyến rũ, kích dục, hoặc thể hiện nội dung khiêu khích, xúc phạm."
+      },
+      "3": {
+        "title": "Cấm phát tán nội dung khiêu dâm",
+        "desc": "Nghiêm cấm phát tán thông tin khiêu dâm dưới mọi hình thức, trực tiếp hoặc gián tiếp."
+      },
+      "4": {
+        "title": "Cấm quảng bá ma túy và vũ khí",
+        "desc": "Nghiêm cấm phát tán ma túy hoặc trưng bày súng, dao kiểm soát, vũ khí dưới mọi hình thức."
+      },
+      "5": {
+        "title": "Cấm quảng cáo độc hại",
+        "desc": "Nghiêm cấm quảng bá quảng cáo, spam, hoặc đăng quảng cáo độc hại dưới mọi hình thức."
+      },
+      "6": {
+        "title": "Cấm ngôn ngữ xúc phạm",
+        "desc": "Nghiêm cấm sử dụng ngôn ngữ xúc phạm, hạ nhục, kỳ thị hoặc phân biệt đối xử."
+      },
+      "7": {
+        "title": "Cấm chủ đề nhạy cảm",
+        "desc": "Nghiêm cấm phát trực tiếp về sự kiện thời sự nhạy cảm, cơ sở quân sự, cơ quan chính phủ hoặc địa điểm tôn giáo."
+      },
+      "8": {
+        "title": "Cấm hút thuốc và bạo lực",
+        "desc": "Nghiêm cấm hút thuốc trong lúc phát sóng hoặc thể hiện hành vi bạo lực."
+      },
+      "9": {
+        "title": "Cấm người dưới 18 tuổi",
+        "desc": "Người dưới 18 tuổi bị cấm đăng ký và phát trực tiếp trên nền tảng."
+      },
+      "10": {
+        "title": "Cấm logo nền tảng khác",
+        "desc": "Nghiêm cấm xuất hiện logo của các nền tảng phát trực tiếp khác trong quá trình phát sóng."
+      },
+      "11": {
+        "title": "Cấm giả mạo danh tính",
+        "desc": "Nghiêm cấm giả mạo BLV, tổ chức hoặc người dùng khác; không được dùng thông tin sai lệch để lừa đảo."
+      }
+    }
+  },
+  "room-owner": {
+    "title": "Thông tin chủ phòng",
+    "subtitle": "Hiển thị trên trang kênh của bạn",
+    "fields": {
+      "intro": {
+        "label": "Giới thiệu",
+        "placeholder": "Nhập giới thiệu",
+        "error": "Vui lòng nhập giới thiệu"
+      },
+      "intro-detail": {
+        "label": "Giới thiệu chi tiết",
+        "placeholder": "Mô tả chi tiết về kênh của bạn...",
+        "error": "Vui lòng nhập giới thiệu chi tiết"
+      },
+      "images": {
+        "label": "Ảnh chi tiết",
+        "error": "Vui lòng tải lên ít nhất 1 ảnh"
+      },
+      "announcement": {
+        "label": "Thông báo trước khi phát sóng",
+        "placeholder": "Vui lòng nhập thông báo trước khi phát sóng",
+        "error": "Vui lòng nhập thông báo"
+      }
+    },
+    "actions": {
+      "cancel": "Hủy",
+      "save": "Lưu"
+    },
+    "preview": {
+      "no-intro": "Chưa có giới thiệu",
+      "intro-detail": "Giới thiệu chi tiết",
+      "images": "Ảnh chi tiết",
+      "announcement": "Thông báo phát sóng",
+      "edit": "Chỉnh sửa",
+      "label": "Thông tin chủ phòng"
+    }
+  },
+  "stream-panel": {
+    "title": "Cài đặt luồng phát",
+    "refresh": "Làm mới key",
+    "refresh-success": "Đã cập nhật thông tin luồng phát",
+    "fields": {
+      "rtmp-url": "RTMP URL",
+      "stream-key": "Stream Key",
+      "live-url-hls": "Live URL (HLS)",
+      "live-url-flv": "Live URL (FLV)"
+    }
+  },
+  "guide": {
+    "button": "Hướng dẫn",
+    "title": "Bắt đầu phát sóng",
+    "subtitle": "OBS trực tiếp",
+    "notice": "Vui lòng liên hệ admin để được cấp quyền phát sóng",
+    "steps": {
+      "step1": "1. Tiêu đề",
+      "step2": "2. Sao chép",
+      "step3": "3. Bắt đầu lần đầu",
+      "step4": "4. Kết thúc"
+    }
+  },
+  "stream-settings": {
+    "title": "Cài đặt trực tiếp",
+    "status": {
+      "idle": "Chưa phát sóng"
+    },
+    "live-id": "ID phát trực tiếp",
+    "owner-info": {
+      "subtitle": "Giới thiệu, ảnh và thông báo phát sóng"
+    },
+    "admin": {
+      "label": "Số quản trị viên",
+      "empty": "Chưa có quản trị viên"
+    },
+    "fields": {
+      "title": {
+        "label": "Tiêu đề",
+        "placeholder": "Nhập tiêu đề buổi phát",
+        "error": "Vui lòng nhập tiêu đề",
+        "max-length": "Tối đa 40 ký tự"
+      },
+      "cover": {
+        "label": "Ảnh bìa",
+        "hint": "Kích thước đề xuất: 300×200"
+      },
+      "scheduled": {
+        "label": "Có đặt trước?"
+      },
+      "scheduled-at": {
+        "label": "Thời gian đặt trước",
+        "placeholder": "Chọn ngày",
+        "error": "Vui lòng chọn thời gian đặt trước"
+      },
+      "live-mode": {
+        "label": "Chọn chế độ phát trực tiếp"
+      },
+      "sport": {
+        "label": "Môn thể thao",
+        "placeholder": "Chọn môn thể thao"
+      },
+      "league": {
+        "placeholder": "Giải đấu",
+        "error": "Vui lòng chọn giải đấu"
+      },
+      "match": {
+        "label": "Trận đấu",
+        "placeholder": "Chọn trận đấu",
+        "error": "Vui lòng chọn trận đấu"
+      },
+      "match-status": {
+        "label": "Trạng thái trận"
+      },
+      "stream-type": {
+        "label": "Cài đặt phát trực tiếp"
+      },
+      "login-required": {
+        "label": "Yêu cầu đăng nhập"
+      },
+      "external-comment": {
+        "label": "Bình luận bên ngoài"
+      },
+      "m3u8-url": {
+        "label": "Địa chỉ m3u8",
+        "placeholder": "Vui lòng nhập địa chỉ"
+      }
+    },
+    "options": {
+      "yes": "Có",
+      "no": "Không",
+      "live-mode": {
+        "match": "Trận đấu liên quan",
+        "free": "Tuỳ chỉnh"
+      },
+      "sport": {
+        "soccer": "Bóng đá",
+        "basketball": "Bóng rổ",
+        "tennis": "Tennis",
+        "volleyball": "Bóng chuyền",
+        "table-tennis": "Bóng bàn",
+        "badminton": "Cầu lông",
+        "snooker": "Billiards",
+        "baseball": "Bóng chày",
+        "football": "Bóng bầu dục",
+        "cricket": "Cricket"
+      },
+      "live-status": {
+        "live": "Đang diễn ra"
+      },
+      "match-status": {
+        "upcoming": "Chưa bắt đầu",
+        "live": "Đang diễn ra",
+        "finished": "Đã kết thúc",
+        "cancelled": "Huỷ trận",
+        "postponed": "Hoãn trận"
+      },
+      "stream-type": {
+        "host": "Chủ phòng phát trực tiếp",
+        "anchor": "BLV phát trực tiếp",
+        "bot": "Bot phát trực tiếp"
+      },
+      "login-required": {
+        "no": "Không cần đăng nhập",
+        "yes": "Đăng nhập",
+        "coin": "Xu thanh toán",
+        "level": "Giới hạn cấp độ người xem"
+      },
+      "external-comment": {
+        "none": "Không kết nối",
+        "connected": "Kết nối"
+      },
+      "custom-type": {
+        "custom-live": "Phát sóng trực tiếp tùy chỉnh"
+      }
+    },
+    "banned-users": {
+      "label": "Người dùng bị cấm nói",
+      "view": "Xem"
+    },
+    "actions": {
+      "cancel": "Huỷ",
+      "confirm": "Xác nhận",
+      "edit": "Chỉnh sửa",
+      "start-stream": "Bắt đầu phát sóng",
+      "start-stream-success": "Đã bắt đầu phát sóng thành công",
+      "end-stream": "Kết thúc",
+      "cancel-reservation": "Huỷ đặt chỗ",
+      "cancel-reservation-confirm": "Xác nhận hủy đặt trước phát trực tiếp?",
+      "end-stream-success": "Đã kết thúc phát sóng"
+    }
+  }
+}

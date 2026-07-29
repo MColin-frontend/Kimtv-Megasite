@@ -2,8 +2,7 @@
 
 import Link from "next/link"
 
-import type { BannerItem } from "@/models/home.models"
-
+import type { BannerItem } from "@/features/home/home.models"
 import CarouselInfinity from "@/components/ui/carousel/carousel-infinity"
 import { Img } from "@/components/ui/image"
 

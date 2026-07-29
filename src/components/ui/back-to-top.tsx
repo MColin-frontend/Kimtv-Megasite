@@ -29,8 +29,8 @@ export function BackToTop({ threshold = 400, className }: BackToTopProps) {
       onClick={scrollToTop}
       aria-label="Lên đầu trang"
       className={cn(
-        "fixed right-5 bottom-20 z-50",
-        "flex size-12 items-center justify-center rounded-full",
+        "fixed right-5 bottom-20 z-50 max-sm:right-3 max-sm:bottom-16",
+        "flex size-12 items-center justify-center rounded-full max-sm:size-8",
         "border text-white backdrop-blur-xl",
         "border-[rgba(245,197,24,0.5)] bg-[rgba(245,197,24,0.75)]",
         "shadow-[0_4px_20px_rgba(245,197,24,0.4),inset_0_1px_0_rgba(255,255,255,0.25)]",

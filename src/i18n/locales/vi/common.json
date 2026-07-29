@@ -3,11 +3,36 @@
   "today": "Hôm nay",
   "tomorrow": "Sắp diễn ra",
   "empty": "Không có dữ liệu",
-  "match-card": {
-    "hours": "Giờ",
-    "minutes": "Phút",
-    "seconds": "Giây",
-    "finished": "FT",
-    "watch-preview": "Xem trước"
+  "live-page": {
+    "live-section": "Đang diễn ra",
+    "upcoming-section": "Sắp diễn ra",
+    "finished-section": "Đã kết thúc",
+    "filter-all": "Tất cả",
+    "filter-hot": "Nổi bật",
+    "filter-live": "Trực tiếp",
+    "filter-tv": "Truyền hình"
+  },
+  "user-info": {
+    "tabs": {
+      "all": "Tất cả",
+      "news": "Tin tức",
+      "video": "Video"
+    },
+    "stats": {
+      "articles": "Bài viết",
+      "videos": "Video",
+      "followers": "Lượt follow",
+      "joined": "Tham gia",
+      "joined-suffix": " ngày"
+    },
+    "follow": "+ Theo dõi",
+    "following": "Đang theo dõi",
+    "hot-news": "Bài viết mới nhất",
+    "empty": "Chưa có nội dung",
+    "category": "Bóng đá",
+    "read-more": "Đọc thêm",
+    "video": "Video",
+    "fallback-bio1": "Bình luận viên & Content Creator bóng đá hàng đầu tại KimTV.",
+    "fallback-bio2": "Mang đến góc nhìn sắc bén, phân tích chuyên sâu và tin tức nóng hổi mỗi ngày."
   }
 }

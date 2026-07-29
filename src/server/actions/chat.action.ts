@@ -1,8 +1,29 @@
 "use server"
 
-import { getRequest } from "@/server/services/request"
+import { getRequest, postRequest } from "@/server/services/request"
 
 import type { ChatMessage } from "@/components/ui/chat"
+
+export type ChatOperateType =
+  | "PIN_MESSAGE"
+  | "UNPIN_MESSAGE"
+  | "DELETE_MESSAGE"
+  | "REPORT"
+  | "ALL_PLATFORMS"
+  | "ROOM_PLATFORMS"
+  | "HOUSING_MANAGEMENT"
+
+export async function chatroomOperateAction(params: {
+  operateType: ChatOperateType
+  userId?: string | number
+  chatroomId?: string | number
+  gameId?: number
+  messageId?: string | number
+  reportType?: string
+  operate?: boolean
+}): Promise<void> {
+  await postRequest("/chatroom/operate", params)
+}
 
 const CHAT_PAGE_SIZE = 50
 
@@ -37,6 +58,7 @@ function normalizeRawMessage(item: Record<string, unknown>): ChatMessage {
     hasFictitious: item.hasFictitious as boolean | undefined,
     userAvatar: ((item.avatar ?? item.userAvatar) as string | null) || undefined,
     sendTime: (item.timeMillis ?? item.sendTime) as number | undefined,
+    vip99Icon: (item.vip99Icon as string | null) || null,
   }
 }
 
@@ -45,7 +67,7 @@ export async function fetchChatMessagesAction(params: FetchChatParams): Promise<
   hasMore: boolean
 }> {
   const size = params.size ?? CHAT_PAGE_SIZE
-  const res = await getRequest<unknown[]>("/chatroom/v2/list", {
+  const result = await getRequest<unknown[]>("/chatroom/v2/list", {
     params: {
       chatroomId: params.chatroomId,
       gameId: params.gameId ?? 0,
@@ -54,7 +76,7 @@ export async function fetchChatMessagesAction(params: FetchChatParams): Promise<
     },
   })
 
-  const raw = Array.isArray(res.data) ? res.data : []
+  const raw = Array.isArray(result) ? result : []
   const messages = (raw as Record<string, unknown>[]).map(normalizeRawMessage)
 
   return { messages, hasMore: raw.length >= size }
@@ -64,14 +86,13 @@ export async function fetchPinnedMessagesAction(params: {
   chatroomId: string | number
   gameId?: number
 }): Promise<ChatMessage[]> {
-  const res = await getRequest<unknown>("/chatroom/pinned", {
+  const result = await getRequest<unknown>("/chatroom/pinned", {
     params: {
       chatroomId: params.chatroomId,
       gameId: params.gameId ?? 0,
     },
   })
 
-  const result = res.data
   if (!result) return []
   const arr = Array.isArray(result) ? result : [result]
   return (arr as Record<string, unknown>[]).map(normalizeRawMessage)

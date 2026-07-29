@@ -7,8 +7,8 @@ import { Bookmark, ChevronDown, Search, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 import { useTranslation } from "@/i18n"
-import type { LeagueApiItem } from "@/models/home.models"
 
+import type { LeagueApiItem } from "@/features/home/home.models"
 import { Img } from "@/components/ui/image"
 import { Typography } from "@/components/ui/typography"
 
@@ -91,7 +91,7 @@ export function LeagueSelect({
       <Popover.Root>
         <Popover.Trigger
           className={cn(
-            "group/trigger inline-flex h-9 w-[160px] items-center justify-between gap-2.5",
+            "group/trigger inline-flex h-9 w-[160px] max-sm:w-full items-center justify-between gap-2.5",
             "rounded-8 border px-3.5 backdrop-blur-sm",
             "cursor-pointer outline-none select-none",
             "transition-all duration-200",
@@ -141,12 +141,12 @@ export function LeagueSelect({
               {/* Header */}
               <div className="flex items-center justify-between border-b border-white/8 px-4 py-3">
                 <div className="flex items-center gap-2">
-                  <Typography as="span" variant="label" className="font-600 text-white">
+                  <Typography as="span" variant="label" weight="600" className="text-white">
                     {t("home.league-select.title")}
                   </Typography>
                   {hasSelection && (
                     <span className="rounded-4 bg-gold/20 ring-gold/30 inline-flex items-center px-2 py-0.5 ring-1">
-                      <Typography as="span" variant="caption" className="font-700 text-gold">
+                      <Typography as="span" variant="caption" weight="700" className="text-gold">
                         {value.length} {t("home.league-select.selected")}
                       </Typography>
                     </span>
@@ -157,7 +157,7 @@ export function LeagueSelect({
                   onClick={clearAll}
                   className={cn(
                     "rounded-8 flex cursor-pointer items-center gap-1.5 px-2.5 py-1.5 transition-colors duration-150",
-                    hasSelection ? "text-white/60 hover:bg-white/8 hover:text-white" : "text-gold"
+                    hasSelection ? "text-muted hover:bg-white/8 hover:text-white" : "text-gold"
                   )}
                 >
                   {hasSelection ? (
@@ -165,7 +165,7 @@ export function LeagueSelect({
                   ) : (
                     <span className="bg-gold size-1.5 rounded-full" />
                   )}
-                  <Typography as="span" variant="caption" className="font-500 text-inherit">
+                  <Typography as="span" variant="caption" weight="500" className="text-inherit">
                     {t("home.league-select.all")}
                   </Typography>
                 </button>
@@ -179,13 +179,13 @@ export function LeagueSelect({
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder={t("home.league-select.searchPlaceholder")}
-                    className="text-12 font-400 h-8 flex-1 bg-transparent text-white outline-none placeholder:text-white/40"
+                    placeholder={t("home.league-select.search-placeholder")}
+                    className="text-12 font-400 placeholder:text-placeholder h-8 flex-1 bg-transparent text-white outline-none"
                   />
                   {search && (
                     <button
                       onClick={() => setSearch("")}
-                      className="flex size-4 cursor-pointer items-center justify-center rounded-full text-white hover:text-white/70"
+                      className="hover:text-muted flex size-4 cursor-pointer items-center justify-center rounded-full text-white"
                     >
                       <X className="size-3" />
                     </button>

@@ -1,0 +1,53 @@
+{
+  "title": "Highlight",
+  "menu": {
+    "featured": "Xu hướng",
+    "latest": "Mới nhất",
+    "trending": "Nổi bật",
+    "news": "Tin tức",
+    "promotion": "Khuyến mãi"
+  },
+  "actions": {
+    "like": "Thích",
+    "comment": "Bình luận",
+    "share": "Chia sẻ",
+    "follow": "Theo dõi",
+    "mute": "Tắt tiếng",
+    "unmute": "Bật tiếng",
+    "play": "Phát",
+    "pause": "Dừng",
+    "replay": "Xem lại"
+  },
+  "share": {
+    "copied": "Đã sao chép liên kết"
+  },
+  "follow": {
+    "success": "Theo dõi thành công"
+  },
+  "comment": {
+    "title": "Bình luận",
+    "placeholder": "Viết bình luận...",
+    "submit": "Gửi",
+    "login-prompt": "Đăng nhập để bình luận",
+    "empty": "Chưa có bình luận nào",
+    "load-more": "Xem thêm",
+    "posting": "Đang gửi...",
+    "reply": "Trả lời",
+    "delete": "Xóa",
+    "post-success": "Bình luận thành công",
+    "reply-success": "Phản hồi bình luận thành công",
+    "post-error": "Bình luận thất bại, vui lòng thử lại",
+    "delete-success": "Đã xóa bình luận",
+    "delete-error": "Xóa bình luận thất bại"
+  },
+  "no-source": {
+    "title": "Hiện không có trận đấu diễn ra",
+    "description": "Vui lòng quay lại sau"
+  },
+  "empty": "Không có video nào",
+  "load-more": "Đang tải...",
+  "seo": {
+    "title": "Highlight thể thao - Video bóng đá mới nhất",
+    "description": "Xem highlight bóng đá, video thể thao mới nhất. Lướt như TikTok, cập nhật liên tục."
+  }
+}

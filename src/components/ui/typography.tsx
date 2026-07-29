@@ -6,19 +6,19 @@ import { cn } from "@/lib/utils"
 const typographyVariants = cva("text-primary", {
   variants: {
     variant: {
-      display: "text-72 font-700 leading-100 tracking-n2",
-      h1: "text-48 font-700 leading-125 tracking-n1",
-      h2: "text-22 font-700 leading-163 tracking-0",
-      h3: "text-30 font-600 leading-138 tracking-n1",
-      h4: "text-24 font-600 leading-138",
-      h5: "text-20 font-500 leading-138",
-      h6: "text-18 font-500 leading-150",
-      "body-lg": "text-18 font-400 leading-163",
-      body: "text-16 font-400 leading-163",
-      "body-sm": "text-14 font-400 leading-150",
+      display: "text-36 sm:text-48 md:text-60 lg:text-72 font-700 leading-100 tracking-n2",
+      h1: "text-24 sm:text-30 md:text-36 lg:text-48 font-700 leading-125 tracking-n1",
+      h2: "text-16 sm:text-18 md:text-20 lg:text-22 font-700 leading-163 tracking-0",
+      h3: "text-18 sm:text-20 md:text-24 lg:text-30 font-600 leading-138 tracking-n1",
+      h4: "text-16 sm:text-18 md:text-20 lg:text-24 font-600 leading-138",
+      h5: "text-14 sm:text-16 md:text-17 lg:text-20 font-500 leading-138",
+      h6: "text-14 sm:text-16 lg:text-18 font-500 leading-150",
+      "body-lg": "text-14 sm:text-16 lg:text-18 font-400 leading-163",
+      body: "text-14 sm:text-16 font-400 leading-163",
+      "body-sm": "text-12 sm:text-14 font-400 leading-150",
       caption: "text-12 font-400 leading-150 tracking-1",
       overline: "text-12 font-600 leading-150 tracking-4 uppercase",
-      label: "text-14 font-500 leading-1.2",
+      label: "text-12 sm:text-14 font-500 leading-1.2",
     },
   },
   defaultVariants: {
@@ -69,6 +69,8 @@ interface TypographyProps extends HTMLAttributes<HTMLElement> {
   color?: string
 }
 
+const TEXT_SIZE_RE = /(?:^|\s)(?:[a-z0-9-]+:)*!?text-\d+(?=\s|$)/g
+
 function Typography({
   as,
   variant = "body",
@@ -83,10 +85,14 @@ function Typography({
 
   const isRawColor = color?.startsWith("#") || color?.startsWith("rgb")
 
+  const variantClasses = size
+    ? typographyVariants({ variant }).replace(TEXT_SIZE_RE, "").trim()
+    : typographyVariants({ variant })
+
   return (
     <Tag
       className={cn(
-        typographyVariants({ variant }),
+        variantClasses,
         size && `text-${size}`,
         weight && `font-${weight}`,
         color && !isRawColor && `text-${color}`,

@@ -1,0 +1,24 @@
+# docker-compose cho server staging (onepage-dev.kimtv.net).
+# Đặt file này + file `.env` (tạo từ .env.example) trong deploy dir trên server,
+# ví dụ: /opt/onepage-dev/
+#
+#   docker compose pull && docker compose up -d
+#
+# App chỉ lắng nghe 127.0.0.1:3000 — nginx trên host terminate TLS và proxy vào.
+services:
+  web:
+    image: ghcr.io/mcolin-frontend/mega-site-one-page-kimtv:staging
+    container_name: onepage-dev-web
+    restart: unless-stopped
+    # Biến runtime (API_BASE_URL, API_ORIGIN, API_TIMEOUT_MS...) nạp từ .env.
+    env_file:
+      - .env
+    # Chỉ bind loopback → chỉ nginx host truy cập được, không lộ ra internet.
+    ports:
+      - "127.0.0.1:3000:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/vi"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s

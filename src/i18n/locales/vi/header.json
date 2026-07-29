@@ -2,8 +2,8 @@
   "nav": {
     "home": "Trang chủ",
     "schedule": "Lịch thi đấu",
-    "liveScore": "Tỉ số trực tuyến",
-    "liveSchedule": "Lịch live",
+    "live-score": "Tỉ số trực tuyến",
+    "live-schedule": "Lịch live",
     "results": "Kết quả",
     "standings": "BXH",
     "news": "Tin tức",
@@ -13,6 +13,39 @@
   },
   "auth": {
     "login": "Đăng nhập",
-    "register": "Đăng ký"
+    "register": "Đăng ký",
+    "callback": {
+      "processing": "Đang xử lý đăng nhập…",
+      "error": "Đăng nhập thất bại"
+    }
+  },
+  "search": {
+    "aria-label": "Tìm kiếm",
+    "placeholder": "Tìm kiếm..."
+  },
+  "user": {
+    "aria-label": "Tài khoản",
+    "account": "Tài khoản của tôi",
+    "fallback-name": "Người dùng",
+    "role": {
+      "admin": "Admin",
+      "blv": "BLV"
+    },
+    "menu": {
+      "broadcast": "Phát trực tiếp",
+      "profile": "Hồ sơ cá nhân",
+      "settings": "Cài đặt"
+    },
+    "logout": {
+      "label": "Đăng xuất",
+      "title": "Đăng xuất",
+      "content": "Bạn có chắc chắn muốn đăng xuất không?",
+      "confirm": "Xác nhận",
+      "cancel": "Hủy"
+    }
+  },
+  "mobile-menu": {
+    "open": "Mở menu",
+    "close": "Đóng menu"
   }
 }

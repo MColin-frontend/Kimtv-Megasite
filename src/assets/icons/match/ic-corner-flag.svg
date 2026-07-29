@@ -1,0 +1,68 @@
+<svg width="320" height="440" viewBox="0 0 320 440" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="flagGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff7b86"/>
+      <stop offset="45%" stop-color="#e8102c"/>
+      <stop offset="100%" stop-color="#7a0012"/>
+    </linearGradient>
+
+    <linearGradient id="flagShine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35"/>
+      <stop offset="40%" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="poleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="35%" stop-color="#e2e2e2"/>
+      <stop offset="70%" stop-color="#b5b5b5"/>
+      <stop offset="100%" stop-color="#8a8a8a"/>
+    </linearGradient>
+
+    <radialGradient id="baseShadow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="softShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- bóng đổ dưới đế -->
+  <ellipse cx="150" cy="410" rx="55" ry="14" fill="url(#baseShadow)"/>
+
+  <!-- cột cờ -->
+  <rect x="144" y="40" width="12" height="360" rx="6" fill="url(#poleGrad)" filter="url(#softShadow)"/>
+  <!-- viền sáng nhỏ trên cột để tạo độ bóng kim loại -->
+  <rect x="146" y="40" width="3" height="360" rx="1.5" fill="#ffffff" opacity="0.5"/>
+
+  <!-- đầu cột tròn -->
+  <circle cx="150" cy="38" r="7" fill="url(#poleGrad)" filter="url(#softShadow)"/>
+
+  <!-- lá cờ dạng gợn sóng, có độ dày -->
+  <path d="M156 52
+           C 205 44, 235 58, 262 78
+           C 268 82, 268 92, 262 96
+           C 235 116, 210 122, 156 112
+           C 150 108, 150 56, 156 52 Z"
+        fill="url(#flagGrad)" filter="url(#softShadow)"/>
+
+  <!-- lớp gợn sóng thứ 2 tạo chiều sâu vải cờ -->
+  <path d="M156 62
+           C 195 57, 220 66, 245 80
+           C 220 92, 195 96, 156 90 Z"
+        fill="#ffffff" opacity="0.08"/>
+
+  <!-- ánh sáng lướt trên mặt cờ -->
+  <path d="M156 52
+           C 205 44, 235 58, 262 78
+           C 268 82, 268 92, 262 96
+           C 235 116, 210 122, 156 112
+           C 150 108, 150 56, 156 52 Z"
+        fill="url(#flagShine)"/>
+
+  <!-- đế cột hình trụ -->
+  <ellipse cx="150" cy="400" rx="20" ry="7" fill="#5a5a5a"/>
+  <rect x="130" y="392" width="40" height="10" rx="5" fill="#7d7d7d"/>
+</svg>

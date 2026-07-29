@@ -1,0 +1,27 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="circleGrad" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#3fae5c"/>
+      <stop offset="55%" stop-color="#1f8a44"/>
+      <stop offset="100%" stop-color="#146b34"/>
+    </linearGradient>
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- vòng tròn nền -->
+  <circle cx="100" cy="100" r="90" fill="url(#circleGrad)" filter="url(#softShadow)"/>
+
+  <!-- thân micro -->
+  <rect x="82" y="45" width="36" height="70" rx="18" fill="#ffffff"/>
+
+  <!-- giá đỡ hình chữ U quanh micro -->
+  <path d="M60 95
+           a40 40 0 0 0 80 0"
+        fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round"/>
+
+  <!-- chân đế micro -->
+  <line x1="100" y1="135" x2="100" y2="155" stroke="#ffffff" stroke-width="9" stroke-linecap="round"/>
+  <line x1="78" y1="155" x2="122" y2="155" stroke="#ffffff" stroke-width="9" stroke-linecap="round"/>
+</svg>

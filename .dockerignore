@@ -1,0 +1,38 @@
+# Dependencies & build output (build lại trong image)
+node_modules
+.next
+out
+build
+
+# Env & secrets — KHÔNG bao giờ đưa vào build context
+.env
+.env.*
+!.env.example
+
+# Git & CI
+.git
+.github
+.gitignore
+
+# Deploy artifacts (chạy trên server, không cần trong image)
+deploy
+
+# Docs & tooling không cần lúc build
+docs
+.husky
+.vscode
+*.md
+!README.md
+
+# Lockfile khác (dự án dùng npm)
+yarn.lock
+
+# Misc
+.DS_Store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.pem
+coverage
+.vercel
+*.tsbuildinfo

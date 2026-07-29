@@ -9,6 +9,7 @@ type ParamValue = string | number | boolean | null | undefined
 type Params = Record<string, ParamValue>
 
 interface UseRouterReturn {
+  pathname: string
   searchParams: ReturnType<typeof useSearchParams>
   /** Lấy giá trị của một param */
   getParam: (key: string) => string | null
@@ -108,6 +109,7 @@ export function useRouter(): UseRouterReturn {
 
   /* ── return ───────────────────────────────────────────────── */
   return {
+    pathname,
     searchParams,
     getParam: (key: string) => searchParams.get(key),
     push: (href) => router.push(href),

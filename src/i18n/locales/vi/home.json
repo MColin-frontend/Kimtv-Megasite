@@ -4,39 +4,19 @@
     "live": "Live",
     "finished": "Kết thúc"
   },
-  "fixtures": {
-    "league": "Giải đấu",
-    "match": "Trận đấu",
-    "time": "Thời gian",
-    "homeTeam": "Đội nhà",
-    "score": "Tỷ số",
-    "awayTeam": "Đội khách",
-    "ht": "HT",
-    "cornerKick": "Phạt góc",
-    "yellowCard": "Thẻ vàng",
-    "redCard": "Thẻ đỏ",
-    "empty": "Không có trận đấu nào"
-  },
   "hero": {
     "alt": "Tặng 100.000 VNĐ khi tham gia trải nghiệm"
   },
   "match-schedule": {
     "title": "Các trận đấu"
   },
-  "news": {
-    "title": "Tin tức xu hướng",
-    "latest": "Tin tức mới nhất",
-    "category": "Bóng đá",
-    "viewAll": "Xem tất cả",
-    "empty": "Không có tin tức"
-  },
   "league-select": {
     "all": "Tất cả giải",
     "unit": "giải",
     "title": "Lọc theo giải đấu",
     "selected": "đã chọn",
-    "clearAll": "Bỏ chọn tất cả",
-    "searchPlaceholder": "Tìm kiếm giải đấu...",
+    "clear-all": "Bỏ chọn tất cả",
+    "search-placeholder": "Tìm kiếm giải đấu...",
     "empty": "Không tìm thấy giải đấu",
     "favorites": "Yêu thích"
   }

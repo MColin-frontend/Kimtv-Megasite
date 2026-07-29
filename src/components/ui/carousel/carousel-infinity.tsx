@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Autoplay from "embla-carousel-autoplay"
 import useEmblaCarousel, { type UseEmblaCarouselType } from "embla-carousel-react"
 
-import { CAROUSEL_ROUND_NAV_BUTTON_CLASS } from "@/constants/ui/ui-carousel.constants"
+import { SlideNavNext, SlideNavPrev } from "@/components/ui/slide-nav"
 
 export type CarouselInfinityApi = UseEmblaCarouselType[1]
 
@@ -13,6 +13,8 @@ interface CarouselInfinityProps<T> {
   renderItem: (item: T, index: number) => React.ReactNode
   /** CSS class cho mỗi slide — dùng để kiểm soát width. vd: "basis-1/2 md:basis-1/3" */
   slideClassName?: string
+  /** Gap giữa các slide — vd: "gap-3". Mặc định không có gap */
+  gapClassName?: string
   autoPlayDelay?: number
   stopAutoPlayOnMouseEnter?: boolean
   stopAutoPlayOnInteraction?: boolean
@@ -21,7 +23,6 @@ interface CarouselInfinityProps<T> {
   /** Callback khi đang đi tới gần cuối danh sách — dùng cho infinite scroll */
   onReachEnd?: () => void
   reachEndThreshold?: number
-  showNavAlways?: boolean
   className?: string
   viewportClassName?: string
 }
@@ -41,6 +42,7 @@ export default function CarouselInfinity<T>({
   items,
   renderItem,
   slideClassName = "basis-44",
+  gapClassName,
   autoPlayDelay,
   stopAutoPlayOnMouseEnter = true,
   stopAutoPlayOnInteraction = true,
@@ -48,7 +50,6 @@ export default function CarouselInfinity<T>({
   onApiReady,
   onReachEnd,
   reachEndThreshold = 2,
-  showNavAlways = false,
   className,
   viewportClassName,
 }: CarouselInfinityProps<T>) {
@@ -66,6 +67,7 @@ export default function CarouselInfinity<T>({
       loop: true,
       dragFree: false,
       slidesToScroll: 1 as const,
+      duration: 20,
     }),
     []
   )
@@ -87,16 +89,26 @@ export default function CarouselInfinity<T>({
   const [emblaRef, emblaApi] = useEmblaCarousel(carouselOptions, plugins)
   const [canScrollPrev, setCanScrollPrev] = useState(false)
   const [canScrollNext, setCanScrollNext] = useState(false)
+  const prevCanScrollPrevRef = useRef(false)
+  const prevCanScrollNextRef = useRef(false)
 
   const updateScrollability = useCallback(() => {
     if (!emblaApi) return
-    setCanScrollPrev(emblaApi.canScrollPrev())
-    setCanScrollNext(emblaApi.canScrollNext())
+    const prev = emblaApi.canScrollPrev()
+    const next = emblaApi.canScrollNext()
+    if (prev !== prevCanScrollPrevRef.current) {
+      prevCanScrollPrevRef.current = prev
+      setCanScrollPrev(prev)
+    }
+    if (next !== prevCanScrollNextRef.current) {
+      prevCanScrollNextRef.current = next
+      setCanScrollNext(next)
+    }
   }, [emblaApi])
 
   useEffect(() => {
     if (!emblaApi) return
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+
     updateScrollability()
     emblaApi.on("select", updateScrollability)
     emblaApi.on("reInit", updateScrollability)
@@ -171,27 +183,22 @@ export default function CarouselInfinity<T>({
 
   const scrollNext = useCallback(() => {
     emblaApi?.scrollNext()
-    requestAnimationFrame(() => {
-      maybeTriggerReachEnd()
-      maybeTriggerReachEndFromNextClick()
-    })
-    window.setTimeout(() => {
-      maybeTriggerReachEnd()
-      maybeTriggerReachEndFromNextClick()
-    }, 180)
-  }, [emblaApi, maybeTriggerReachEnd, maybeTriggerReachEndFromNextClick])
+    requestAnimationFrame(maybeTriggerReachEndFromNextClick)
+  }, [emblaApi, maybeTriggerReachEndFromNextClick])
 
   return (
     <div className={`group/carousel relative w-full ${className ?? ""}`}>
       <div
-        className={`overflow-x-hidden overflow-y-visible${viewportClassName ? ` ${viewportClassName}` : ""}`}
+        className={`overflow-hidden${viewportClassName ? ` ${viewportClassName}` : ""}`}
         ref={emblaRef}
       >
-        <div className="-ml-4 flex">
+        <div
+          className={`flex items-stretch will-change-transform${gapClassName ? ` ${gapClassName}` : ""}`}
+        >
           {(Array.isArray(items) ? items : []).map((item, index) => (
             <div
               key={keyExtractor ? keyExtractor(item, index) : index}
-              className={`shrink-0 pl-4 ${slideClassName}`}
+              className={`shrink-0 ${slideClassName}`}
             >
               {renderItem(item, index)}
             </div>
@@ -199,33 +206,19 @@ export default function CarouselInfinity<T>({
         </div>
       </div>
 
-      <button
+      <SlideNavPrev
         onClick={scrollPrev}
-        aria-label="Previous"
         disabled={!canScrollPrev}
-        className={`${CAROUSEL_ROUND_NAV_BUTTON_CLASS} absolute top-1/2 left-0 z-10 -translate-x-3 -translate-y-1/2 duration-200 ${showNavAlways ? "opacity-100" : "opacity-0 group-hover/carousel:opacity-100"}`}
-      >
-        <svg
-          viewBox="0 0 24 24"
-          className="h-4 w-4 fill-none stroke-current stroke-2 max-sm:h-3.5 max-sm:w-3.5"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
+        variant="gold"
+        className="absolute top-1/2 left-0 z-10 -translate-x-3 -translate-y-1/2 opacity-35 transition-[opacity,transform] duration-200 group-hover/carousel:-translate-x-4 group-hover/carousel:scale-110 group-hover/carousel:opacity-100"
+      />
 
-      <button
+      <SlideNavNext
         onClick={scrollNext}
-        aria-label="Next"
         disabled={!canScrollNext}
-        className={`${CAROUSEL_ROUND_NAV_BUTTON_CLASS} absolute top-1/2 right-0 z-10 translate-x-3 -translate-y-1/2 duration-200 ${showNavAlways ? "opacity-100" : "opacity-0 group-hover/carousel:opacity-100"}`}
-      >
-        <svg
-          viewBox="0 0 24 24"
-          className="h-4 w-4 fill-none stroke-current stroke-2 max-sm:h-3.5 max-sm:w-3.5"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-        </svg>
-      </button>
+        variant="gold"
+        className="absolute top-1/2 right-0 z-10 translate-x-3 -translate-y-1/2 opacity-35 transition-[opacity,transform] duration-200 group-hover/carousel:translate-x-4 group-hover/carousel:scale-110 group-hover/carousel:opacity-100"
+      />
     </div>
   )
 }

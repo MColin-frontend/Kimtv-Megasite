@@ -10,6 +10,7 @@ import { useTranslation } from "@/i18n"
 import { getRoutes } from "@/config/routes"
 
 import type { NewsItem } from "@/features/home/home.api"
+import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import CarouselInfinity, {
   type CarouselInfinityApi,
 } from "@/components/ui/carousel/carousel-infinity"
@@ -96,17 +97,11 @@ function HighlightSlide({ item, isActive }: { item: NewsItem; href: string; isAc
             {item.userName && (
               <div className="flex items-center gap-1.5">
                 {item.userAvatar && (
-                  <Img
-                    src={item.userAvatar}
-                    alt={item.userName}
-                    width={16}
-                    height={16}
-                    rounded="full"
-                    objectFit="cover"
-                    className="size-4 shrink-0 overflow-hidden rounded-full"
-                  />
+                  <Avatar size={16}>
+                    <AvatarImage src={item.userAvatar} alt={item.userName} />
+                  </Avatar>
                 )}
-                <Typography variant="caption" className="truncate text-white/50">
+                <Typography variant="caption" className="text-muted truncate">
                   {item.userName}
                 </Typography>
               </div>
@@ -130,27 +125,16 @@ export function HighlightsCarousel({ items }: HighlightsCarouselProps) {
   if (!items.length) return null
 
   return (
-    <div
-      className="card-glow rounded-12 flex flex-col gap-3 p-4"
-      style={{
-        background: [
-          "radial-gradient(ellipse at 10% 0%, rgba(74,140,255,0.16) 0%, transparent 55%)",
-          "radial-gradient(ellipse at 90% 100%, rgba(30,80,180,0.13) 0%, transparent 50%)",
-          "radial-gradient(ellipse at 50% 50%, rgba(20,50,120,0.08) 0%, transparent 70%)",
-          "rgba(8,15,30,0.85)",
-        ].join(", "),
-        backdropFilter: "blur(32px)",
-      }}
-    >
+    <div className="card-glow rounded-12 flex flex-col gap-3 p-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <Typography variant="h2">Highlights</Typography>
         <Link
           href={routes.video.index}
-          className="group/btn text-13 font-500 flex items-center gap-1 overflow-hidden pr-1 text-white/60 transition-colors hover:text-white"
+          className="group/btn text-13 font-500 text-muted flex items-center gap-1 overflow-hidden pr-1 transition-colors hover:text-white"
         >
           <span className="transition-all duration-200 group-hover/btn:italic">
-            {t("home.news.viewAll")}
+            {t("news.view-all")}
           </span>
           <ArrowRight className="size-4 -translate-x-4 opacity-0 transition-all duration-200 group-hover/btn:translate-x-0 group-hover/btn:opacity-100" />
         </Link>

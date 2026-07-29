@@ -1,0 +1,30 @@
+{
+  "title": "Trung tâm phát trực tiếp",
+  "section-manage": "Quản lý trực tiếp",
+  "join-now": "Tham gia ngay",
+  "menu": {
+    "registration": "Đăng ký BLV",
+    "settings": "Cài đặt phát trực tiếp",
+    "reservation": "Đặt chỗ trước",
+    "commentator": "Bình luận viên",
+    "channel": "Quản lý kênh",
+    "history": "Lịch sử xem",
+    "guide": "Quy định phát sóng",
+    "faq": "Câu hỏi thường gặp",
+    "support": "Liên hệ hỗ trợ",
+    "social": "Mạng xã hội"
+  },
+  "empty": "Tính năng đang được phát triển",
+  "reservation": {
+    "active-title": "Lịch phát sóng đã đặt",
+    "form-title": "Đặt lịch phát sóng trước",
+    "stream-title": "Tên buổi phát",
+    "scheduled-at": "Thời gian dự kiến",
+    "cancel": "Huỷ lịch đặt trước",
+    "book": "Đặt lịch",
+    "booked": "Đã đặt",
+    "submit": "Xác nhận đặt lịch",
+    "select-match-hint": "Chọn trận đấu từ danh sách bên dưới",
+    "change-match": "Đổi trận"
+  }
+}
