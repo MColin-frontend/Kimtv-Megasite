@@ -239,10 +239,11 @@ interface PollHistoryModalProps {
 
 export function PollHistoryModal({ open, onOpenChange, chatroomId }: PollHistoryModalProps) {
   const [list, setList] = useState<PollInterface[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
+  const [loading, setLoading] = useState<boolean>(false)
 
   useEffect(() => {
-    getPollHistoryApi(chatroomId as string | number)
+    if (!open || !chatroomId) return
+    getPollHistoryApi(chatroomId as string | number, setLoading)
       .then((res) => setList(Array.isArray(res) ? res : []))
       .catch(() => setList([]))
       .finally(() => setLoading(false))

@@ -3,9 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { Controller, useForm } from "react-hook-form"
-import { Accordion as AccordionPrimitive } from "@base-ui/react/accordion"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ChartBarStacked, ChevronDown, Clock, RefreshCw } from "lucide-react"
+import { ChevronDown, ChevronUp, RefreshCw, X } from "lucide-react"
 import { z } from "zod"
 
 import {
@@ -21,13 +20,16 @@ import { useRouter } from "@/hooks/useRouter"
 
 import { useTranslation } from "@/i18n"
 import { env } from "@/config/env"
+import { siteConfig } from "@/config/site"
 import { HERO_VIDEO_PARAMS } from "@/constants/component/home.constants"
 import {
+  CHAT_CHANNEL,
   CHAT_CLASSES,
   CHAT_CONNECTION_STATUS,
   CHAT_INPUT_HEIGHT,
   CHAT_MESSAGE_TYPE,
   CHAT_MSG_PADDING,
+  CHAT_OPERATE_TYPE,
   CHAT_SCROLLBAR_STYLE,
   CHAT_SOCIAL_NAMES,
   CHAT_SYMBOLS,
@@ -54,8 +56,6 @@ import imgChat from "@assets/images/common/img-chat.png"
 import imgFacebook from "@assets/images/layout/img-facebook.png"
 import imgTele from "@assets/images/layout/img-tele.png"
 import imgZalo from "@assets/images/layout/img-zalo.png"
-
-/* ── Types ───────────────────────────────────────────────── */
 
 export type ChatMessageType = (typeof CHAT_MESSAGE_TYPE)[keyof typeof CHAT_MESSAGE_TYPE]
 export type UserRole = (typeof CHAT_USER_ROLE)[keyof typeof CHAT_USER_ROLE]
@@ -94,10 +94,8 @@ export interface ChatProps {
   inputSuffix?: React.ReactNode
   topContent?: React.ReactNode
   className?: string
-  /** Home page truyền trực tiếp để tránh timing issue. Live page dùng URL. */
   chatroomId?: string | number
   gameId?: number
-  /** Khi true — Chat không tự quản lý poll (parent tự xử lý qua onPollMessage) */
   externalPoll?: boolean
 }
 
@@ -105,8 +103,6 @@ const WS_RECONNECT_DELAY = 2000
 const WS_HEARTBEAT_INTERVAL = 10_000
 
 type TFunc = (key: Parameters<ReturnType<typeof useTranslation>["t"]>[0]) => string
-
-/* ── Sub-components ──────────────────────────────────────── */
 
 function ChatAvatar({ message, size = 48 }: { message: ChatMessage; size?: number }) {
   const wrapperCls = message.hasAnchorMe
@@ -335,11 +331,8 @@ function MessageItem({
   )
 }
 
-/* ── User Popup ──────────────────────────────────────────── */
-
 function UserPopup({
   message,
-  userRole,
   isPinned,
   onClose,
   onReport,
@@ -348,7 +341,6 @@ function UserPopup({
   onUnpin,
   onBanRoom,
   onBanAll,
-  onSetManager,
 }: {
   message: ChatMessage
   userRole: UserRole
@@ -430,8 +422,8 @@ function UserPopup({
           </div>
         </div>
 
-        {/* Report — ordinary */}
-        {userRole === CHAT_USER_ROLE.ORDINARY && (
+        {/* Message thường → report */}
+        {!(message.hasAnchorMe || message.hasFictitious) && (
           <>
             <div className="flex flex-col p-2">
               {REPORT_TYPES.map((label, i) => (
@@ -475,103 +467,81 @@ function UserPopup({
           </>
         )}
 
-        {/* Admin actions — ADMIN + HOUSING_MANAGEMENT */}
-        {(userRole === CHAT_USER_ROLE.ADMIN || userRole === CHAT_USER_ROLE.HOUSING_MANAGEMENT) && (
-          <div className="flex items-start justify-around border-t border-white/[0.06] px-3 py-4">
-            {userRole === CHAT_USER_ROLE.ADMIN && message.type !== CHAT_MESSAGE_TYPE.VIRTUAL && (
-              <button
-                onClick={() => {
+        {/* BLV/Admin message (hasAnchorMe || hasFictitious) → action buttons */}
+        {(message.hasAnchorMe || message.hasFictitious) && (
+          <div className="flex flex-col border-t border-white/[0.06] py-1">
+            {[
+              {
+                icon: imgBlacklist,
+                label: t("chat.actions.ban-all"),
+                onClick: () => {
                   onBanAll?.(message, true)
                   onClose()
-                }}
-                className="flex flex-col items-center gap-2 transition-transform active:scale-90"
-              >
-                <Img src={imgBlacklist} alt="" width={40} height={40} objectFit="contain" />
-                <span className="text-12 font-600 w-16 text-center leading-tight text-white/80">
-                  {t("chat.actions.ban-all")}
-                </span>
-              </button>
-            )}
-            {message.type !== CHAT_MESSAGE_TYPE.VIRTUAL && (
-              <button
-                onClick={() => {
+                },
+                show: true,
+                danger: true,
+              },
+              {
+                icon: imgRestriction,
+                label: t("chat.actions.ban-room"),
+                onClick: () => {
                   onBanRoom?.(message, true)
                   onClose()
-                }}
-                className="flex flex-col items-center gap-2 transition-transform active:scale-90"
-              >
-                <Img src={imgRestriction} alt="" width={40} height={40} objectFit="contain" />
-                <span className="text-12 font-600 w-16 text-center leading-tight text-white/80">
-                  {t("chat.actions.ban-room")}
-                </span>
-              </button>
-            )}
-            <button
-              onClick={() => {
-                onDelete?.(message)
-                onClose()
-              }}
-              className="flex flex-col items-center gap-2 transition-transform active:scale-90"
-            >
-              <Img src={imgRemove} alt="" width={40} height={40} objectFit="contain" />
-              <span className="text-12 font-600 w-16 text-center leading-tight text-white/80">
-                {t("chat.actions.delete")}
-              </span>
-            </button>
-          </div>
-        )}
-
-        {/* Anchor actions — ANCHOR only */}
-        {userRole === CHAT_USER_ROLE.ANCHOR && (
-          <div className="flex items-start justify-around border-t border-white/[0.06] px-3 py-4">
-            {message.type !== CHAT_MESSAGE_TYPE.VIRTUAL && (
-              <button
-                onClick={() => {
-                  onSetManager?.(message, true)
+                },
+                show: true,
+                danger: true,
+              },
+              {
+                icon: imgRemove,
+                label: t("chat.actions.delete"),
+                onClick: () => {
+                  onDelete?.(message)
                   onClose()
-                }}
-                className="flex flex-col items-center gap-2 transition-transform active:scale-90"
-              >
-                <Img
-                  src={imgRestriction}
-                  alt=""
-                  width={40}
-                  height={40}
-                  objectFit="contain"
-                  className="opacity-50"
-                />
-                <span className="text-12 font-600 w-16 text-center leading-tight text-white/80">
-                  {t("chat.actions.set-manager")}
-                </span>
-              </button>
-            )}
-            {message.hasFictitious && (
-              <button
-                onClick={() => {
+                },
+                show: true,
+                danger: true,
+              },
+              {
+                icon: imgPin,
+                label: isPinned ? t("chat.actions.unpin") : t("chat.actions.pin"),
+                onClick: () => {
                   if (isPinned) onUnpin?.(message)
                   else onPin?.(message)
                   onClose()
-                }}
-                className="flex flex-col items-center gap-2 transition-transform active:scale-90"
-              >
-                <Img
-                  src={imgPin}
-                  alt=""
-                  width={40}
-                  height={40}
-                  objectFit="contain"
-                  className={isPinned ? "opacity-100" : "opacity-50"}
-                />
-                <span
-                  className={cn(
-                    "text-12 font-600 w-16 text-center leading-tight",
-                    isPinned ? "text-gold/80" : "text-white/80"
-                  )}
+                },
+                show: message.hasFictitious,
+                pinned: isPinned,
+              },
+            ]
+              .filter((a) => a.show)
+              .map((action) => (
+                <button
+                  key={action.label}
+                  onClick={action.onClick}
+                  className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-white/[0.04] active:bg-white/[0.07]"
                 >
-                  {isPinned ? t("chat.actions.unpin") : t("chat.actions.pin")}
-                </span>
-              </button>
-            )}
+                  <Img
+                    src={action.icon}
+                    alt=""
+                    width={28}
+                    height={28}
+                    objectFit="contain"
+                    className={action.pinned === false ? "opacity-40" : undefined}
+                  />
+                  <span
+                    className={cn(
+                      "text-14 font-500",
+                      action.pinned
+                        ? "text-gold"
+                        : action.danger
+                          ? "text-white/80"
+                          : "text-white/80"
+                    )}
+                  >
+                    {action.label}
+                  </span>
+                </button>
+              ))}
           </div>
         )}
 
@@ -583,193 +553,6 @@ function UserPopup({
   )
 }
 
-/* ── Poll ────────────────────────────────────────────────── */
-
-interface PollOption {
-  id: number
-  label: string
-  votes: number
-}
-
-interface PollData {
-  question: string
-  options: PollOption[]
-  durationSeconds: number
-}
-
-interface PollFormValues {
-  optionId: number | null
-}
-
-function ChatPoll({ poll }: { poll: PollData }) {
-  const { watch, setValue, handleSubmit } = useForm<PollFormValues>({
-    defaultValues: { optionId: null },
-  })
-
-  const selected = watch("optionId")
-  const hasVoted = selected !== null
-
-  function onSubmit(data: PollFormValues) {
-    // TODO: call vote API with data.optionId
-    console.log("voted:", data.optionId)
-  }
-
-  const totalVotes = poll.options.reduce((s, o) => s + o.votes, 0)
-  const expired = poll.durationSeconds <= 0
-
-  return (
-    <div className="card-gold rounded-8 mx-2 my-1.5 overflow-hidden">
-      <AccordionPrimitive.Root>
-        <AccordionPrimitive.Item value="poll">
-          {/* Header = Trigger */}
-          <AccordionPrimitive.Header>
-            <AccordionPrimitive.Trigger className="group flex w-full items-center justify-between px-3 pt-2.5 pb-2 outline-none">
-              <div className="flex items-center gap-1.5">
-                <ChartBarStacked className="text-gold/60 size-3 shrink-0" />
-                <Typography
-                  as="span"
-                  variant="caption"
-                  weight="600"
-                  color="white/90"
-                  className="leading-none"
-                >
-                  {poll.question}
-                </Typography>
-              </div>
-              <div className="flex items-center gap-2">
-                <div
-                  className={cn(
-                    "flex items-center gap-0.5 rounded-full px-1.5 py-[3px] tabular-nums",
-                    expired
-                      ? "bg-white/5"
-                      : "bg-gold/15 ring-gold/25 shadow-[0_0_8px_rgba(246,195,67,0.2)] ring-1"
-                  )}
-                >
-                  <Clock className="mr-0.5 size-2.5" />
-                  <Typography
-                    as="span"
-                    size="10"
-                    weight="600"
-                    color={expired ? "white/30" : "gold"}
-                    className="leading-none"
-                  >
-                    {/* TODO: hiển thị thời gian từ API */}
-                  </Typography>
-                </div>
-                <ChevronDown className="size-3 text-white/30 transition-transform duration-200 group-aria-expanded:rotate-180" />
-              </div>
-            </AccordionPrimitive.Trigger>
-          </AccordionPrimitive.Header>
-
-          {/* Options = Panel */}
-          <AccordionPrimitive.Panel className="data-open:animate-accordion-down data-closed:animate-accordion-up overflow-hidden">
-            <div className="h-(--accordion-panel-height) data-ending-style:h-0 data-starting-style:h-0">
-              {/* Options form */}
-              <form onSubmit={handleSubmit(onSubmit)}>
-                <div className="flex flex-col gap-1.5 px-3 pb-3">
-                  {poll.options.map((opt) => {
-                    const pct = totalVotes > 0 ? Math.round((opt.votes / totalVotes) * 100) : 0
-                    const isSelected = selected === opt.id
-                    return (
-                      <button
-                        key={opt.id}
-                        type="submit"
-                        disabled={expired}
-                        onClick={() => setValue("optionId", opt.id, { shouldDirty: true })}
-                        className={cn(
-                          "group rounded-6 relative flex h-8 w-full items-center justify-between overflow-hidden px-2.5 text-left transition-all duration-200",
-                          isSelected
-                            ? "border-gold/40 bg-gold/10 border shadow-[0_0_12px_rgba(246,195,67,0.12)]"
-                            : hasVoted
-                              ? "border border-white/6 bg-white/[0.025]"
-                              : "hover:border-gold/20 hover:bg-gold/5 border border-white/8 bg-white/[0.03] active:scale-[0.98]"
-                        )}
-                      >
-                        {/* Progress fill */}
-                        {hasVoted && (
-                          <div
-                            className={cn(
-                              "rounded-l-6 absolute inset-y-0 left-0 transition-[width] duration-700 ease-out",
-                              isSelected ? "bg-gold/18" : "bg-white/4"
-                            )}
-                            style={{ width: `${pct}%` }}
-                          />
-                        )}
-
-                        {/* Left: radio + label */}
-                        <div className="relative flex items-center gap-2">
-                          <div
-                            className={cn(
-                              "flex size-[14px] shrink-0 items-center justify-center rounded-full border-[1.5px] transition-all duration-200",
-                              isSelected
-                                ? "border-gold bg-gold shadow-[0_0_6px_rgba(246,195,67,0.5)]"
-                                : "border-white/20 group-hover:border-white/35"
-                            )}
-                          >
-                            {isSelected && (
-                              <div className="size-1.5 rounded-full bg-[#080e1c]/80" />
-                            )}
-                          </div>
-                          <Typography
-                            as="span"
-                            variant="caption"
-                            weight={isSelected ? "600" : "500"}
-                            color={isSelected ? "gold" : hasVoted ? "white/50" : "white/75"}
-                            className="leading-none"
-                          >
-                            {opt.label}
-                          </Typography>
-                        </div>
-
-                        {/* Right: percentage */}
-                        {hasVoted && (
-                          <Typography
-                            as="span"
-                            size="10"
-                            weight="600"
-                            color={isSelected ? "gold/90" : "white/30"}
-                            className="relative leading-none tabular-nums"
-                          >
-                            {pct}%
-                          </Typography>
-                        )}
-                      </button>
-                    )
-                  })}
-
-                  {!hasVoted && !expired && (
-                    <Typography
-                      as="p"
-                      size="10"
-                      color="white/20"
-                      className="pt-0.5 text-center italic"
-                    >
-                      Chọn một đáp án để bình chọn
-                    </Typography>
-                  )}
-                  {expired && (
-                    <Typography as="p" size="10" color="white/15" className="pt-0.5 text-center">
-                      Poll đã kết thúc
-                    </Typography>
-                  )}
-                </div>
-              </form>
-            </div>
-          </AccordionPrimitive.Panel>
-        </AccordionPrimitive.Item>
-      </AccordionPrimitive.Root>
-    </div>
-  )
-}
-
-/* ── Role resolution ─────────────────────────────────────── */
-
-/**
- * Map roleType từ backend Java → CHAT_USER_ROLE.
- * Kimtvpc convention: 1=ADMIN, 2=ANCHOR(BLV), 3=HOUSING_MANAGEMENT(CSKH).
- * Hỗ trợ cả field `roleType` lẫn `type` vì backend có thể dùng khác nhau.
- * Chỉ ADMIN và HOUSING_MANAGEMENT (CSKH) được ghim tin nhắn — ANCHOR (BLV) không được.
- */
 function resolveChatRole(user: KimtvUser | null, isLoggedIn: boolean): UserRole {
   if (!isLoggedIn || !user) return CHAT_USER_ROLE.NOT_LOGIN
   const raw = (user.roleType ?? user.type) as number | undefined
@@ -785,13 +568,7 @@ function resolveChatRole(user: KimtvUser | null, isLoggedIn: boolean): UserRole 
   }
 }
 
-/* ── Main Component ──────────────────────────────────────── */
-
-const DEFAULT_SOCIALS: ChatSocials = {
-  telegram: "https://t.me/anhemkimtv",
-  facebook: "https://www.facebook.com/groups/5814050098675787",
-  zalo: "https://zalo.me/0582963553",
-}
+const DEFAULT_SOCIALS: ChatSocials = siteConfig.socials
 
 export function Chat({
   socials,
@@ -812,7 +589,6 @@ export function Chat({
 
   const userRole = resolveChatRole(user, isLoggedIn)
 
-  /* ── Internal state ──────────────────────────────────────── */
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [pinnedMessages, setPinnedMessages] = useState<ChatMessage[]>([])
   const [poll, setPoll] = useState<PollInterface | null>(null)
@@ -856,7 +632,6 @@ export function Chat({
   const pageIndexRef = useRef(0)
   const loadingMoreRef = useRef(false)
 
-  // Dùng window.location.search để tránh useSearchParams() hydration timing issue
   const pathLastSegment = pathname.split("/").filter(Boolean).pop() ?? ""
   const _urlParams =
     typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null
@@ -876,8 +651,6 @@ export function Chat({
   const gameId = isAnchor ? 0 : Number(_gameIdFromUrl ?? 0) || gameIdProp || 0
 
   const mergedSocials = { ...DEFAULT_SOCIALS, ...socials }
-
-  /* ── WebSocket ───────────────────────────────────────────── */
 
   const clearHeartbeat = useCallback(() => {
     if (heartbeatRef.current) {
@@ -928,15 +701,6 @@ export function Chat({
       setConnectionStatus(CHAT_CONNECTION_STATUS.CONNECTING)
       try {
         const token = getTokenFromCookie() ?? ""
-        if (!env.wsBaseUrl)
-          console.error("[chat] NEXT_PUBLIC_WS_BASE_URL is not set — check env config")
-        if (!token)
-          console.warn(
-            "[chat] token is empty — server may reject (code 1000). Check login state or env mismatch (dev token vs prod WS)"
-          )
-        console.log(
-          `[chat] connecting — url: ${env.wsBaseUrl}/chat?chatroom_id=${cId}&game_id=${gId}&token=***&lan=vi`
-        )
         const ws = new WebSocket(
           `${env.wsBaseUrl}/chat?chatroom_id=${cId}&game_id=${gId}&token=${token}&lan=vi`
         )
@@ -948,7 +712,6 @@ export function Chat({
           setConnectionStatus(CHAT_CONNECTION_STATUS.CONNECTED)
           startHeartbeat()
           reconnectCountRef.current = 0
-          console.log(`[chat] connected ✓ chatroom_id: ${cId}, game_id: ${gId}`)
         })
 
         ws.addEventListener("message", ({ data: raw }) => {
@@ -957,10 +720,7 @@ export function Chat({
           try {
             const res = JSON.parse(raw) as Record<string, unknown>
 
-            console.log("[chat] raw:", raw)
-
             if (Object.values(PollChannelEnum).includes(res.channel as PollChannelEnum)) {
-              console.log("[chat] poll event →", res.channel, res.data)
               onPollMessageRef.current?.(res.channel as string, res.data)
               if (!externalPoll) {
                 const p = res.data as PollInterface
@@ -997,7 +757,7 @@ export function Chat({
 
             const data = res.data as Record<string, unknown> | undefined
             if (!data || (data.code as number) === 10) return
-            if (res.channel === "CHATROOM" && data.content) {
+            if (res.channel === CHAT_CHANNEL.CHATROOM && data.content) {
               const msg: ChatMessage = {
                 ...(data as unknown as ChatMessage),
                 content: parseLinks(String(data.content)),
@@ -1006,32 +766,23 @@ export function Chat({
               }
               setMessages((prev) => [...prev.slice(-200), msg])
             }
-            if (res.channel === "PIN_MESSAGE") {
+            if (res.channel === CHAT_OPERATE_TYPE.PIN_MESSAGE) {
               const msgs = data.messages
               setPinnedMessages(
                 Array.isArray(msgs) ? (msgs as ChatMessage[]) : msgs ? [msgs as ChatMessage] : []
               )
             }
-            if (res.channel === "LIVE_END") {
+            if (res.channel === CHAT_CHANNEL.LIVE_END) {
               setMessages([])
               setPinnedMessages([])
             }
-          } catch (err) {
-            console.error("[chat] message parse error:", err, "raw:", raw)
+          } catch {
+            // ignore malformed message
           }
         })
 
         ws.addEventListener("close", (ev) => {
           if (ws !== wsRef.current) return
-          const hint =
-            ev.code === 1000
-              ? " — server đóng bình thường (có thể do token sai môi trường: dev token → prod WS)"
-              : ev.code === 1006
-                ? " — mất kết nối bất thường (sai URL hoặc server không phản hồi)"
-                : ""
-          console.error(
-            `[chat] ws closed — code: ${ev.code} reason: ${ev.reason || "(none)"}${hint}`
-          )
           setConnectionStatus(CHAT_CONNECTION_STATUS.DISCONNECTED)
           clearHeartbeat()
           wsRef.current = null
@@ -1040,19 +791,13 @@ export function Chat({
               reconnectCountRef.current++
               initWsRef.current?.(cId, gId)
             }, WS_RECONNECT_DELAY)
-          } else {
-            console.error(
-              `[chat] max reconnect (4) reached — chatroom_id: ${cId}, game_id: ${gId}, wsBaseUrl: ${env.wsBaseUrl}`
-            )
           }
         })
         ws.addEventListener("error", (ev) => {
           if (ws !== wsRef.current) return
-          console.error("[chat] ws error:", ev)
           setConnectionStatus(CHAT_CONNECTION_STATUS.DISCONNECTED)
         })
       } catch (err) {
-        console.error("[chat] ws init error:", err)
         setConnectionStatus(CHAT_CONNECTION_STATUS.DISCONNECTED)
       }
     },
@@ -1082,7 +827,6 @@ export function Chat({
     }
   }, [chatroomId, gameId, hasMoreMessages])
 
-  /* ── Load messages khi chatroom đổi ─────────────────────── */
   useEffect(() => {
     if (!chatroomId) return
     pageIndexRef.current = 0
@@ -1096,24 +840,15 @@ export function Chat({
     })
   }, [chatroomId, gameId])
 
-  /* ── Poll: fetch active + reset khi chatroom đổi ────────── */
   useEffect(() => {
     if (!pollChatroomId || externalPoll) return
-    console.log("[poll] fetching — pollChatroomId:", pollChatroomId, "chatroomId:", chatroomId)
     getActivePollApi(pollChatroomId).then((p) => {
-      console.log("[poll] active poll response:", p)
       if (p) setPoll(p)
     })
   }, [pollChatroomId, externalPoll])
 
-  /* ── WebSocket: reconnect khi chatroom đổi hoặc auth đổi ── */
   useEffect(() => {
-    if (!chatroomId) {
-      console.warn(
-        "[chat] chatroomId is undefined — WebSocket will not connect. Check URL params (match_id / game_id) or prop drilling from parent."
-      )
-      return
-    }
+    if (!chatroomId) return
     reconnectCountRef.current = 0
     // eslint-disable-next-line react-hooks/set-state-in-effect
     initWs(chatroomId, gameId)
@@ -1166,28 +901,28 @@ export function Chat({
 
   const handlePin = (msg: ChatMessage) => {
     chatroomOperateAction({
-      operateType: "PIN_MESSAGE",
+      operateType: CHAT_OPERATE_TYPE.PIN_MESSAGE,
       userId: msg.userId,
-      chatroomId: msg.chatroomId,
+      chatroomId: chatroomId ?? msg.chatroomId,
       gameId,
       messageId: msg.id,
-    }).catch(console.error)
+    }).catch(() => {})
   }
 
   const handleUnpin = (msg: ChatMessage) => {
     chatroomOperateAction({
-      operateType: "UNPIN_MESSAGE",
+      operateType: CHAT_OPERATE_TYPE.UNPIN_MESSAGE,
       userId: msg.userId,
-      chatroomId: msg.chatroomId,
+      chatroomId: chatroomId ?? msg.chatroomId,
       gameId,
       messageId: msg.id,
-    }).catch(console.error)
+    }).catch(() => {})
   }
 
   const handleDelete = useCallback(
     (msg: ChatMessage) => {
       chatroomOperateAction({
-        operateType: "DELETE_MESSAGE",
+        operateType: CHAT_OPERATE_TYPE.DELETE_MESSAGE,
         userId: msg.userId,
         chatroomId: msg.chatroomId,
         gameId,
@@ -1196,7 +931,7 @@ export function Chat({
         .then(() => {
           setMessages((prev) => prev.filter((m) => m.id !== msg.id))
         })
-        .catch(console.error)
+        .catch(() => {})
     },
     [gameId]
   )
@@ -1327,80 +1062,84 @@ export function Chat({
 
         {/* Pinned messages */}
         {pinnedMessages.length > 0 && (
-          <div className="flex shrink-0 flex-col gap-px border-b border-white/6">
-            {pinnedMessages.map((msg) => (
-              <div
-                key={msg.id}
-                onClick={() => !expandedPinId && setExpandedPinId(msg.id)}
-                className={cn(
-                  "rounded-4 mx-2 my-1 flex flex-col gap-1 border-l-[3px] bg-white/4 px-2.5 py-2 text-[12px] text-white select-none",
-                  "border-chat-pin",
-                  !expandedPinId ? "cursor-pointer" : "cursor-default"
-                )}
-              >
-                <div className="flex items-start gap-1.5">
-                  <Typography as="span" size="12" className="shrink-0 pt-px leading-none">
-                    {CHAT_SYMBOLS.PIN}
-                  </Typography>
-                  <Typography
-                    as="span"
-                    size="12"
-                    weight="700"
-                    className={cn("shrink-0 whitespace-nowrap", CHAT_CLASSES.pin)}
+          <div className="absolute top-[55px] right-0 left-0 z-20 flex flex-col gap-px border-b border-white/6 pr-3">
+            {pinnedMessages.map((msg) => {
+              const isExpanded = expandedPinId === msg.id
+              return (
+                <div
+                  key={msg.id}
+                  className={cn(
+                    "rounded-4 relative flex flex-col gap-1 border-l-[3px] bg-[#1a140a] py-1.5 pr-2 pl-2 text-[12px] text-white select-none",
+                    "border-chat-pin"
+                  )}
+                >
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <span
+                        className="absolute -top-1.5 -right-1.5 z-30 flex size-4 shrink-0 cursor-pointer items-center justify-center rounded-full bg-red-500/90 text-white shadow-[0_0_6px_rgba(239,68,68,0.5)] transition-colors hover:bg-red-400"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          if (msg.hasFictitious) handleUnpin(msg)
+                          else setExpandedPinId(isExpanded ? null : msg.id)
+                        }}
+                      >
+                        {msg.hasFictitious ? (
+                          <X className="size-2.5" strokeWidth={3} />
+                        ) : isExpanded ? (
+                          <ChevronUp className="size-2.5" strokeWidth={3} />
+                        ) : (
+                          <ChevronDown className="size-2.5" strokeWidth={3} />
+                        )}
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {msg.hasFictitious
+                        ? t("chat.actions.unpin")
+                        : isExpanded
+                          ? t("chat.actions.collapse")
+                          : t("chat.actions.expand")}
+                    </TooltipContent>
+                  </Tooltip>
+
+                  {/* Header row */}
+                  <div
+                    className="flex cursor-pointer items-center gap-1"
+                    onClick={() => setExpandedPinId(isExpanded ? null : msg.id)}
                   >
-                    {t("chat.pin-label")}:
-                  </Typography>
-                  <span
-                    className={cn(
-                      "text-14 flex-1",
-                      expandedPinId === msg.id
-                        ? "max-h-[400px] overflow-y-auto break-words whitespace-normal"
-                        : "overflow-hidden text-ellipsis whitespace-nowrap"
-                    )}
-                    dangerouslySetInnerHTML={{ __html: msg.content }}
-                  />
-                  <span
-                    className={cn("text-14 shrink-0 leading-none", CHAT_CLASSES.pin)}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      if (
-                        userRole === CHAT_USER_ROLE.ADMIN ||
-                        userRole === CHAT_USER_ROLE.HOUSING_MANAGEMENT
-                      )
-                        handleUnpin(msg)
-                      else setExpandedPinId(expandedPinId === msg.id ? null : msg.id)
-                    }}
-                  >
-                    {userRole === CHAT_USER_ROLE.ADMIN ||
-                    userRole === CHAT_USER_ROLE.HOUSING_MANAGEMENT
-                      ? CHAT_SYMBOLS.CLOSE
-                      : expandedPinId === msg.id
-                        ? CHAT_SYMBOLS.COLLAPSE
-                        : CHAT_SYMBOLS.EXPAND}
-                  </span>
+                    <span className="min-w-0 flex-1 overflow-hidden leading-none text-ellipsis whitespace-nowrap">
+                      <Typography as="span" size="12" className="mr-1 leading-none">
+                        {CHAT_SYMBOLS.PIN}
+                      </Typography>
+                      <Typography
+                        as="span"
+                        size="12"
+                        weight="700"
+                        className={cn("mr-1.5 leading-none", CHAT_CLASSES.pin)}
+                      >
+                        {t("chat.pin-label")}:
+                      </Typography>
+                      <span dangerouslySetInnerHTML={{ __html: msg.content }} />
+                    </span>
+                    <span
+                      className={cn(
+                        "shrink-0 leading-none transition-transform duration-200",
+                        CHAT_CLASSES.pin
+                      )}
+                    >
+                      {isExpanded ? CHAT_SYMBOLS.COLLAPSE : CHAT_SYMBOLS.EXPAND}
+                    </span>
+                  </div>
+
+                  {/* Expanded: full content */}
+                  {isExpanded && (
+                    <div
+                      className="max-h-48 overflow-y-auto pb-1 leading-relaxed break-words text-white"
+                      dangerouslySetInnerHTML={{ __html: msg.content }}
+                    />
+                  )}
                 </div>
-                {expandedPinId === msg.id && (
-                  <button
-                    className={cn(
-                      "group mt-1 flex w-full cursor-pointer items-center justify-center gap-1.5",
-                      "text-12 font-500 transition-all duration-200",
-                      CHAT_CLASSES.pin
-                    )}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setExpandedPinId(null)
-                    }}
-                  >
-                    <span className="not-italic transition-all duration-200 group-hover:italic">
-                      Thu hẹp
-                    </span>
-                    <span className="transition-transform duration-200 group-hover:translate-x-1">
-                      →
-                    </span>
-                  </button>
-                )}
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
 
@@ -1408,7 +1147,7 @@ export function Chat({
         <div
           ref={listRef}
           onScroll={handleScroll}
-          className="flex-1 overflow-y-auto py-2"
+          className="flex-1 overflow-y-auto py-2 pt-7"
           style={CHAT_SCROLLBAR_STYLE}
         >
           {connectionStatus === CHAT_CONNECTION_STATUS.CONNECTING && (

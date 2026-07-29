@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { LogOut, Menu, UserRound, X } from "lucide-react"
@@ -329,7 +329,7 @@ function DesktopNav({
   const pathname = usePathname()
   const [indicator, setIndicator] = useState({ left: 0, opacity: 0 })
 
-  useEffect(() => {
+  const updateIndicator = useCallback(() => {
     const nav = navRef.current
     if (!nav) return
     const active = nav.querySelector<HTMLElement>("[data-active='true']")
@@ -340,7 +340,14 @@ function DesktopNav({
     } else {
       setIndicator((s) => ({ ...s, opacity: 0 }))
     }
-  }, [pathname])
+  }, [])
+
+  useEffect(() => {
+    updateIndicator()
+    const ro = new ResizeObserver(updateIndicator)
+    if (navRef.current) ro.observe(navRef.current)
+    return () => ro.disconnect()
+  }, [pathname, updateIndicator])
 
   return (
     <nav ref={navRef} className="relative flex flex-1 items-center justify-center max-lg:hidden">

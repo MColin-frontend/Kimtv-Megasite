@@ -32,6 +32,8 @@
     "delete": "Xóa tin nhắn",
     "pin": "Ghim tin nhắn",
     "unpin": "Bỏ ghim",
+    "collapse": "Thu gọn",
+    "expand": "Xem thêm",
     "set-manager": "Đặt làm quản lý"
   },
   "login-to-chat": "Đăng nhập để chat",
