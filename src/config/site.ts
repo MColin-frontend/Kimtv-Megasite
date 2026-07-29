@@ -28,6 +28,12 @@ export const siteConfig = {
     twitter: "https://twitter.com/kimtv",
     promotion: "https://www.kim66.plus/pc/?dl=7t1fn4",
   },
+
+  socials: {
+    telegram: "https://t.me/anhemkimtv",
+    facebook: "https://www.facebook.com/groups/5814050098675787",
+    zalo: "https://zalo.me/0582963553",
+  },
 } as const
 
 export type SiteConfig = typeof siteConfig

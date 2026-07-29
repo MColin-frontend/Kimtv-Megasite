@@ -21,6 +21,17 @@ export const CHAT_CONNECTION_STATUS = {
   DISCONNECTED: "disconnected",
 } as const
 
+export const CHAT_OPERATE_TYPE = {
+  PIN_MESSAGE: "PIN_MESSAGE",
+  UNPIN_MESSAGE: "UNPIN_MESSAGE",
+  DELETE_MESSAGE: "DELETE_MESSAGE",
+} as const
+
+export const CHAT_CHANNEL = {
+  CHATROOM: "CHATROOM",
+  LIVE_END: "LIVE_END",
+} as const
+
 /* ── Symbols ─────────────────────────────────────────────── */
 
 export const CHAT_SYMBOLS = {

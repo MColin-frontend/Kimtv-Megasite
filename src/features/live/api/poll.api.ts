@@ -53,11 +53,16 @@ export function closePollApi(pollId: string) {
   return javaPost<void>(POLL_API.CLOSE, { pollId }, { isMessageError: true })
 }
 
-export function getPollHistoryApi(chatroomId: string | number, limit = 50) {
+export function getPollHistoryApi(
+  chatroomId: string | number,
+  setLoading: (loading: boolean) => void,
+  limit = 50
+) {
+  setLoading(true)
   return javaGet<PollInterface[]>(POLL_API.HISTORY, {
     params: { chatroomId, gameId: 0, limit },
     isMessageError: false,
-  })
+  }).finally(() => setLoading(false))
 }
 
 export function getActivePollApi(chatroomId: string | number) {
