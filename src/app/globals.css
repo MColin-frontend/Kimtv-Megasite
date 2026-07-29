@@ -355,14 +355,6 @@
   background: linear-gradient(0deg, rgba(30, 54, 144, 0.5) 0%, rgba(44, 44, 44, 0) 100%);
 }
 
-@utility social-btn {
-  background: linear-gradient(180deg, #717171 0%, #2c2c2c 100%);
-  transition: background 0.3s ease;
-  &:hover {
-    background: linear-gradient(180deg, #4a4a4a 0%, #141414 100%);
-  }
-}
-
 @keyframes blink {
   0%,
   100% {

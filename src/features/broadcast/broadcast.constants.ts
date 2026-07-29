@@ -278,18 +278,12 @@ export function getBroadcastGuideSteps(t: T): { title: string; images: string[] 
   ]
 }
 
-export function getBroadcastRules(t: T): string[] {
-  return [
-    t("broadcast.rules.item0"),
-    t("broadcast.rules.item1"),
-    t("broadcast.rules.item2"),
-    t("broadcast.rules.item3"),
-    t("broadcast.rules.item4"),
-    t("broadcast.rules.item5"),
-    t("broadcast.rules.item6"),
-    t("broadcast.rules.item7"),
-    t("broadcast.rules.item8"),
-  ]
+export function getBroadcastRules(t: T): { title: string; desc: string }[] {
+  const keys = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] as const
+  return keys.map((i) => ({
+    title: t(`broadcast.rules.items.${i}.title`),
+    desc: t(`broadcast.rules.items.${i}.desc`),
+  }))
 }
 
 /* ── Broadcast Center ─────────────────────────────────────── */

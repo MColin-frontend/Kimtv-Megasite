@@ -12,9 +12,10 @@ import { downcastStream, type CreateAnchorLiveResult } from "@/features/broadcas
 import { useStreamStatus } from "@/features/broadcast/hooks/use-stream-status"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "@/components/ui/toast"
 import { Typography } from "@/components/ui/typography"
+
+import { BroadcastStreamPanelSkeleton } from "./skeleton"
 
 export function StreamField({
   label,
@@ -94,20 +95,7 @@ export function StreamPanel() {
   }
 
   if (isLoading) {
-    return (
-      <div className="card-glow rounded-12 flex flex-col gap-5 p-5">
-        <div className="flex items-center justify-between">
-          <Skeleton className="rounded-8 h-6 w-36" />
-          <Skeleton className="rounded-8 h-8 w-24" />
-        </div>
-        {Array.from({ length: 2 }).map((_, i) => (
-          <div key={i} className="flex flex-col gap-1.5">
-            <Skeleton className="rounded-4 h-4 w-20" />
-            <Skeleton className="rounded-8 h-9 w-full" />
-          </div>
-        ))}
-      </div>
-    )
+    return <BroadcastStreamPanelSkeleton />
   }
 
   if (!streaming) return null

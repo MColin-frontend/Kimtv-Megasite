@@ -46,7 +46,7 @@ function MenuItem({
         "group rounded-8 relative flex items-center gap-3 px-3 py-2 transition-all duration-150",
         isActive
           ? "bg-amber-400/12 text-amber-300"
-          : "text-white/45 hover:bg-white/6 hover:text-white/80"
+          : "text-white/75 hover:bg-white/6 hover:text-white"
       )}
     >
       {isActive && (
@@ -55,7 +55,7 @@ function MenuItem({
       <item.icon
         className={cn(
           "size-[15px] shrink-0 transition-colors",
-          isActive ? "text-amber-400" : "text-white/30 group-hover:text-white/60"
+          isActive ? "text-amber-400" : "text-white/55 group-hover:text-white/85"
         )}
       />
       <Typography
@@ -66,34 +66,6 @@ function MenuItem({
         {t(item.labelKey as Parameters<typeof t>[0])}
       </Typography>
     </Link>
-  )
-}
-
-export function BroadcastCenterSidebarSkeleton() {
-  return (
-    <div className="flex w-80 shrink-0 flex-col gap-3 max-lg:w-full">
-      <aside className="card-glow rounded-12 flex flex-col overflow-hidden">
-        <div className="flex items-center gap-2 border-b border-white/6 px-4 py-3.5">
-          <Skeleton className="rounded-6 size-6 shrink-0" />
-          <Skeleton className="rounded-4 h-3 w-28" />
-        </div>
-        <div className="flex flex-col gap-0.5 p-2">
-          {Array.from({ length: 2 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-3 px-3 py-2">
-              <Skeleton className="rounded-4 size-[15px] shrink-0" />
-              <Skeleton className="rounded-4 h-4 w-32" />
-            </div>
-          ))}
-        </div>
-        <div className="mx-3 h-px bg-white/6" />
-        <div className="flex flex-col gap-0.5 p-2">
-          <div className="flex items-center gap-3 px-3 py-2">
-            <Skeleton className="rounded-4 size-[15px] shrink-0" />
-            <Skeleton className="rounded-4 h-4 w-28" />
-          </div>
-        </div>
-      </aside>
-    </div>
   )
 }
 
@@ -148,11 +120,11 @@ export function BroadcastCenterSidebar() {
                 <div className="rounded-6 flex size-6 items-center justify-center bg-amber-400/15">
                   <Radio className="size-3 text-amber-400" />
                 </div>
-                <Typography variant="overline" className="text-white/50">
+                <Typography variant="overline" className="text-white/80">
                   {t("broadcast-center.section-manage")}
                 </Typography>
               </div>
-              <ChevronDown className="size-3.5 text-white/30 transition-transform duration-200 group-data-[open]/nav:rotate-180" />
+              <ChevronDown className="size-3.5 text-white/50 transition-transform duration-200 group-data-[open]/nav:rotate-180" />
             </AccordionPrimitive.Trigger>
           </AccordionPrimitive.Header>
           <AccordionPrimitive.Panel className="data-open:animate-accordion-down data-closed:animate-accordion-up overflow-hidden">
@@ -203,11 +175,11 @@ export function BroadcastCenterSidebar() {
                   <div className="rounded-6 flex size-6 items-center justify-center bg-amber-400/15">
                     <CalendarClock className="size-3 text-amber-400" />
                   </div>
-                  <Typography variant="overline" className="text-white/50">
+                  <Typography variant="overline" className="text-white/80">
                     {t("broadcast-center.reservation.active-title")}
                   </Typography>
                 </div>
-                <ChevronDown className="size-3.5 text-white/30 transition-transform duration-200 group-data-[open]/res:rotate-180" />
+                <ChevronDown className="size-3.5 text-white/50 transition-transform duration-200 group-data-[open]/res:rotate-180" />
               </AccordionPrimitive.Trigger>
             </AccordionPrimitive.Header>
             <AccordionPrimitive.Panel className="data-open:animate-accordion-down data-closed:animate-accordion-up overflow-hidden">
