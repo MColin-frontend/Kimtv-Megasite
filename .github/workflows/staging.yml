@@ -266,6 +266,59 @@ jobs:
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEPLOY_DIR: ${{ vars.DEPLOY_DIR }}
 
+      - name: Notify Lark on success
+        if: success()
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          PAYLOAD=$(jq -n \
+            --arg branch "${{ github.ref_name }}" \
+            --arg actor "${{ github.actor }}" \
+            --arg commit "$COMMIT_MSG" \
+            --arg sha "${GITHUB_SHA::7}" \
+            --arg url "$RUN_URL" \
+            '{
+              msg_type: "interactive",
+              card: {
+                header: {
+                  title: { tag: "plain_text", content: "✅ Deploy thành công — Staging" },
+                  template: "green"
+                },
+                elements: [
+                  { tag: "hr" },
+                  {
+                    tag: "div",
+                    fields: [
+                      { is_short: true, text: { tag: "lark_md", content: ("**📌 Branch**\n`" + $branch + "`") } },
+                      { is_short: true, text: { tag: "lark_md", content: ("**👤 Author**\n" + $actor) } }
+                    ]
+                  },
+                  {
+                    tag: "div",
+                    fields: [
+                      { is_short: true, text: { tag: "lark_md", content: ("**🔑 Commit**\n`" + $sha + "`") } },
+                      { is_short: true, text: { tag: "lark_md", content: ("**💬 Message**\n" + $commit) } }
+                    ]
+                  },
+                  { tag: "hr" },
+                  {
+                    tag: "action",
+                    actions: [{
+                      tag: "button",
+                      text: { tag: "plain_text", content: "Xem chi tiết →" },
+                      url: $url,
+                      type: "primary"
+                    }]
+                  }
+                ]
+              }
+            }')
+
+          curl -s -X POST "${{ secrets.LARK_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
+
       - name: Notify Lark on failure
         if: failure()
         env:
