@@ -246,7 +246,6 @@ jobs:
           STAGING_URL: ${{ vars.STAGING_URL }}
         run: |
           CLEAN_COMMIT=$(printf '%s' "$COMMIT_MSG" | grep -v "^Co-Authored-By:" | sed '/^[[:space:]]*$/d')
-          CLAUDE_AUTHOR=$(printf '%s' "$COMMIT_MSG" | grep "^Co-Authored-By:" | head -1 | sed 's/^Co-Authored-By: //' | sed 's/ <.*//')
           DEPLOY_TIME=$(date '+%d/%m/%Y, %H:%M:%S')
           APP_URL="${STAGING_URL:-$RUN_URL}"
 
@@ -258,7 +257,6 @@ jobs:
             --arg url "$RUN_URL" \
             --arg app_url "$APP_URL" \
             --arg time "$DEPLOY_TIME" \
-            --arg claude "$CLAUDE_AUTHOR" \
             '{
               msg_type: "interactive",
               card: {
@@ -273,10 +271,6 @@ jobs:
                     flex_mode: "stretch",
                     background_style: "default",
                     columns: [
-                      {
-                        tag: "column", width: "weighted", weight: 1,
-                        elements: [{ tag: "div", text: { tag: "lark_md", content: "📁 Dự án\n**MColin-frontend**" } }]
-                      },
                       {
                         tag: "column", width: "weighted", weight: 1,
                         elements: [{ tag: "div", text: { tag: "lark_md", content: ("🔗 Commit\n**`" + $sha + "`**") } }]
@@ -300,19 +294,11 @@ jobs:
                     columns: [
                       {
                         tag: "column", width: "weighted", weight: 1,
-                        elements: [{ tag: "div", text: { tag: "lark_md", content: ("🤖 Co-Authored-By\n**" + (if $claude != "" then $claude else "—" end) + "**") } }]
-                      },
-                      {
-                        tag: "column", width: "weighted", weight: 1,
                         elements: [{ tag: "div", text: { tag: "lark_md", content: ("🕐 Thời gian deploy\n**" + $time + "**") } }]
                       },
                       {
                         tag: "column", width: "weighted", weight: 1,
                         elements: [{ tag: "div", text: { tag: "lark_md", content: ("👤 Người deploy\n**" + $actor + "**") } }]
-                      },
-                      {
-                        tag: "column", width: "weighted", weight: 1,
-                        elements: [{ tag: "div", text: { tag: "lark_md", content: "✅ Trạng thái\n**Hoạt động ổn định**" } }]
                       }
                     ]
                   },
