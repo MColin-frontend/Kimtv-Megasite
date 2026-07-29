@@ -60,13 +60,13 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           if [[ "${{ steps.install.outcome }}" == "failure" ]]; then
-            FAILED_STEP="📦 Install dependencies"
+            FAILED_STEP="Install dependencies"
           elif [[ "${{ steps.lint.outcome }}" == "failure" ]]; then
-            FAILED_STEP="🔍 Lint (ESLint)"
+            FAILED_STEP="Lint (ESLint)"
           elif [[ "${{ steps.typecheck.outcome }}" == "failure" ]]; then
-            FAILED_STEP="🔎 Typecheck (TypeScript)"
+            FAILED_STEP="Typecheck (TypeScript)"
           else
-            FAILED_STEP="❓ Unknown step"
+            FAILED_STEP="Unknown step"
           fi
 
           PAYLOAD=$(jq -n \
@@ -86,29 +86,13 @@ jobs:
                 elements: [
                   {
                     tag: "div",
-                    text: { tag: "lark_md", content: ("**Bước lỗi:** " + $step) }
+                    text: { tag: "lark_md", content: ("**Lỗi tại:** " + $step + "\n" + $actor + " · `" + $sha + "` · " + $branch + "\n" + $commit) }
                   },
-                  { tag: "hr" },
-                  {
-                    tag: "div",
-                    fields: [
-                      { is_short: true, text: { tag: "lark_md", content: ("**📌 Branch**\n`" + $branch + "`") } },
-                      { is_short: true, text: { tag: "lark_md", content: ("**👤 Author**\n" + $actor) } }
-                    ]
-                  },
-                  {
-                    tag: "div",
-                    fields: [
-                      { is_short: true, text: { tag: "lark_md", content: ("**🔑 Commit**\n`" + $sha + "`") } },
-                      { is_short: true, text: { tag: "lark_md", content: ("**💬 Message**\n" + $commit) } }
-                    ]
-                  },
-                  { tag: "hr" },
                   {
                     tag: "action",
                     actions: [{
                       tag: "button",
-                      text: { tag: "plain_text", content: "Xem log chi tiết →" },
+                      text: { tag: "plain_text", content: "Xem log →" },
                       url: $url,
                       type: "danger"
                     }]
@@ -176,11 +160,11 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           if [[ "${{ steps.login.outcome }}" == "failure" ]]; then
-            FAILED_STEP="🔐 Login GHCR"
+            FAILED_STEP="Login GHCR"
           elif [[ "${{ steps.build.outcome }}" == "failure" ]]; then
-            FAILED_STEP="🐳 Build & Push Docker image"
+            FAILED_STEP="Build & Push Docker image"
           else
-            FAILED_STEP="❓ Unknown step"
+            FAILED_STEP="Unknown step"
           fi
 
           PAYLOAD=$(jq -n \
@@ -200,29 +184,13 @@ jobs:
                 elements: [
                   {
                     tag: "div",
-                    text: { tag: "lark_md", content: ("**Bước lỗi:** " + $step) }
+                    text: { tag: "lark_md", content: ("**Lỗi tại:** " + $step + "\n" + $actor + " · `" + $sha + "` · " + $branch + "\n" + $commit) }
                   },
-                  { tag: "hr" },
-                  {
-                    tag: "div",
-                    fields: [
-                      { is_short: true, text: { tag: "lark_md", content: ("**📌 Branch**\n`" + $branch + "`") } },
-                      { is_short: true, text: { tag: "lark_md", content: ("**👤 Author**\n" + $actor) } }
-                    ]
-                  },
-                  {
-                    tag: "div",
-                    fields: [
-                      { is_short: true, text: { tag: "lark_md", content: ("**🔑 Commit**\n`" + $sha + "`") } },
-                      { is_short: true, text: { tag: "lark_md", content: ("**💬 Message**\n" + $commit) } }
-                    ]
-                  },
-                  { tag: "hr" },
                   {
                     tag: "action",
                     actions: [{
                       tag: "button",
-                      text: { tag: "plain_text", content: "Xem log chi tiết →" },
+                      text: { tag: "plain_text", content: "Xem log →" },
                       url: $url,
                       type: "danger"
                     }]
@@ -286,27 +254,15 @@ jobs:
                   template: "green"
                 },
                 elements: [
-                  { tag: "hr" },
                   {
                     tag: "div",
-                    fields: [
-                      { is_short: true, text: { tag: "lark_md", content: ("**📌 Branch**\n`" + $branch + "`") } },
-                      { is_short: true, text: { tag: "lark_md", content: ("**👤 Author**\n" + $actor) } }
-                    ]
+                    text: { tag: "lark_md", content: ($actor + " · `" + $sha + "` · " + $branch + "\n" + $commit) }
                   },
-                  {
-                    tag: "div",
-                    fields: [
-                      { is_short: true, text: { tag: "lark_md", content: ("**🔑 Commit**\n`" + $sha + "`") } },
-                      { is_short: true, text: { tag: "lark_md", content: ("**💬 Message**\n" + $commit) } }
-                    ]
-                  },
-                  { tag: "hr" },
                   {
                     tag: "action",
                     actions: [{
                       tag: "button",
-                      text: { tag: "plain_text", content: "Xem chi tiết →" },
+                      text: { tag: "plain_text", content: "Xem →" },
                       url: $url,
                       type: "primary"
                     }]
@@ -326,9 +282,9 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           if [[ "${{ steps.ssh.outcome }}" == "failure" ]]; then
-            FAILED_STEP="🚀 SSH Deploy (docker compose up)"
+            FAILED_STEP="SSH Deploy (docker compose up)"
           else
-            FAILED_STEP="❓ Unknown step"
+            FAILED_STEP="Unknown step"
           fi
 
           PAYLOAD=$(jq -n \
@@ -348,29 +304,13 @@ jobs:
                 elements: [
                   {
                     tag: "div",
-                    text: { tag: "lark_md", content: ("**Bước lỗi:** " + $step) }
+                    text: { tag: "lark_md", content: ("**Lỗi tại:** " + $step + "\n" + $actor + " · `" + $sha + "` · " + $branch + "\n" + $commit) }
                   },
-                  { tag: "hr" },
-                  {
-                    tag: "div",
-                    fields: [
-                      { is_short: true, text: { tag: "lark_md", content: ("**📌 Branch**\n`" + $branch + "`") } },
-                      { is_short: true, text: { tag: "lark_md", content: ("**👤 Author**\n" + $actor) } }
-                    ]
-                  },
-                  {
-                    tag: "div",
-                    fields: [
-                      { is_short: true, text: { tag: "lark_md", content: ("**🔑 Commit**\n`" + $sha + "`") } },
-                      { is_short: true, text: { tag: "lark_md", content: ("**💬 Message**\n" + $commit) } }
-                    ]
-                  },
-                  { tag: "hr" },
                   {
                     tag: "action",
                     actions: [{
                       tag: "button",
-                      text: { tag: "plain_text", content: "Xem log chi tiết →" },
+                      text: { tag: "plain_text", content: "Xem log →" },
                       url: $url,
                       type: "danger"
                     }]
