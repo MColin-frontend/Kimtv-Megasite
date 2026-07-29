@@ -5,6 +5,7 @@ import { getTokenFromCookie } from "@/lib/auth-cookie"
 
 import { env } from "@/config/env"
 
+import { PollTypeApiEnum, type PollTypeApiValue } from "../poll.constants"
 import type {
   CreatePollPayloadInterface,
   PollInterface,
@@ -38,12 +39,14 @@ export function createPollApi(payload: CreatePollPayloadInterface) {
   return javaPost<PollInterface>(POLL_API.CREATE, payload, { isMessageError: true })
 }
 
-export function votePollApi(pollId: string, optionKeys: string[]) {
-  return javaPost<PollInterface>(
-    POLL_API.VOTE,
-    { pollId, optionKeys } satisfies VotePayloadInterface,
-    { isMessageError: true }
-  )
+export function votePollApi(pollId: string, optionKeys: string[], pollType: PollTypeApiValue) {
+  // MULTIPLE_CHOICE → optionKeys[]; SINGLE_CHOICE / RATING → optionKey
+  const payload: VotePayloadInterface =
+    pollType === PollTypeApiEnum.MULTIPLE_CHOICE
+      ? { pollId, optionKeys }
+      : { pollId, optionKey: optionKeys[0] }
+
+  return javaPost<PollInterface>(POLL_API.VOTE, payload, { isMessageError: true })
 }
 
 export function closePollApi(pollId: string) {

@@ -55,5 +55,8 @@ export interface CreatePollPayloadInterface {
 
 export interface VotePayloadInterface {
   pollId: string
-  optionKeys: string[]
+  /** SINGLE_CHOICE / RATING */
+  optionKey?: string
+  /** MULTIPLE_CHOICE */
+  optionKeys?: string[]
 }

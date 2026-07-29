@@ -846,7 +846,7 @@ export function Chat({
 
   async function handlePollVote(optionKeys: string[]) {
     if (!poll?.pollId) return
-    const updated = await votePollApi(poll.pollId, optionKeys)
+    const updated = await votePollApi(poll.pollId, optionKeys, poll.type)
     if (updated) return updated
   }
   const reconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null)
