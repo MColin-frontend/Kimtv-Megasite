@@ -6,6 +6,7 @@ export enum PollChannelEnum {
   ACTIVE = "POLL_ACTIVE",
   UPDATE = "POLL_UPDATE",
   CLOSED = "POLL_CLOSED",
+  VOTED = "POLL_VOTED",
 }
 
 export const POLL_QUESTION_MAX = 120

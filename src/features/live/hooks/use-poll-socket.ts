@@ -28,6 +28,7 @@ interface UsePollSocketOptions {
   onActive?: (poll: PollInterface) => void
   onUpdate?: (poll: PollInterface) => void
   onClosed?: () => void
+  onVoted?: (poll: PollInterface) => void
 }
 
 export function usePollSocket({
@@ -37,6 +38,7 @@ export function usePollSocket({
   onActive,
   onUpdate,
   onClosed,
+  onVoted,
 }: UsePollSocketOptions): void {
   const wsRef = useRef<WebSocket | null>(null)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -46,12 +48,14 @@ export function usePollSocket({
   const onActiveRef = useRef(onActive)
   const onUpdateRef = useRef(onUpdate)
   const onClosedRef = useRef(onClosed)
+  const onVotedRef = useRef(onVoted)
 
   useEffect(() => {
     onStartRef.current = onStart
     onActiveRef.current = onActive
     onUpdateRef.current = onUpdate
     onClosedRef.current = onClosed
+    onVotedRef.current = onVoted
   })
 
   useEffect(() => {
@@ -94,21 +98,14 @@ export function usePollSocket({
           if (msg.channel === PollChannelEnum.ACTIVE) onActiveRef.current?.(msg.data)
           if (msg.channel === PollChannelEnum.UPDATE) onUpdateRef.current?.(msg.data)
           if (msg.channel === PollChannelEnum.CLOSED) onClosedRef.current?.()
+          if (msg.channel === PollChannelEnum.VOTED) onVotedRef.current?.(msg.data)
         } catch {
-          console.error("[poll-ws] parse error", raw)
+          // parse error — ignore malformed message
         }
       })
 
-      ws.addEventListener("close", (ev) => {
+      ws.addEventListener("close", () => {
         if (ws !== wsRef.current) return
-        console.warn(
-          "[poll-ws] closed — code:",
-          ev.code,
-          "reason:",
-          ev.reason || "(none)",
-          "reconnect:",
-          reconnectCount.current
-        )
         clearTimer()
         wsRef.current = null
         if (reconnectCount.current < WS_MAX_RECONNECT) {
@@ -116,14 +113,10 @@ export function usePollSocket({
             reconnectCount.current++
             connect()
           }, WS_RECONNECT_DELAY)
-        } else {
-          console.warn("[poll-ws] max reconnect reached")
         }
       })
 
-      ws.addEventListener("error", (ev) => {
-        console.error("[poll-ws] error:", ev)
-      })
+      ws.addEventListener("error", () => {})
     }
 
     reconnectCount.current = 0

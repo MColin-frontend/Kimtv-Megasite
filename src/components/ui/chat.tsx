@@ -518,6 +518,33 @@ function UserPopup({
                 {t("chat.actions.delete")}
               </span>
             </button>
+          </div>
+        )}
+
+        {/* Anchor actions — ANCHOR only */}
+        {userRole === CHAT_USER_ROLE.ANCHOR && (
+          <div className="flex items-start justify-around border-t border-white/[0.06] px-3 py-4">
+            {message.type !== CHAT_MESSAGE_TYPE.VIRTUAL && (
+              <button
+                onClick={() => {
+                  onSetManager?.(message, true)
+                  onClose()
+                }}
+                className="flex flex-col items-center gap-2 transition-transform active:scale-90"
+              >
+                <Img
+                  src={imgRestriction}
+                  alt=""
+                  width={40}
+                  height={40}
+                  objectFit="contain"
+                  className="opacity-50"
+                />
+                <span className="text-12 font-600 w-16 text-center leading-tight text-white/80">
+                  {t("chat.actions.set-manager")}
+                </span>
+              </button>
+            )}
             {message.hasFictitious && (
               <button
                 onClick={() => {
@@ -545,31 +572,6 @@ function UserPopup({
                 </span>
               </button>
             )}
-          </div>
-        )}
-
-        {/* Anchor actions — ANCHOR only */}
-        {userRole === CHAT_USER_ROLE.ANCHOR && message.type !== CHAT_MESSAGE_TYPE.VIRTUAL && (
-          <div className="flex items-start justify-around border-t border-white/[0.06] px-3 py-4">
-            <button
-              onClick={() => {
-                onSetManager?.(message, true)
-                onClose()
-              }}
-              className="flex flex-col items-center gap-2 transition-transform active:scale-90"
-            >
-              <Img
-                src={imgRestriction}
-                alt=""
-                width={40}
-                height={40}
-                objectFit="contain"
-                className="opacity-50"
-              />
-              <span className="text-12 font-600 w-16 text-center leading-tight text-white/80">
-                {t("chat.actions.set-manager")}
-              </span>
-            </button>
           </div>
         )}
 
