@@ -41,8 +41,8 @@
     "delete-error": "Xóa bình luận thất bại"
   },
   "no-source": {
-    "title": "Hiện không có trận đấu diễn ra",
-    "description": "Vui lòng quay lại sau"
+    "title": "Không tìm thấy nguồn phát",
+    "description": "Vui lòng kiểm tra đường truyền hoặc thử lại sau"
   },
   "empty": "Không có video nào",
   "load-more": "Đang tải...",

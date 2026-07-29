@@ -71,42 +71,34 @@ export interface LiveSearchMatchInterface {
 function StatItem({
   icon,
   alt,
-  value,
+  home,
+  away,
   label,
 }: {
   icon: string
   alt: string
-  value: number
+  home: number
+  away: number
   label: string
 }) {
   return (
-    <div className="flex flex-1 flex-col items-center gap-1 max-sm:gap-0.5">
-      <div className="flex items-center gap-1">
+    <div className="flex flex-1 flex-col items-center gap-0.5 px-4 max-sm:px-1">
+      <div className="flex items-center gap-1 max-sm:gap-0.5">
         <Img
           src={icon}
           alt={alt}
-          width={20}
-          height={20}
+          width={16}
+          height={16}
           objectFit="contain"
-          className="max-md:!size-3.5 max-sm:!size-[10px]"
+          className="max-sm:!size-[10px]"
         />
-        <Typography
-          as="span"
-          variant="body"
-          weight="700"
-          className="max-md:text-12 max-sm:!text-10 text-white tabular-nums"
-        >
-          {value}
-        </Typography>
+        <span className="text-12 sm:text-14 leading-150 font-700 max-sm:!text-10 text-white tabular-nums">{home}</span>
+        <span className="text-12 font-400 leading-150 tracking-1 text-white/50">-</span>
+        <span className="text-12 sm:text-14 leading-150 font-700 max-sm:!text-10 text-white tabular-nums">{away}</span>
       </div>
-      <Typography
-        as="span"
-        size="14"
-        weight="500"
-        className="max-md:text-10 whitespace-nowrap text-white max-sm:!text-[9px]"
-      >
+      <span className="text-12 leading-150 tracking-1 font-500 whitespace-nowrap text-white/80 max-sm:!text-[9px]">
         {label}
-      </Typography>
+      </span>
     </div>
   )
 }
@@ -405,7 +397,7 @@ export function MatchCardLive({
                     {match.awayScore ?? 0}
                   </Typography>
                 </div>
-                {isLive && <MatchStatusBadge type="live" label={periodLabel} />}
+                {/* TODO: <MatchStatusBadge type="live" label={periodLabel} /> */}
               </>
             )}
           </div>
@@ -438,24 +430,27 @@ export function MatchCardLive({
 
         {/* Row 4: Stats bar */}
         {!isUpcoming && (
-          <div className="rounded-8 flex items-center justify-between gap-1 bg-white/[0.06] px-3 py-2 backdrop-blur-2xl max-md:px-2 max-md:py-1 max-sm:px-1 max-sm:py-0.5">
+          <div className="rounded-8 flex items-center justify-between bg-white/10 px-2 py-1.5 [will-change:transform] backdrop-blur-[80px] max-sm:px-1 max-sm:py-0.5">
             {[
               {
                 icon: icYellowCardV2,
                 alt: "yellow",
-                value: (match.homeYellowCard ?? 0) + (match.awayYellowCard ?? 0),
+                home: match.homeYellowCard ?? 0,
+                away: match.awayYellowCard ?? 0,
                 labelKey: "match.card.stats.yellow-card",
               },
               {
                 icon: icRedCardV2,
                 alt: "red",
-                value: (match.homeRedCard ?? 0) + (match.awayRedCard ?? 0),
+                home: match.homeRedCard ?? 0,
+                away: match.awayRedCard ?? 0,
                 labelKey: "match.card.stats.red-card",
               },
               {
                 icon: icCornerFlag,
                 alt: "corner",
-                value: (match.homeCornerKick ?? 0) + (match.awayCornerKick ?? 0),
+                home: match.homeCornerKick ?? 0,
+                away: match.awayCornerKick ?? 0,
                 labelKey: "match.card.stats.corner",
               },
             ].map((s, i) => (
@@ -464,7 +459,8 @@ export function MatchCardLive({
                 <StatItem
                   icon={s.icon}
                   alt={s.alt}
-                  value={s.value}
+                  home={s.home}
+                  away={s.away}
                   label={t(s.labelKey as Parameters<typeof t>[0])}
                 />
               </div>

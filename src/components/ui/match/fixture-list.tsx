@@ -72,6 +72,18 @@ export function FixtureRow({
     match.status === MatchStatusEnum.LIVE || match.status === MatchStatusEnum.FINISHED
 
   const isLive = match.status === MatchStatusEnum.LIVE
+  const isFinished = match.status === MatchStatusEnum.FINISHED
+  const isUpcoming =
+    match.status === MatchStatusEnum.UPCOMING || match.status === MatchStatusEnum.UNKNOWN
+  const isStream = isLive && !!(match.anchorRoomVos?.[0] ?? match.anchor)
+
+  const statusInsetColor = isLive
+    ? "var(--color-red-600)"
+    : isUpcoming
+      ? "var(--gold)"
+      : isFinished
+        ? "rgba(203,213,225,0.5)"
+        : null
 
   function handleClick() {
     if (onSelect) {
@@ -90,17 +102,23 @@ export function FixtureRow({
           extraColumn ? FIXTURE_ROW_CLASS + ` ${extraColumn.width ?? "auto"}` : FIXTURE_ROW_CLASS,
           "rounded-10 fixture-row-bg border-white-linear mb-1.5 py-3 last:mb-0",
           "transition-all duration-200 hover:bg-white/[0.04] max-lg:hidden",
+
           onSelect || isLive
             ? "cursor-pointer hover:bg-white/[0.08] hover:shadow-[0_4px_20px_rgba(0,0,0,0.25)]"
             : "cursor-default"
         )}
-        style={
-          extraColumn
+        style={{
+          ...(extraColumn
             ? {
                 gridTemplateColumns: `8rem 1fr 4.5rem 5rem 3rem 3rem 3rem ${extraColumn.width ?? "5rem"}`,
               }
-            : undefined
-        }
+            : {}),
+          ...(statusInsetColor
+            ? {
+                boxShadow: `inset 4px 0 0 ${statusInsetColor}, inset 0 1px 0 rgba(255,255,255,0.07)`,
+              }
+            : {}),
+        }}
       >
         <Tooltip>
           <TooltipTrigger className="flex min-w-0 items-center gap-2 text-left">
@@ -189,6 +207,13 @@ export function FixtureRow({
           "flex flex-col gap-1.5 transition-all duration-200 hover:bg-white/[0.04] lg:hidden",
           onSelect || isLive ? "cursor-pointer hover:bg-white/[0.08]" : "cursor-default"
         )}
+        style={
+          statusInsetColor
+            ? {
+                boxShadow: `inset 4px 0 0 ${statusInsetColor}, inset 0 1px 0 rgba(255,255,255,0.07)`,
+              }
+            : undefined
+        }
       >
         <div className="flex items-center gap-2">
           {match.leagueLogo && (
@@ -380,12 +405,14 @@ interface FixtureListProps {
   onPageChange: (page: number) => void
   onSelect?: (match: MatchInterface) => void
   extraColumn?: ExtraColumnInterface
+  className?: string
 }
 
 export function FixtureList({
   groups,
   loading,
   page,
+  className,
   pageSize,
   total,
   onPageChange,
@@ -397,9 +424,9 @@ export function FixtureList({
   if (loading) return <FixtureListSkeleton />
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className={cn("flex h-full flex-col gap-3", className)}>
       {isEmpty(groups) ? (
-        <div className="flex flex-col items-center justify-center gap-3 py-16">
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16">
           <Img
             src={imgEmpty.src}
             alt={t("match.fixture.empty")}
@@ -412,7 +439,7 @@ export function FixtureList({
           </Typography>
         </div>
       ) : (
-        <div className="rounded-12 w-full overflow-hidden">
+        <div className="rounded-12 w-full flex-1 overflow-hidden">
           <FixtureTableHeader extraColumn={extraColumn} />
           {groups.map((group) => (
             <div key={group.key}>

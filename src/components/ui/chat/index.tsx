@@ -1,10 +1,9 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { createPortal } from "react-dom"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ChevronDown, ChevronUp, RefreshCw, X } from "lucide-react"
+import { RefreshCw } from "lucide-react"
 import { z } from "zod"
 
 import {
@@ -13,545 +12,49 @@ import {
   fetchPinnedMessagesAction,
 } from "@/server/actions/chat.action"
 import { getTokenFromCookie, type KimtvUser } from "@/lib/auth-cookie"
-import { formatMatchTime } from "@/lib/date"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/use-auth"
 import { useRouter } from "@/hooks/useRouter"
-
 import { useTranslation } from "@/i18n"
 import { env } from "@/config/env"
 import { siteConfig } from "@/config/site"
 import { HERO_VIDEO_PARAMS } from "@/constants/component/home.constants"
 import {
   CHAT_CHANNEL,
-  CHAT_CLASSES,
   CHAT_CONNECTION_STATUS,
   CHAT_INPUT_HEIGHT,
   CHAT_MESSAGE_TYPE,
-  CHAT_MSG_PADDING,
   CHAT_OPERATE_TYPE,
   CHAT_SCROLLBAR_STYLE,
   CHAT_SOCIAL_NAMES,
-  CHAT_SYMBOLS,
   CHAT_USER_ROLE,
 } from "@/constants/ui/ui-chat.constants"
-
 import { getActivePollApi, votePollApi } from "@/features/live/api/poll.api"
 import { PollVoteView } from "@/features/live/components/poll-vote-view"
 import { PollChannelEnum } from "@/features/live/poll.constants"
 import type { PollInterface } from "@/features/live/poll.models"
-import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Img } from "@/components/ui/image"
 import { MessageInput } from "@/components/ui/message-input"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Typography } from "@/components/ui/typography"
 
-import imgBlacklist from "@assets/images/chat/img-blacklist.png"
-import imgCrown from "@assets/images/chat/img-crown.png"
-import imgPin from "@assets/images/chat/img-pin.png"
-import imgRemove from "@assets/images/chat/img-remove.png"
-import imgRestriction from "@assets/images/chat/img-restriction.png"
 import imgChat from "@assets/images/common/img-chat.png"
 import imgFacebook from "@assets/images/layout/img-facebook.png"
 import imgTele from "@assets/images/layout/img-tele.png"
 import imgZalo from "@assets/images/layout/img-zalo.png"
 
-export type ChatMessageType = (typeof CHAT_MESSAGE_TYPE)[keyof typeof CHAT_MESSAGE_TYPE]
-export type UserRole = (typeof CHAT_USER_ROLE)[keyof typeof CHAT_USER_ROLE]
-export type ConnectionStatus = (typeof CHAT_CONNECTION_STATUS)[keyof typeof CHAT_CONNECTION_STATUS]
+import type { ChatMessage, ChatProps, ChatSocials, ConnectionStatus, UserRole } from "./types"
+import { MessageItem } from "./parts/message-item"
+import { PinItemRow } from "./parts/pin-item-row"
+import { UserPopup } from "./parts/user-popup"
 
-export interface ChatMessage {
-  id: string | number
-  type: ChatMessageType
-  content: string
-  userName: string
-  userId?: string | number
-  chatroomId?: string | number
-  level?: number
-  isVip?: boolean
-  isSVip?: boolean
-  hasAnchorMe?: boolean
-  hasFictitious?: boolean
-  userAvatar?: string
-  sendTime?: number
-  vip99Icon?: string | null
-}
-
-export interface ChatSocials {
-  telegram?: string
-  facebook?: string
-  zalo?: string
-}
-
-export interface ChatProps {
-  socials?: ChatSocials
-  onReport?: (message: ChatMessage, reportType: number) => void
-  onBanRoom?: (message: ChatMessage, mute: boolean) => void
-  onBanAll?: (message: ChatMessage, mute: boolean) => void
-  onSetManager?: (message: ChatMessage, set: boolean) => void
-  onPollMessage?: (channel: string, data: unknown) => void
-  inputSuffix?: React.ReactNode
-  topContent?: React.ReactNode
-  className?: string
-  chatroomId?: string | number
-  gameId?: number
-  externalPoll?: boolean
-}
+export type { ChatMessage, ChatSocials, ChatProps, UserRole, ConnectionStatus }
+export type { ChatMessageType } from "./types"
 
 const WS_RECONNECT_DELAY = 2000
 const WS_HEARTBEAT_INTERVAL = 10_000
 
-type TFunc = (key: Parameters<ReturnType<typeof useTranslation>["t"]>[0]) => string
-
-function ChatAvatar({ message, size = 48 }: { message: ChatMessage; size?: number }) {
-  const wrapperCls = message.hasAnchorMe
-    ? "bg-gradient-to-br from-[#ffd75a] to-[#f6c343] shadow-[0_0_8px_2px_rgba(246,195,67,0.45)]"
-    : message.hasFictitious
-      ? ""
-      : "bg-white"
-
-  return (
-    <div
-      className={cn("shrink-0 rounded-full p-px", wrapperCls)}
-      style={{ width: size + 2, height: size + 2 }}
-    >
-      <Avatar size={size}>
-        <AvatarImage src={message.userAvatar} />
-      </Avatar>
-    </div>
-  )
-}
-
-function RoleBadge({ message, t }: { message: ChatMessage; t: TFunc }) {
-  if (message.hasAnchorMe) {
-    return (
-      <Typography
-        as="span"
-        size="10"
-        weight="600"
-        className="bg-live/10 text-live rounded-4 mr-1 inline-block px-1.5 py-0.5 align-middle backdrop-blur-sm"
-      >
-        {t("chat.role.streamer")}
-      </Typography>
-    )
-  }
-  if (message.hasFictitious) {
-    return (
-      <Typography
-        as="span"
-        size="10"
-        weight="600"
-        className="rounded-4 mr-1 inline-block bg-fuchsia-500/15 px-1.5 py-0.5 align-middle text-fuchsia-400 backdrop-blur-sm"
-      >
-        {t("chat.role.admin")}
-      </Typography>
-    )
-  }
-  return null
-}
-
-function WelcomeMessageItem({
-  message,
-  onDoubleClick,
-  t,
-}: {
-  message: ChatMessage
-  onDoubleClick: (msg: ChatMessage) => void
-  t: TFunc
-}) {
-  return (
-    <div
-      onDoubleClick={() => onDoubleClick(message)}
-      className={cn(
-        "flex flex-col gap-2 py-1.5 max-sm:gap-0.5 max-sm:!px-2 max-sm:py-0.5",
-        CHAT_MSG_PADDING,
-        (message.isSVip || message.isVip) && "bg-gold/5"
-      )}
-    >
-      <div className="flex items-center gap-2 max-sm:gap-1.5">
-        <div className="relative shrink-0 max-sm:size-8 max-sm:overflow-hidden max-sm:rounded-full">
-          <div className="max-sm:origin-top-left max-sm:scale-[0.64]">
-            {message.hasAnchorMe && (
-              <div className="border-gold-hover absolute -top-2 -right-1 z-11 flex size-6 items-center justify-center rounded-full border-[0.5px] bg-black/70 p-[2px]">
-                <Img src={imgCrown} alt="crown" width={14} height={14} objectFit="contain" />
-              </div>
-            )}
-            <ChatAvatar message={message} size={48} />
-          </div>
-        </div>
-        <div className="flex w-full min-w-0 flex-col flex-wrap gap-1 max-sm:gap-0.5">
-          <div className="flex items-center justify-between gap-1">
-            <div className="flex w-full items-center gap-1">
-              <Tooltip>
-                <TooltipTrigger>
-                  <Typography
-                    as="span"
-                    variant="body-sm"
-                    weight="600"
-                    className={cn(
-                      "max-sm:text-10 block max-w-48 cursor-pointer truncate",
-                      CHAT_CLASSES.username
-                    )}
-                  >
-                    {message.userName}
-                  </Typography>
-                </TooltipTrigger>
-                <TooltipContent>{message.userName}</TooltipContent>
-              </Tooltip>
-              <RoleBadge message={message} t={t} />
-
-              {message?.vip99Icon && (
-                <Img
-                  src={message?.vip99Icon || ""}
-                  alt="vip99 icon"
-                  width={32}
-                  height={32}
-                  unoptimized
-                  objectFit="contain"
-                  className="h-auto max-sm:!size-5"
-                />
-              )}
-            </div>
-            {message.sendTime && (
-              <Typography
-                variant="overline"
-                className="text-muted max-sm:text-10 ml-auto shrink-0 tabular-nums"
-              >
-                {formatMatchTime(message.sendTime)}
-              </Typography>
-            )}
-          </div>
-          <Typography as="span" variant="body-sm" className="text-muted max-sm:text-10">
-            {t("chat.welcome")}
-          </Typography>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function MessageItem({
-  message,
-  onDoubleClick,
-  t,
-}: {
-  message: ChatMessage
-  onDoubleClick: (msg: ChatMessage) => void
-  t: TFunc
-}) {
-  if (message.type === CHAT_MESSAGE_TYPE.GIFT) {
-    return (
-      <div
-        onDoubleClick={() => onDoubleClick(message)}
-        className={cn(
-          "text-14 bg-chat-gift/5 flex items-center gap-1 py-2.5 text-white max-sm:!px-2",
-          CHAT_MSG_PADDING
-        )}
-      >
-        {message?.vip99Icon && (
-          <Img
-            src={message?.vip99Icon || ""}
-            alt="vip99 icon"
-            width={32}
-            height={32}
-            unoptimized
-            objectFit="contain"
-            className="h-auto max-sm:!size-5"
-          />
-        )}
-        <span dangerouslySetInnerHTML={{ __html: message.content }} />
-      </div>
-    )
-  }
-
-  if (message.type === CHAT_MESSAGE_TYPE.WELCOME) {
-    return <WelcomeMessageItem message={message} onDoubleClick={onDoubleClick} t={t} />
-  }
-
-  return (
-    <div
-      onDoubleClick={() => onDoubleClick(message)}
-      className={cn(
-        "flex gap-2 py-1.5 max-sm:gap-1.5 max-sm:!px-2 max-sm:py-0.5",
-        CHAT_MSG_PADDING
-      )}
-    >
-      <div className="relative shrink-0 max-sm:size-8 max-sm:overflow-hidden max-sm:rounded-full">
-        <div className="max-sm:origin-top-left max-sm:scale-[0.64]">
-          {message.hasAnchorMe && (
-            <div className="border-gold-hover absolute -top-2 -right-1 z-10 flex size-6 items-center justify-center rounded-full border-[0.5px] bg-black/70 p-[2px]">
-              <Img src={imgCrown} alt="crown" width={14} height={14} objectFit="contain" />
-            </div>
-          )}
-          <ChatAvatar message={message} size={48} />
-        </div>
-      </div>
-
-      <div className="min-w-0 flex-1">
-        <div className="flex items-baseline justify-between gap-2">
-          <div className="flex min-w-0 items-center gap-1">
-            <Typography
-              as="span"
-              variant="body-sm"
-              weight="600"
-              className={cn("max-sm:text-12 cursor-pointer truncate", CHAT_CLASSES.username)}
-            >
-              {message.userName}
-            </Typography>
-            <RoleBadge message={message} t={t} />
-            {message?.vip99Icon && (
-              <Img
-                src={message?.vip99Icon || ""}
-                alt="vip99 icon"
-                width={32}
-                height={32}
-                unoptimized
-                objectFit="contain"
-                className="h-auto max-sm:!size-5"
-              />
-            )}
-          </div>
-          {formatMatchTime(message?.sendTime ?? 0) && (
-            <Typography
-              variant="overline"
-              className="text-muted max-sm:text-10 shrink-0 tabular-nums"
-            >
-              {formatMatchTime(message?.sendTime ?? 0)}
-            </Typography>
-          )}
-        </div>
-        <Typography
-          variant="body-sm"
-          className={cn("max-sm:text-12 break-words text-white", `[&_a]:${CHAT_CLASSES.link}`)}
-          dangerouslySetInnerHTML={{ __html: message.content }}
-        />
-      </div>
-    </div>
-  )
-}
-
-function UserPopup({
-  message,
-  isPinned,
-  onClose,
-  onReport,
-  onDelete,
-  onPin,
-  onUnpin,
-  onBanRoom,
-  onBanAll,
-}: {
-  message: ChatMessage
-  userRole: UserRole
-  isPinned: boolean
-  onClose: () => void
-  onReport?: (msg: ChatMessage, type: number) => void
-  onDelete?: (msg: ChatMessage) => void
-  onPin?: (msg: ChatMessage) => void
-  onUnpin?: (msg: ChatMessage) => void
-  onBanRoom?: (msg: ChatMessage, mute: boolean) => void
-  onBanAll?: (msg: ChatMessage, mute: boolean) => void
-  onSetManager?: (msg: ChatMessage, set: boolean) => void
-}) {
-  const { t } = useTranslation()
-  const [reportType, setReportType] = useState(0)
-
-  const REPORT_TYPES = [
-    t("chat.report.types.speech"),
-    t("chat.report.types.attack"),
-    t("chat.report.types.nickname"),
-    t("chat.report.types.ad"),
-    t("chat.report.types.avatar"),
-    t("chat.report.types.spam"),
-  ]
-
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[999] flex items-end justify-center sm:items-center"
-      onClick={onClose}
-    >
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
-
-      {/* Sheet */}
-      <div
-        className="panel-news sm:rounded-16 relative z-10 w-full max-w-[600px] overflow-hidden rounded-t-2xl"
-        style={{ boxShadow: "0 32px 80px rgba(0,0,0,0.7)" }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Drag handle — mobile */}
-        <div className="flex justify-center pt-3 pb-1 sm:hidden">
-          <div className="h-1 w-10 rounded-full bg-white/20" />
-        </div>
-
-        {/* User info */}
-        <div className="flex items-center gap-3 px-5 py-5">
-          <div className="relative shrink-0">
-            {message.hasAnchorMe && (
-              <div className="border-gold/70 absolute -top-1 -right-0.5 z-10 flex size-6 items-center justify-center rounded-full border-[0.5px] bg-black/80">
-                <Img src={imgCrown} alt="crown" width={13} height={13} objectFit="contain" />
-              </div>
-            )}
-            <ChatAvatar message={message} size={64} />
-          </div>
-          <div className="min-w-0 flex-1">
-            <Typography variant="body" weight="700" className="truncate text-white">
-              {message.userName}
-            </Typography>
-            <RoleBadge message={message} t={t} />
-          </div>
-        </div>
-
-        {/* Quote */}
-        <div className="rounded-8 mx-5 mb-3 bg-white/[0.03] px-4 py-3">
-          <Typography
-            size="10"
-            weight="500"
-            className="mb-1.5 tracking-widest text-white/30 uppercase"
-          >
-            {t("chat.report.title")}
-          </Typography>
-          <div
-            className="max-h-[120px] overflow-y-auto pr-1"
-            style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.1) transparent" }}
-          >
-            <Typography variant="body-sm" className="leading-relaxed text-white/60">
-              {message.content.replace(/<[^>]*>/g, "")}
-            </Typography>
-          </div>
-        </div>
-
-        {/* Message thường → report */}
-        {!(message.hasAnchorMe || message.hasFictitious) && (
-          <>
-            <div className="flex flex-col p-2">
-              {REPORT_TYPES.map((label, i) => (
-                <button
-                  key={i}
-                  onClick={() => setReportType(i)}
-                  className={cn(
-                    "font-500 rounded-4 mb-1 flex items-center gap-3 px-5 py-2.5 text-left text-sm transition-colors",
-                    reportType === i
-                      ? "bg-danger/8 text-danger"
-                      : "text-white/55 hover:bg-white/[0.03] hover:text-white/80"
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "inline-flex size-4 shrink-0 items-center justify-center rounded-full border transition-colors",
-                      reportType === i ? "border-danger bg-danger/20" : "border-white/20"
-                    )}
-                  >
-                    {reportType === i && <span className="bg-danger block size-1 rounded-full" />}
-                  </span>
-                  {label}
-                </button>
-              ))}
-            </div>
-            <div className="flex w-full gap-3 px-5 py-4">
-              <Button variant="cancel" className="flex-1" onClick={onClose}>
-                {t("chat.cancel")}
-              </Button>
-              <Button
-                variant="gradient"
-                className="flex-1"
-                onClick={() => {
-                  onReport?.(message, reportType)
-                  onClose()
-                }}
-              >
-                {t("chat.report.submit")}
-              </Button>
-            </div>
-          </>
-        )}
-
-        {/* BLV/Admin message (hasAnchorMe || hasFictitious) → action buttons */}
-        {(message.hasAnchorMe || message.hasFictitious) && (
-          <div className="flex flex-col border-t border-white/[0.06] py-1">
-            {[
-              {
-                icon: imgBlacklist,
-                label: t("chat.actions.ban-all"),
-                onClick: () => {
-                  onBanAll?.(message, true)
-                  onClose()
-                },
-                show: true,
-                danger: true,
-              },
-              {
-                icon: imgRestriction,
-                label: t("chat.actions.ban-room"),
-                onClick: () => {
-                  onBanRoom?.(message, true)
-                  onClose()
-                },
-                show: true,
-                danger: true,
-              },
-              {
-                icon: imgRemove,
-                label: t("chat.actions.delete"),
-                onClick: () => {
-                  onDelete?.(message)
-                  onClose()
-                },
-                show: true,
-                danger: true,
-              },
-              {
-                icon: imgPin,
-                label: isPinned ? t("chat.actions.unpin") : t("chat.actions.pin"),
-                onClick: () => {
-                  if (isPinned) onUnpin?.(message)
-                  else onPin?.(message)
-                  onClose()
-                },
-                show: message.hasFictitious,
-                pinned: isPinned,
-              },
-            ]
-              .filter((a) => a.show)
-              .map((action) => (
-                <button
-                  key={action.label}
-                  onClick={action.onClick}
-                  className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-white/[0.04] active:bg-white/[0.07]"
-                >
-                  <Img
-                    src={action.icon}
-                    alt=""
-                    width={28}
-                    height={28}
-                    objectFit="contain"
-                    className={action.pinned === false ? "opacity-40" : undefined}
-                  />
-                  <span
-                    className={cn(
-                      "text-14 font-500",
-                      action.pinned
-                        ? "text-gold"
-                        : action.danger
-                          ? "text-white/80"
-                          : "text-white/80"
-                    )}
-                  >
-                    {action.label}
-                  </span>
-                </button>
-              ))}
-          </div>
-        )}
-
-        {/* Safe area bottom — mobile */}
-        <div className="h-safe-area-bottom sm:hidden" />
-      </div>
-    </div>,
-    document.body
-  )
-}
+const DEFAULT_SOCIALS: ChatSocials = siteConfig.socials
 
 function resolveChatRole(user: KimtvUser | null, isLoggedIn: boolean): UserRole {
   if (!isLoggedIn || !user) return CHAT_USER_ROLE.NOT_LOGIN
@@ -567,8 +70,6 @@ function resolveChatRole(user: KimtvUser | null, isLoggedIn: boolean): UserRole 
       return CHAT_USER_ROLE.ORDINARY
   }
 }
-
-const DEFAULT_SOCIALS: ChatSocials = siteConfig.socials
 
 export function Chat({
   socials,
@@ -596,6 +97,7 @@ export function Chat({
     CHAT_CONNECTION_STATUS.DISCONNECTED
   )
   const [hasMoreMessages, setHasMoreMessages] = useState(false)
+  const [initialLoading, setInitialLoading] = useState(true)
   const chatSchema = z.object({
     content: z.string().refine((v) => v.trim().length > 0, t("chat.empty-message")),
   })
@@ -701,14 +203,15 @@ export function Chat({
       setConnectionStatus(CHAT_CONNECTION_STATUS.CONNECTING)
       try {
         const token = getTokenFromCookie() ?? ""
-        const ws = new WebSocket(
-          `${env.wsBaseUrl}/chat?chatroom_id=${cId}&game_id=${gId}&token=${token}&lan=vi`
-        )
+        const wsUrl = `${env.wsBaseUrl}/chat?chatroom_id=${cId}&game_id=${gId}&token=${token}&lan=vi`
+        console.log("[Chat] initWs → connecting to:", wsUrl, "| token:", token ? "✓" : "✗ (empty)")
+        const ws = new WebSocket(wsUrl)
 
         wsRef.current = ws
 
         ws.addEventListener("open", () => {
           if (ws !== wsRef.current) return
+          console.log("[Chat] WebSocket OPEN ✓ | chatroomId:", cId, "| gameId:", gId)
           setConnectionStatus(CHAT_CONNECTION_STATUS.CONNECTED)
           startHeartbeat()
           reconnectCountRef.current = 0
@@ -716,6 +219,7 @@ export function Chat({
 
         ws.addEventListener("message", ({ data: raw }) => {
           if (ws !== wsRef.current || raw === "ping") return
+          console.log("[Chat] WS message received:", raw)
 
           try {
             const res = JSON.parse(raw) as Record<string, unknown>
@@ -819,7 +323,10 @@ export function Chat({
       })
       if (result.messages.length > 0) {
         pageIndexRef.current++
-        setMessages((prev) => [...result.messages, ...prev])
+        setMessages((prev) => [
+          ...result.messages.map((m) => ({ ...m, content: parseLinks(m.content) })),
+          ...prev,
+        ])
       }
       setHasMoreMessages(result.hasMore)
     } finally {
@@ -834,9 +341,10 @@ export function Chat({
       fetchChatMessagesAction({ chatroomId, gameId, pageIndex: 0 }),
       fetchPinnedMessagesAction({ chatroomId, gameId }),
     ]).then(([chatResult, pinned]) => {
-      setMessages(chatResult.messages)
+      setMessages(chatResult.messages.map((m) => ({ ...m, content: parseLinks(m.content) })))
       setHasMoreMessages(chatResult.hasMore)
       setPinnedMessages(pinned)
+      setInitialLoading(false)
     })
   }, [chatroomId, gameId])
 
@@ -856,8 +364,22 @@ export function Chat({
   }, [chatroomId, gameId, isLoggedIn, initWs, closeWs])
 
   const handleSendMessage = ({ content }: ChatFormType) => {
-    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return
-    wsRef.current.send(JSON.stringify({ type: 1, content: content }))
+    console.log("[Chat] handleSendMessage called", { content })
+    console.log("[Chat] wsRef.current:", wsRef.current)
+    console.log(
+      "[Chat] readyState:",
+      wsRef.current?.readyState,
+      "(OPEN=1, CONNECTING=0, CLOSING=2, CLOSED=3)"
+    )
+    console.log("[Chat] chatroomId:", chatroomId, "| gameId:", gameId)
+    console.log("[Chat] isLoggedIn:", isLoggedIn)
+    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+      console.warn("[Chat] Cannot send — WebSocket not OPEN")
+      return
+    }
+    const payload = JSON.stringify({ type: 1, content: content })
+    console.log("[Chat] Sending payload:", payload)
+    wsRef.current.send(payload)
     resetForm()
   }
 
@@ -1062,82 +584,27 @@ export function Chat({
 
         {/* Pinned messages */}
         {pinnedMessages.length > 0 && (
-          <div className="absolute top-[55px] right-0 left-0 z-20 flex flex-col gap-px border-b border-white/6 pr-3">
+          <div className="absolute top-[55px] right-0 left-0 z-20 flex flex-col gap-1 border-b border-white/6 bg-[#1a1300] pr-3">
             {pinnedMessages.map((msg) => {
               const isExpanded = expandedPinId === msg.id
+              const canUnpin =
+                userRole === CHAT_USER_ROLE.ADMIN ||
+                userRole === CHAT_USER_ROLE.ANCHOR ||
+                userRole === CHAT_USER_ROLE.HOUSING_MANAGEMENT
               return (
-                <div
+                <PinItemRow
                   key={msg.id}
-                  className={cn(
-                    "rounded-4 relative flex flex-col gap-1 border-l-[3px] bg-[#1a140a] py-1.5 pr-2 pl-2 text-[12px] text-white select-none",
-                    "border-chat-pin"
-                  )}
-                >
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <span
-                        className="absolute -top-1.5 -right-1.5 z-30 flex size-4 shrink-0 cursor-pointer items-center justify-center rounded-full bg-red-500/90 text-white shadow-[0_0_6px_rgba(239,68,68,0.5)] transition-colors hover:bg-red-400"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          if (msg.hasFictitious) handleUnpin(msg)
-                          else setExpandedPinId(isExpanded ? null : msg.id)
-                        }}
-                      >
-                        {msg.hasFictitious ? (
-                          <X className="size-2.5" strokeWidth={3} />
-                        ) : isExpanded ? (
-                          <ChevronUp className="size-2.5" strokeWidth={3} />
-                        ) : (
-                          <ChevronDown className="size-2.5" strokeWidth={3} />
-                        )}
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      {msg.hasFictitious
-                        ? t("chat.actions.unpin")
-                        : isExpanded
-                          ? t("chat.actions.collapse")
-                          : t("chat.actions.expand")}
-                    </TooltipContent>
-                  </Tooltip>
-
-                  {/* Header row */}
-                  <div
-                    className="flex cursor-pointer items-center gap-1"
-                    onClick={() => setExpandedPinId(isExpanded ? null : msg.id)}
-                  >
-                    <span className="min-w-0 flex-1 overflow-hidden leading-none text-ellipsis whitespace-nowrap">
-                      <Typography as="span" size="12" className="mr-1 leading-none">
-                        {CHAT_SYMBOLS.PIN}
-                      </Typography>
-                      <Typography
-                        as="span"
-                        size="12"
-                        weight="700"
-                        className={cn("mr-1.5 leading-none", CHAT_CLASSES.pin)}
-                      >
-                        {t("chat.pin-label")}:
-                      </Typography>
-                      <span dangerouslySetInnerHTML={{ __html: msg.content }} />
-                    </span>
-                    <span
-                      className={cn(
-                        "shrink-0 leading-none transition-transform duration-200",
-                        CHAT_CLASSES.pin
-                      )}
-                    >
-                      {isExpanded ? CHAT_SYMBOLS.COLLAPSE : CHAT_SYMBOLS.EXPAND}
-                    </span>
-                  </div>
-
-                  {/* Expanded: full content */}
-                  {isExpanded && (
-                    <div
-                      className="max-h-48 overflow-y-auto pb-1 leading-relaxed break-words text-white"
-                      dangerouslySetInnerHTML={{ __html: msg.content }}
-                    />
-                  )}
-                </div>
+                  msg={msg}
+                  isExpanded={isExpanded}
+                  canUnpin={canUnpin}
+                  onToggle={() => setExpandedPinId(isExpanded ? null : msg.id)}
+                  onUnpin={() => handleUnpin(msg)}
+                  pinLabel={t("chat.pin-label")}
+                  tooltipUnpin={t("chat.actions.unpin")}
+                  tooltipCollapse={t("chat.actions.collapse")}
+                  tooltipExpand={t("chat.actions.expand")}
+                  parseLinks={parseLinks}
+                />
               )
             })}
           </div>
@@ -1161,16 +628,42 @@ export function Chat({
             </Typography>
           )}
 
-          {messages.map((msg, i) => (
-            <div key={`${msg.id}-${i}`} className="mb-2">
-              <MessageItem
-                message={msg}
-                onDoubleClick={handleDoubleClick}
-
-                t={t}
-              />
-            </div>
-          ))}
+          {initialLoading
+            ? Array.from({ length: 11 }).map((_, i) => (
+                <div key={i} className="relative mb-2 overflow-hidden px-[18px] py-1.5">
+                  <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.4s_infinite] bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
+                  <div className="flex gap-2">
+                    {/* Avatar */}
+                    <div
+                      className="shrink-0 rounded-full bg-white/8"
+                      style={{ width: 50, height: 50 }}
+                    />
+                    <div className="flex flex-1 flex-col gap-2 pt-1">
+                      {/* Name row */}
+                      <div className="flex items-center gap-2">
+                        <div className="rounded-4 h-3.5 w-24 bg-white/8" />
+                        <div className="rounded-4 h-3 w-12 bg-white/5" />
+                      </div>
+                      {/* Content lines */}
+                      <div
+                        className="rounded-4 h-3 bg-white/8"
+                        style={{ width: `${60 + (i % 3) * 15}%` }}
+                      />
+                      {i % 2 === 0 && (
+                        <div
+                          className="rounded-4 h-3 bg-white/5"
+                          style={{ width: `${40 + (i % 4) * 10}%` }}
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))
+            : messages.map((msg, i) => (
+                <div key={`${msg.id}-${i}`} className="mb-2">
+                  <MessageItem message={msg} onDoubleClick={handleDoubleClick} t={t} />
+                </div>
+              ))}
 
           {connectionStatus === CHAT_CONNECTION_STATUS.DISCONNECTED && (
             <div className="flex flex-col items-center gap-2 py-4">

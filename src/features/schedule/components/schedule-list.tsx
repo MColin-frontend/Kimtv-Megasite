@@ -25,7 +25,7 @@ export default function ScheduleList() {
   const leagueGroups = buildLeagueGroupsFromApi(leaguesData?.moreLeagus ?? [])
 
   return (
-    <section className="rounded-12 card-glow flex flex-col gap-4 p-5 max-sm:p-3">
+    <section className="rounded-12 card-glow flex h-full flex-col gap-4 p-5 max-sm:p-3">
       <ScheduleSectionHeader />
       <ScheduleFilter
         groups={leagueGroups}
@@ -46,6 +46,7 @@ export default function ScheduleList() {
         pageSize={filter.pageSize}
         total={total}
         onPageChange={filter.setPage}
+        className="flex-1"
       />
     </section>
   )

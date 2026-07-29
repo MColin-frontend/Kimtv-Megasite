@@ -2,7 +2,7 @@
 
 import "react"
 
-import { Calendar, Trophy, Users } from "lucide-react"
+import { Calendar, Trophy, Users, Video } from "lucide-react"
 
 import { formatFootballGameTime, formatMatchDate, formatMatchTime } from "@/lib/date"
 import { LIVE_MATCH_TYPE } from "@/lib/match.utils"
@@ -50,11 +50,11 @@ export function MatchCard({ match, isLoading, className }: MatchCardProps) {
   const { t } = useTranslation()
   const navigateToLive = useLiveNavigate()
   const countdown = useCountdown(match?.startTime)
-
-  function handleClick() {
-    if (!match?.matchId || !match?.gameId) return
-    navigateToLive(match.matchId, match.gameId)
-  }
+  const countdownDone =
+    !!match?.startTime &&
+    countdown.hours === 0 &&
+    countdown.minutes === 0 &&
+    countdown.seconds === 0
 
   if (isLoading || !match) return <MatchCardSkeleton className={className} />
 
@@ -70,22 +70,33 @@ export function MatchCard({ match, isLoading, className }: MatchCardProps) {
   const isStream = !!match.anchor || !!firstAnchor
   // Trận live nhưng không có BLV → "LIVE"
   const isLive = isMatchLive && !isStream
+
+  function handleClick() {
+    if (!match?.matchId || !match?.gameId) return
+    if (!isLive && !isStream) return
+    navigateToLive(match.matchId, match.gameId)
+  }
   const halfLabel = MATCH_HALF_LABEL[match.state as MatchFootballStateEnum] ?? "LIVE"
   const periodI18nKey = MATCH_HALF_LABEL_I18N_KEY[halfLabel]
   const periodLabel = periodI18nKey ? t(periodI18nKey as Parameters<typeof t>[0]) : halfLabel
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const displayMinute = useFakeGameMinute(match.gameTime, isStream || isLive)
 
-  const statValues = [
-    0,
-    (match.homeYellowCard ?? 0) + (match.awayYellowCard ?? 0),
-    (match.homeRedCard ?? 0) + (match.awayRedCard ?? 0),
-    (match.homeCornerKick ?? 0) + (match.awayCornerKick ?? 0),
-  ]
-  const stats = MATCH_STAT_CONFIG.map((cfg, i) => ({
+  const stats = MATCH_STAT_CONFIG.map((cfg) => ({
     ...cfg,
     label: t(cfg.labelKey as Parameters<typeof t>[0]),
-    value: statValues[i],
+    home:
+      cfg.alt === "yellow"
+        ? (match.homeYellowCard ?? 0)
+        : cfg.alt === "red"
+          ? (match.homeRedCard ?? 0)
+          : (match.homeCornerKick ?? 0),
+    away:
+      cfg.alt === "yellow"
+        ? (match.awayYellowCard ?? 0)
+        : cfg.alt === "red"
+          ? (match.awayRedCard ?? 0)
+          : (match.awayCornerKick ?? 0),
   }))
 
   return (
@@ -93,7 +104,7 @@ export function MatchCard({ match, isLoading, className }: MatchCardProps) {
       onClick={handleClick}
       className={cn(
         "card-match-bg rounded-12 relative h-full w-full overflow-hidden shadow-none transition-all",
-        match?.matchId && match?.gameId
+        (isLive || isStream) && match?.matchId && match?.gameId
           ? "hover:shadow-card-hover cursor-pointer"
           : "cursor-default",
         className
@@ -315,7 +326,7 @@ export function MatchCard({ match, isLoading, className }: MatchCardProps) {
                     {match.awayScore ?? 0}
                   </span>
                 </div>
-                {isLive && <MatchStatusBadge type="live" label={periodLabel} />}
+                {/* TODO: {isLive && <MatchStatusBadge type="live" label={periodLabel} />} */}
                 {isFinished && (
                   <MatchStatusBadge type="finished" label={t(MATCH_CARD_I18N_KEYS.finished)} />
                 )}
@@ -352,43 +363,64 @@ export function MatchCard({ match, isLoading, className }: MatchCardProps) {
 
         {/* Row 4: Countdown (upcoming) */}
         {isUpcoming && (
-          <div className="flex items-center justify-center gap-3">
-            {[
-              { value: countdown.hours, label: t(COUNTDOWN_I18N_KEYS.hours) },
-              { value: countdown.minutes, label: t(COUNTDOWN_I18N_KEYS.minutes) },
-              { value: countdown.seconds, label: t(COUNTDOWN_I18N_KEYS.seconds) },
-            ].map(({ value, label }, i) => (
-              <div key={label} className="flex items-start gap-2">
-                <div className="flex flex-col items-center">
-                  <Typography
-                    variant="h3"
-                    weight="700"
-                    className="text-gold leading-100 tabular-nums"
-                  >
-                    {String(value).padStart(2, "0")}
-                  </Typography>
-                  <Typography as="span" size="12" className="text-muted mt-1">
-                    {label}
-                  </Typography>
+          countdownDone ? (
+            <div className="rounded-8 flex flex-col items-center justify-center gap-1 bg-white/[0.06] px-3 py-2 text-center backdrop-blur-2xl max-md:px-2 max-md:py-1 max-sm:px-1 max-sm:py-0.5">
+              <span className="flex items-center gap-1">
+                <Video className="size-4 text-gold drop-shadow-[0_0_8px_rgba(245,197,24,0.8)]" aria-hidden />
+                <Typography
+                  as="span"
+                  variant="overline"
+                  className="text-gold drop-shadow-[0_0_8px_rgba(245,197,24,0.8)]"
+                >
+                  Trận đấu sắp bắt đầu
+                </Typography>
+              </span>
+              <Typography variant="h6" weight="700" className="text-white drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]">
+                Chuẩn bị lên sóng
+              </Typography>
+              <Typography as="span" variant="caption" color="white/80">
+                Đừng bỏ lỡ những diễn biến hấp dẫn!
+              </Typography>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-3">
+              {[
+                { value: countdown.hours, label: t(COUNTDOWN_I18N_KEYS.hours) },
+                { value: countdown.minutes, label: t(COUNTDOWN_I18N_KEYS.minutes) },
+                { value: countdown.seconds, label: t(COUNTDOWN_I18N_KEYS.seconds) },
+              ].map(({ value, label }, i) => (
+                <div key={label} className="flex items-start gap-2">
+                  <div className="flex flex-col items-center">
+                    <Typography
+                      variant="h3"
+                      weight="700"
+                      className="text-gold leading-100 tabular-nums"
+                    >
+                      {String(value).padStart(2, "0")}
+                    </Typography>
+                    <Typography as="span" size="12" className="text-muted mt-1">
+                      {label}
+                    </Typography>
+                  </div>
+                  {i < 2 && (
+                    <Typography variant="h3" weight="700" className="text-gold/60 leading-100">
+                      :
+                    </Typography>
+                  )}
                 </div>
-                {i < 2 && (
-                  <Typography variant="h3" weight="700" className="text-gold/60 leading-100">
-                    :
-                  </Typography>
-                )}
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )
         )}
 
         {/* Row 4: Stats (live/finished) */}
         {!isUpcoming && (
-          <div className="rounded-8 flex items-center justify-between gap-1 bg-white/[0.02] px-2 py-1.5 backdrop-blur-[80px] max-sm:px-1 max-sm:py-0.5">
+          <div className="rounded-8 flex items-center justify-between bg-white/10 px-2 py-1.5 [will-change:transform] backdrop-blur-[80px] max-sm:px-1 max-sm:py-0.5">
             {stats.map((s, i) => (
               <div key={i} className="flex flex-1 items-center">
                 {i > 0 && <div className="h-4 w-px shrink-0 bg-white/20 max-sm:h-2.5" />}
-                <div className="flex flex-1 flex-col items-center gap-0.5">
-                  <div className="flex items-center gap-0.5">
+                <div className="flex flex-1 flex-col items-center gap-0.5 px-4 max-sm:px-1">
+                  <div className="flex items-center gap-1 max-sm:gap-0.5">
                     <Img
                       src={s.icon}
                       alt={s.alt}
@@ -397,24 +429,17 @@ export function MatchCard({ match, isLoading, className }: MatchCardProps) {
                       objectFit="contain"
                       className="max-sm:!size-[10px]"
                     />
-                    <Typography
-                      as="span"
-                      variant="caption"
-                      size="14"
-                      weight="700"
-                      className="max-sm:!text-10 text-white tabular-nums"
-                    >
-                      {s.value}
-                    </Typography>
+                    <span className="text-12 sm:text-14 leading-150 font-700 max-sm:!text-10 text-white tabular-nums">
+                      {s.home}
+                    </span>
+                    <span className="text-12 font-400 leading-150 tracking-1 text-white/50">-</span>
+                    <span className="text-12 sm:text-14 leading-150 font-700 max-sm:!text-10 text-white tabular-nums">
+                      {s.away}
+                    </span>
                   </div>
-                  <Typography
-                    as="span"
-                    variant="caption"
-                    weight="500"
-                    className="whitespace-nowrap text-white max-sm:!text-[9px]"
-                  >
+                  <span className="text-12 leading-150 tracking-1 font-500 whitespace-nowrap text-white/80 max-sm:!text-[9px]">
                     {s.label}
-                  </Typography>
+                  </span>
                 </div>
               </div>
             ))}

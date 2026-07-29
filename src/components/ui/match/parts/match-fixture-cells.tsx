@@ -42,8 +42,8 @@ export function ScoreBadge({ match }: { match: MatchInterface }) {
         >
           {match.homeScore ?? 0}
         </Typography>
-        <Typography variant="body" weight="500" className="text-gold/60 px-0.5 leading-100">
-          -
+        <Typography variant="body" weight="500" className="text-gold/60 px-1.5 leading-100">
+          :
         </Typography>
         <Typography
           as="span"
@@ -115,9 +115,11 @@ export function StatCell({
   away: number | null | undefined
 }) {
   return (
-    <Typography as="span" variant="body-sm" color="white" className="text-center tabular-nums">
-      {`${home ?? 0}-${away ?? 0}`}
-    </Typography>
+    <span className="flex items-center justify-center gap-0.5 tabular-nums">
+      <Typography as="span" variant="body-sm" color="white">{home ?? 0}</Typography>
+      <Typography as="span" variant="caption" color="foreground/50">-</Typography>
+      <Typography as="span" variant="body-sm" color="white">{away ?? 0}</Typography>
+    </span>
   )
 }
 
@@ -131,14 +133,10 @@ export function HTCell({ match }: { match: MatchInterface }) {
       </Typography>
     )
   return (
-    <Typography
-      as="span"
-      variant="body-sm"
-      weight="500"
-      color="foreground/55"
-      className="text-center tabular-nums"
-    >
-      {h}-{a}
-    </Typography>
+    <span className="flex items-center justify-center gap-0.5 tabular-nums">
+      <Typography as="span" variant="body-sm" weight="500" color="foreground/55">{h}</Typography>
+      <Typography as="span" variant="caption" color="foreground/30">-</Typography>
+      <Typography as="span" variant="body-sm" weight="500" color="foreground/55">{a}</Typography>
+    </span>
   )
 }

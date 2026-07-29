@@ -27,7 +27,7 @@ function Fixtures() {
   const groups = buildLeagueGroupsFromApi(leaguesData?.moreLeagus ?? [])
 
   return (
-    <section className="rounded-12 card-glow flex flex-col gap-4 p-5 max-sm:p-3">
+    <section className="rounded-12 card-glow flex h-full flex-col gap-4 p-5 max-sm:p-3">
       <ScheduleSectionHeader />
 
       <HeroFixtures

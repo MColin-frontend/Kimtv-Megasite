@@ -300,7 +300,7 @@ function LeagueOption({
       >
         {league.name}
       </Typography>
-      {league.count != null && (
+      {league.count != null && league.count > 0 && (
         <Typography
           variant="label"
           className={cn("font-600", selected ? "text-gold/70" : "text-white")}

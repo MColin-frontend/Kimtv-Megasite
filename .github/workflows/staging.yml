@@ -69,11 +69,13 @@ jobs:
             FAILED_STEP="Unknown step"
           fi
 
+          CLEAN_COMMIT=$(printf '%s' "$COMMIT_MSG" | grep -v "^Co-Authored-By:" | sed '/^[[:space:]]*$/d')
+
           PAYLOAD=$(jq -n \
             --arg step "$FAILED_STEP" \
             --arg branch "${{ github.ref_name }}" \
             --arg actor "${{ github.actor }}" \
-            --arg commit "$COMMIT_MSG" \
+            --arg commit "$CLEAN_COMMIT" \
             --arg sha "${GITHUB_SHA::7}" \
             --arg url "$RUN_URL" \
             '{
@@ -86,7 +88,7 @@ jobs:
                 elements: [
                   {
                     tag: "div",
-                    text: { tag: "lark_md", content: ("**Lỗi tại:** " + $step + "\n" + $actor + " · `" + $sha + "` · " + $branch + "\n" + $commit) }
+                    text: { tag: "lark_md", content: ("**Lỗi tại:** " + $step + "\n" + $actor + " · `" + $sha + "` · " + $branch + "\n**" + $commit + "**") }
                   },
                   {
                     tag: "action",
@@ -167,11 +169,13 @@ jobs:
             FAILED_STEP="Unknown step"
           fi
 
+          CLEAN_COMMIT=$(printf '%s' "$COMMIT_MSG" | grep -v "^Co-Authored-By:" | sed '/^[[:space:]]*$/d')
+
           PAYLOAD=$(jq -n \
             --arg step "$FAILED_STEP" \
             --arg branch "${{ github.ref_name }}" \
             --arg actor "${{ github.actor }}" \
-            --arg commit "$COMMIT_MSG" \
+            --arg commit "$CLEAN_COMMIT" \
             --arg sha "${GITHUB_SHA::7}" \
             --arg url "$RUN_URL" \
             '{
@@ -184,7 +188,7 @@ jobs:
                 elements: [
                   {
                     tag: "div",
-                    text: { tag: "lark_md", content: ("**Lỗi tại:** " + $step + "\n" + $actor + " · `" + $sha + "` · " + $branch + "\n" + $commit) }
+                    text: { tag: "lark_md", content: ("**Lỗi tại:** " + $step + "\n" + $actor + " · `" + $sha + "` · " + $branch + "\n**" + $commit + "**") }
                   },
                   {
                     tag: "action",
@@ -239,33 +243,95 @@ jobs:
         env:
           COMMIT_MSG: ${{ github.event.head_commit.message }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          STAGING_URL: ${{ vars.STAGING_URL }}
         run: |
+          CLEAN_COMMIT=$(printf '%s' "$COMMIT_MSG" | grep -v "^Co-Authored-By:" | sed '/^[[:space:]]*$/d')
+          CLAUDE_AUTHOR=$(printf '%s' "$COMMIT_MSG" | grep "^Co-Authored-By:" | head -1 | sed 's/^Co-Authored-By: //' | sed 's/ <.*//')
+          DEPLOY_TIME=$(date '+%d/%m/%Y, %H:%M:%S')
+          APP_URL="${STAGING_URL:-$RUN_URL}"
+
           PAYLOAD=$(jq -n \
             --arg branch "${{ github.ref_name }}" \
             --arg actor "${{ github.actor }}" \
-            --arg commit "$COMMIT_MSG" \
+            --arg commit "$CLEAN_COMMIT" \
             --arg sha "${GITHUB_SHA::7}" \
             --arg url "$RUN_URL" \
+            --arg app_url "$APP_URL" \
+            --arg time "$DEPLOY_TIME" \
+            --arg claude "$CLAUDE_AUTHOR" \
             '{
               msg_type: "interactive",
               card: {
                 header: {
-                  title: { tag: "plain_text", content: "✅ Deploy thành công — Staging" },
+                  title: { tag: "plain_text", content: "✅ Deploy thành công" },
+                  subtitle: { tag: "plain_text", content: "Đã triển khai phiên bản mới lên môi trường staging 🚀" },
                   template: "green"
                 },
                 elements: [
                   {
+                    tag: "column_set",
+                    flex_mode: "stretch",
+                    background_style: "default",
+                    columns: [
+                      {
+                        tag: "column", width: "weighted", weight: 1,
+                        elements: [{ tag: "div", text: { tag: "lark_md", content: "📁 Dự án\n**MColin-frontend**" } }]
+                      },
+                      {
+                        tag: "column", width: "weighted", weight: 1,
+                        elements: [{ tag: "div", text: { tag: "lark_md", content: ("🔗 Commit\n**`" + $sha + "`**") } }]
+                      },
+                      {
+                        tag: "column", width: "weighted", weight: 1,
+                        elements: [{ tag: "div", text: { tag: "lark_md", content: ("🌐 Môi trường\n**" + $branch + "**") } }]
+                      }
+                    ]
+                  },
+                  { tag: "hr" },
+                  {
                     tag: "div",
-                    text: { tag: "lark_md", content: ($actor + " · `" + $sha + "` · " + $branch + "\n" + $commit) }
+                    text: { tag: "lark_md", content: ("⚡ **CẬP NHẬT NỔI BẬT**\n✅ **" + $commit + "**") }
+                  },
+                  { tag: "hr" },
+                  {
+                    tag: "column_set",
+                    flex_mode: "stretch",
+                    background_style: "grey",
+                    columns: [
+                      {
+                        tag: "column", width: "weighted", weight: 1,
+                        elements: [{ tag: "div", text: { tag: "lark_md", content: ("🤖 Co-Authored-By\n**" + (if $claude != "" then $claude else "—" end) + "**") } }]
+                      },
+                      {
+                        tag: "column", width: "weighted", weight: 1,
+                        elements: [{ tag: "div", text: { tag: "lark_md", content: ("🕐 Thời gian deploy\n**" + $time + "**") } }]
+                      },
+                      {
+                        tag: "column", width: "weighted", weight: 1,
+                        elements: [{ tag: "div", text: { tag: "lark_md", content: ("👤 Người deploy\n**" + $actor + "**") } }]
+                      },
+                      {
+                        tag: "column", width: "weighted", weight: 1,
+                        elements: [{ tag: "div", text: { tag: "lark_md", content: "✅ Trạng thái\n**Hoạt động ổn định**" } }]
+                      }
+                    ]
                   },
                   {
                     tag: "action",
-                    actions: [{
-                      tag: "button",
-                      text: { tag: "plain_text", content: "Xem →" },
-                      url: $url,
-                      type: "primary"
-                    }]
+                    actions: [
+                      {
+                        tag: "button",
+                        text: { tag: "plain_text", content: "Xem chi tiết log →" },
+                        url: $url,
+                        type: "default"
+                      },
+                      {
+                        tag: "button",
+                        text: { tag: "plain_text", content: "Mở ứng dụng staging →" },
+                        url: $app_url,
+                        type: "primary"
+                      }
+                    ]
                   }
                 ]
               }
@@ -287,11 +353,13 @@ jobs:
             FAILED_STEP="Unknown step"
           fi
 
+          CLEAN_COMMIT=$(printf '%s' "$COMMIT_MSG" | grep -v "^Co-Authored-By:" | sed '/^[[:space:]]*$/d')
+
           PAYLOAD=$(jq -n \
             --arg step "$FAILED_STEP" \
             --arg branch "${{ github.ref_name }}" \
             --arg actor "${{ github.actor }}" \
-            --arg commit "$COMMIT_MSG" \
+            --arg commit "$CLEAN_COMMIT" \
             --arg sha "${GITHUB_SHA::7}" \
             --arg url "$RUN_URL" \
             '{
@@ -304,7 +372,7 @@ jobs:
                 elements: [
                   {
                     tag: "div",
-                    text: { tag: "lark_md", content: ("**Lỗi tại:** " + $step + "\n" + $actor + " · `" + $sha + "` · " + $branch + "\n" + $commit) }
+                    text: { tag: "lark_md", content: ("**Lỗi tại:** " + $step + "\n" + $actor + " · `" + $sha + "` · " + $branch + "\n**" + $commit + "**") }
                   },
                   {
                     tag: "action",

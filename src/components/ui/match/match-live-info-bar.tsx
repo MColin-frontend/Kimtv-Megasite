@@ -232,16 +232,21 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
   const isSoccer = gameId === 202
   const showStats = isSoccer || (gameId != null && gameId > 200)
 
-  const statValues = [
-    0,
-    (match.homeYellowCard ?? 0) + (match.awayYellowCard ?? 0),
-    (match.homeRedCard ?? 0) + (match.awayRedCard ?? 0),
-    (match.homeCornerKick ?? 0) + (match.awayCornerKick ?? 0),
-  ]
-  const stats = MATCH_STAT_CONFIG.map((cfg, i) => ({
+  const stats = MATCH_STAT_CONFIG.map((cfg) => ({
     ...cfg,
     label: t(cfg.labelKey as Parameters<typeof t>[0]),
-    value: statValues[i],
+    home:
+      cfg.alt === "yellow"
+        ? (match.homeYellowCard ?? 0)
+        : cfg.alt === "red"
+          ? (match.homeRedCard ?? 0)
+          : (match.homeCornerKick ?? 0),
+    away:
+      cfg.alt === "yellow"
+        ? (match.awayYellowCard ?? 0)
+        : cfg.alt === "red"
+          ? (match.awayRedCard ?? 0)
+          : (match.awayCornerKick ?? 0),
   }))
 
   return (
@@ -313,12 +318,10 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
         {/* Row 1: live + time + share — ẩn trên mobile */}
         <div className="flex w-full items-center justify-between max-sm:-my-1 max-sm:origin-left">
           <div className="flex items-center gap-2 max-md:scale-90 max-sm:scale-75">
-            {isStream && <MatchLiveIndicator label="Stream" />}
-            {isLive && <MatchLiveIndicator label="LIVE" />}
+            <MatchLiveIndicator label={isStream ? "Stream" : "LIVE"} />
           </div>
           <div className="flex items-center gap-1.5">
             <div className="flex items-center gap-1.5">
-              <MatchStatusBadge type="live" label={periodLabel} className="hidden max-sm:flex" />
               {displayMinute != null && displayMinute !== 0 && (
                 <div className="rounded-4 border-gold/30 bg-gold/10 border px-1.5 py-0.5 max-sm:px-1 max-sm:py-0">
                   <Typography
@@ -459,7 +462,7 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
               {stats.map((s, i) => (
                 <div key={i} className="flex flex-1 items-center">
                   {i > 0 && <div className="h-4 w-px shrink-0 bg-white/20 max-sm:h-2.5" />}
-                  <div className="flex flex-1 flex-col items-center gap-0.5 px-5 max-sm:px-1">
+                  <div className="flex flex-1 flex-col items-center gap-0.5 px-4 max-sm:px-1">
                     <div className="flex items-center gap-1 max-sm:gap-0.5">
                       <Img
                         src={s.icon}
@@ -471,12 +474,26 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
                       />
                       <Typography
                         as="span"
-                        variant="caption"
-                        size="14"
+                        variant="body-sm"
                         weight="700"
                         className="max-sm:!text-10 text-white tabular-nums"
                       >
-                        {s.value}
+                        {s.home}
+                      </Typography>
+                      <Typography
+                        as="span"
+                        variant="caption"
+                        className="text-white/50"
+                      >
+                        -
+                      </Typography>
+                      <Typography
+                        as="span"
+                        variant="body-sm"
+                        weight="700"
+                        className="max-sm:!text-10 text-white tabular-nums"
+                      >
+                        {s.away}
                       </Typography>
                     </div>
                     <Typography
