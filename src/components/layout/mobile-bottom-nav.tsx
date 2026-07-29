@@ -16,7 +16,9 @@ const BAR_COLOR = "#111d35" // noticeably lighter than page (#091320) so notch i
 const BAR_H = 64
 const CIRCLE_R = 35
 const NOTCH_R = 39 // tight around circle: gap = 39-35 = 4px
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const CURVE_S = 8
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const CORNER_R = 0
 
 /** SVG path: bar with true circular notch using 2-segment bezier approximation */
