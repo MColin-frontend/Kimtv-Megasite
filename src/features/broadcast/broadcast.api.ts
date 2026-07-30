@@ -39,35 +39,7 @@ export const BROADCAST_API = {
   DELETE_RESERVATION: "/delete-reservation",
 } as const
 
-/* ── Match list ───────────────────────────────────────────── */
-
 export type { BroadcastMatchGroupInterface as BroadcastMatchGroup }
-
-export function fetchMatchesByGame(gameId: string): Promise<BroadcastMatchGroupInterface[] | null> {
-  return javaGet<BroadcastMatchGroupInterface[]>(BROADCAST_API.MATCHES_BY_GAME, {
-    params: { gameId },
-  })
-}
-
-/* ── League async fetch ───────────────────────────────────── */
-
-export async function fetchLeagueOptions(
-  gameId: string,
-  { search, page, pageSize }: LeagueFetchParamsInterface
-): Promise<LeagueFetchResultInterface> {
-  const res = await javaGet<LeagueItemInterface[]>(BROADCAST_API.LEAGUE_LIST, {
-    params: { sportId: gameId, search, page, pageSize },
-  })
-
-  const items = res ?? []
-  return {
-    options: items.map((l) => ({
-      value: String(l.leagueId),
-      label: l.leagueName ?? `League #${l.leagueId}`,
-    })),
-    hasMore: items.length === pageSize,
-  }
-}
 
 /* ── Anchor info ──────────────────────────────────────────── */
 
@@ -121,10 +93,6 @@ export function updateAnchor(payload: UpdateAnchorPayloadInterface) {
 
 export function startBroadcast(liveId: string): Promise<unknown> {
   return javaGet(BROADCAST_API.BROADCAST, { params: { liveId } })
-}
-
-export function fetchLiveInfo(liveId: string): Promise<LiveInfoInterface | null> {
-  return javaGet<LiveInfoInterface>(BROADCAST_API.LIVE_INFO, { params: { liveId } })
 }
 
 export function downcastStream(liveId: string): Promise<unknown> {

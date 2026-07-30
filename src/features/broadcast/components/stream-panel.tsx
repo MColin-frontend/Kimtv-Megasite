@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard"
 import { useQuery } from "@tanstack/react-query"
 import { Check, Copy, Eye, EyeOff, RefreshCw } from "lucide-react"
 
@@ -27,13 +28,7 @@ export function StreamField({
   masked?: boolean
 }) {
   const [visible, setVisible] = useState(!masked)
-  const [copied, setCopied] = useState(false)
-
-  function handleCopy() {
-    navigator.clipboard?.writeText(value).catch(() => {})
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
+  const { copied, copy } = useCopyToClipboard()
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -62,7 +57,7 @@ export function StreamField({
               type="button"
               variant="ghost"
               size="icon-sm"
-              onClick={handleCopy}
+              onClick={() => copy(value)}
               className="text-white/40 hover:bg-white/8 hover:text-white"
             >
               {copied ? (

@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query"
 
 import { useAuth } from "@/hooks/use-auth"
-import { useRouter } from "@/hooks/useRouter"
+import { useRouter } from "@/hooks/use-router"
 
 import { useTranslation } from "@/i18n/use-translation"
 

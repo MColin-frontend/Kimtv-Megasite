@@ -12,7 +12,10 @@ export function useCountdown(startTime: number | null | undefined): CountdownRes
   const [countdown, setCountdown] = useState<CountdownResult>({ hours: 0, minutes: 0, seconds: 0 })
 
   useEffect(() => {
-    if (!startTime) return
+    if (!startTime) {
+      setCountdown({ hours: 0, minutes: 0, seconds: 0 })
+      return
+    }
     const update = () => {
       const diff = startTime * 1000 - Date.now()
       if (diff <= 0) {

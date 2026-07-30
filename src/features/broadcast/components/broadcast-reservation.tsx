@@ -16,8 +16,8 @@ import {
   fetchReservationList,
 } from "@/features/broadcast/broadcast.api"
 import { ScheduleFilter } from "@/components/ui/filters/schedule-filter"
-import { FixtureList, groupMatches } from "@/components/ui/match/fixture-list"
-import { ScheduleSectionHeader } from "@/components/ui/match/schedule-section-header"
+import { groupMatches, Fixtures } from "@/components/ui/match/fixtures"
+import { ScheduleHeader } from "@/components/ui/match/parts/schedule-header"
 import { buildLeagueGroupsFromApi } from "@/components/ui/select/league-select"
 import { Typography } from "@/components/ui/typography"
 
@@ -73,7 +73,7 @@ export function BroadcastReservation() {
 
   return (
     <section className="card-glow rounded-12 flex flex-col gap-4 p-3 sm:p-5">
-      <ScheduleSectionHeader />
+      <ScheduleHeader />
 
       <ScheduleFilter
         groups={leagueGroups}
@@ -87,7 +87,7 @@ export function BroadcastReservation() {
         onStatusChange={filter.setStatus}
         onLeagueChange={filter.setLeagueIds}
       />
-      <FixtureList
+      <Fixtures
         groups={groups}
         loading={loading}
         page={filter.page}

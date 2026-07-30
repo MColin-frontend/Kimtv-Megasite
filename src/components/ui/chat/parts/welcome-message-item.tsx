@@ -34,15 +34,13 @@ export function WelcomeMessageItem({
       )}
     >
       <div className="flex items-center gap-2 max-sm:gap-1.5">
-        <div className="relative shrink-0 max-sm:size-8 max-sm:overflow-hidden max-sm:rounded-full">
-          <div className="max-sm:origin-top-left max-sm:scale-[0.64]">
-            {message.hasAnchorMe && (
-              <div className="border-gold-hover absolute -top-2 -right-1 z-11 flex size-6 items-center justify-center rounded-full border-[0.5px] bg-black/70 p-[2px]">
-                <Img src={imgCrown} alt="crown" width={14} height={14} objectFit="contain" />
-              </div>
-            )}
-            <ChatAvatar message={message} size={48} />
-          </div>
+        <div className="relative shrink-0">
+          {message.hasAnchorMe && (
+            <div className="border-gold-hover absolute -top-2 -right-1 z-11 flex size-6 items-center justify-center rounded-full border-[0.5px] bg-black/70 p-[2px] max-sm:size-4 max-sm:-top-1 max-sm:-right-0.5 max-sm:p-px">
+              <Img src={imgCrown} alt="crown" width={14} height={14} objectFit="contain" className="max-sm:!size-2.5" />
+            </div>
+          )}
+          <ChatAvatar message={message} size={48} className="max-sm:!w-8 max-sm:!h-8" />
         </div>
         <div className="flex w-full min-w-0 flex-col flex-wrap gap-1 max-sm:gap-0.5">
           <div className="flex items-center justify-between gap-1">

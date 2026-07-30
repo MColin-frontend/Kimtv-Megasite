@@ -4,14 +4,14 @@ import { useCallback, useEffect } from "react"
 import dynamic from "next/dynamic"
 
 import { cn } from "@/lib/utils"
-import { useRouter } from "@/hooks/useRouter"
+import { useRouter } from "@/hooks/use-router"
 
 import { SKELETON_BG } from "@/constants/common.constants"
 import { HERO_VIDEO_PARAMS } from "@/constants/component/home.constants"
 import type { AnchorRoomVo, MatchInterface } from "@/models/match.models"
 
 import { Chat, type UserRole } from "@/components/ui/chat"
-import { MatchLiveInfoBar } from "@/components/ui/match/match-live-info-bar"
+import { MatchLiveInfoBar } from "@/components/ui/match/card-live-info"
 import { Skeleton } from "@/components/ui/skeleton"
 
 import type { LiveMatch } from "./hero-video"

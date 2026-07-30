@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 
-import { FixtureListSkeleton } from "@/components/ui/match/fixture-list"
+import { FixturesSkeleton } from "@/components/ui/match/fixtures"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export function BroadcastHeroSkeleton() {
@@ -130,7 +130,7 @@ export function BroadcastReservationSkeleton() {
           <Skeleton key={i} className="rounded-8 h-9 w-28 max-sm:w-[calc(50%-4px)] max-sm:grow" />
         ))}
       </div>
-      <FixtureListSkeleton />
+      <FixturesSkeleton />
     </section>
   )
 }

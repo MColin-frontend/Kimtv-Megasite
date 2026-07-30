@@ -7,8 +7,8 @@ import { useFixtureData } from "@/hooks/use-fixture-data"
 import { useFixturesFilter } from "@/hooks/use-fixtures-filter"
 
 import { ScheduleFilter } from "@/components/ui/filters/schedule-filter"
-import { FixtureList, groupMatches } from "@/components/ui/match/fixture-list"
-import { ScheduleSectionHeader } from "@/components/ui/match/schedule-section-header"
+import { groupMatches, Fixtures } from "@/components/ui/match/fixtures"
+import { ScheduleHeader } from "@/components/ui/match/parts/schedule-header"
 import { buildLeagueGroupsFromApi } from "@/components/ui/select/league-select"
 
 export default function ScheduleList() {
@@ -26,7 +26,7 @@ export default function ScheduleList() {
 
   return (
     <section className="rounded-12 card-glow flex h-full flex-col gap-4 p-5 max-sm:p-3">
-      <ScheduleSectionHeader />
+      <ScheduleHeader />
       <ScheduleFilter
         groups={leagueGroups}
         hotLeagues={hotLeagues}
@@ -39,7 +39,7 @@ export default function ScheduleList() {
         onLeagueChange={filter.setLeagueIds}
       />
 
-      <FixtureList
+      <Fixtures
         groups={groups}
         loading={loading}
         page={filter.page}

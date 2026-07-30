@@ -4,7 +4,7 @@ import type { CSSProperties, ElementType, HTMLAttributes, ReactNode } from "reac
 import { Children, cloneElement, isValidElement } from "react"
 
 import { cn } from "@/lib/utils"
-import { useInView } from "@/hooks/useInView"
+import { useInView } from "@/hooks/use-in-view"
 
 export type RevealVariant =
   "fade-up" | "fade-down" | "fade-left" | "fade-right" | "fade" | "scale" | "blur" | "clip"

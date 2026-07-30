@@ -66,15 +66,15 @@ async function request<T>(
   config: AxiosRequestConfig,
   options: ClientRequestOptions = {}
 ): Promise<ClientRequestResult<T>> {
-  const { isMessageError, messageSuccess, messageError } = options
+  const { isMessageError, isMessageSuccess, messageSuccess, messageError } = options
   try {
     const res = await clientHttp.request<T>(config)
-    if (messageSuccess) toast.success(messageSuccess)
+    if (isMessageSuccess && messageSuccess) toast.success(messageSuccess)
     return { success: true, data: res.data, httpStatus: res.status }
   } catch (error) {
     const httpStatus = axios.isAxiosError(error) ? (error.response?.status ?? 0) : 0
     const errMsg = messageError ?? "Yêu cầu thất bại"
-    if (isMessageError) toast.error(errMsg)
+    if (isMessageError === true) toast.error(errMsg)
     return { success: false, data: null, httpStatus }
   }
 }
@@ -132,17 +132,22 @@ function handleJavaToast<T>(
     if (opts.isMessageSuccess && opts.messageSuccess) toast.success(opts.messageSuccess)
     return (envelope?.result ?? null) as T | null
   }
-  if (opts.isMessageError !== false) {
+  if (opts.isMessageError === true) {
     const errMsg = opts.messageError ?? getJavaErrorMessage(envelope) ?? "Yêu cầu thất bại"
     toast.error(errMsg)
   }
   return null
 }
 
-export function javaGet<T>(path: string, options?: ClientRequestOptions): Promise<T | null> {
+function splitToastOpts(options?: ClientRequestOptions) {
   const { isMessageSuccess, messageSuccess, isMessageError, messageError, ...rest } = options ?? {}
+  return { toastOpts: { isMessageSuccess, messageSuccess, isMessageError, messageError }, rest }
+}
+
+export function javaGet<T>(path: string, options?: ClientRequestOptions): Promise<T | null> {
+  const { toastOpts, rest } = splitToastOpts(options)
   return clientGet<ApiEnvelopeInterface<T>>(javaUrl(path), rest).then((res) =>
-    handleJavaToast(res, { isMessageSuccess, messageSuccess, isMessageError, messageError })
+    handleJavaToast(res, toastOpts)
   )
 }
 
@@ -151,15 +156,15 @@ export function javaPost<T>(
   body?: unknown,
   options?: ClientRequestOptions
 ): Promise<T | null> {
-  const { isMessageSuccess, messageSuccess, isMessageError, messageError, ...rest } = options ?? {}
+  const { toastOpts, rest } = splitToastOpts(options)
   return clientPost<ApiEnvelopeInterface<T>>(javaUrl(path), body, rest).then((res) =>
-    handleJavaToast(res, { isMessageSuccess, messageSuccess, isMessageError, messageError })
+    handleJavaToast(res, toastOpts)
   )
 }
 
 export function javaDelete<T>(path: string, options?: ClientRequestOptions): Promise<T | null> {
-  const { isMessageSuccess, messageSuccess, isMessageError, messageError, ...rest } = options ?? {}
+  const { toastOpts, rest } = splitToastOpts(options)
   return clientDelete<ApiEnvelopeInterface<T>>(javaUrl(path), rest).then((res) =>
-    handleJavaToast(res, { isMessageSuccess, messageSuccess, isMessageError, messageError })
+    handleJavaToast(res, toastOpts)
   )
 }

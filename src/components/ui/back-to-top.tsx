@@ -15,7 +15,10 @@ export function BackToTop({ threshold = 400, className }: BackToTopProps) {
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > threshold)
+    const onScroll = () => {
+      const t = window.innerWidth < 640 ? Math.min(threshold, 200) : threshold
+      setVisible(window.scrollY > t)
+    }
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
   }, [threshold])

@@ -1,6 +1,6 @@
 "use client"
 
-import { useFakeGameMinute } from "@/hooks/useFakeGameMinute"
+import { useFakeGameMinute } from "@/hooks/use-fake-game-minute"
 
 import { MATCH_HALF_LABEL } from "@/constants/common.constants"
 import { MatchFootballStateEnum, MatchStatusEnum, MatchStatusLabelEnum } from "@/enums/match.enum"
@@ -116,9 +116,15 @@ export function StatCell({
 }) {
   return (
     <span className="flex items-center justify-center gap-0.5 tabular-nums">
-      <Typography as="span" variant="body-sm" color="white">{home ?? 0}</Typography>
-      <Typography as="span" variant="caption" color="foreground/50">-</Typography>
-      <Typography as="span" variant="body-sm" color="white">{away ?? 0}</Typography>
+      <Typography as="span" variant="body-sm" color="white">
+        {home ?? 0}
+      </Typography>
+      <Typography as="span" variant="caption" color="foreground/50">
+        -
+      </Typography>
+      <Typography as="span" variant="body-sm" color="white">
+        {away ?? 0}
+      </Typography>
     </span>
   )
 }
@@ -134,9 +140,15 @@ export function HTCell({ match }: { match: MatchInterface }) {
     )
   return (
     <span className="flex items-center justify-center gap-0.5 tabular-nums">
-      <Typography as="span" variant="body-sm" weight="500" color="foreground/55">{h}</Typography>
-      <Typography as="span" variant="caption" color="foreground/30">-</Typography>
-      <Typography as="span" variant="body-sm" weight="500" color="foreground/55">{a}</Typography>
+      <Typography as="span" variant="body-sm" weight="500" color="foreground/55">
+        {h}
+      </Typography>
+      <Typography as="span" variant="caption" color="foreground/30">
+        -
+      </Typography>
+      <Typography as="span" variant="body-sm" weight="500" color="foreground/55">
+        {a}
+      </Typography>
     </span>
   )
 }

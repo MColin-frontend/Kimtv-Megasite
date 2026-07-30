@@ -1,4 +1,14 @@
+import type { ClientRequestOptions } from "@/server/services/client-request"
 import { javaGet, javaPost } from "@/server/services/client-request"
+
+function toastOptsFromMsg(msg?: ActionMessagesInterface): Pick<ClientRequestOptions, 'isMessageSuccess' | 'messageSuccess' | 'isMessageError' | 'messageError'> {
+  return {
+    isMessageSuccess: !!msg?.messageSuccess,
+    messageSuccess: msg?.messageSuccess,
+    isMessageError: !!msg?.messageError,
+    messageError: msg?.messageError,
+  }
+}
 
 import type {
   ActionMessagesInterface,
@@ -35,12 +45,7 @@ function handlePostComment(
   params: PostCommentParamsInterface,
   msg?: ActionMessagesInterface
 ): Promise<unknown | null> {
-  return javaPost<unknown>(NEWS_COMMENT_API.POST, params, {
-    isMessageSuccess: !!msg?.messageSuccess,
-    messageSuccess: msg?.messageSuccess,
-    isMessageError: !!msg?.messageError,
-    messageError: msg?.messageError,
-  })
+  return javaPost<unknown>(NEWS_COMMENT_API.POST, params, toastOptsFromMsg(msg))
 }
 
 function fetchDeleteComment(
@@ -50,10 +55,7 @@ function fetchDeleteComment(
 ): Promise<unknown | null> {
   return javaGet<unknown>(NEWS_COMMENT_API.DELETE, {
     params: { commentId, loginUserId },
-    isMessageSuccess: !!msg?.messageSuccess,
-    messageSuccess: msg?.messageSuccess,
-    isMessageError: !!msg?.messageError,
-    messageError: msg?.messageError,
+    ...toastOptsFromMsg(msg),
   })
 }
 

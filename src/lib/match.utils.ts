@@ -3,6 +3,7 @@ import {
   MATCH_STATUS_TAB,
   type MatchStatusTabValue,
 } from "@/constants/component/home.constants"
+import { MatchFootballStateEnum, MatchStatusEnum } from "@/enums/match.enum"
 
 import type { ApiConfig } from "@/features/home/home.models"
 
@@ -33,6 +34,33 @@ const H5_OPTION: Partial<Record<MatchStatusTabValue, number>> = {
   [MATCH_STATUS_TAB.ALL]: 1,
   [MATCH_STATUS_TAB.UPCOMING]: 1,
   [MATCH_STATUS_TAB.FINISHED]: 2,
+}
+
+export interface MatchStatusFlagsInterface {
+  isMatchLive: boolean
+  isStream: boolean
+  isLive: boolean
+  isUpcoming: boolean
+  isFinished: boolean
+}
+
+export function deriveMatchStatusFlags(params: {
+  status?: number | null
+  state?: number | null
+  anchor?: boolean | null
+  hasAnchorRoom?: boolean
+}): MatchStatusFlagsInterface {
+  const { status, state, anchor, hasAnchorRoom } = params
+  const isMatchLive = status === MatchStatusEnum.LIVE
+  const isStream = !!anchor || !!hasAnchorRoom
+  const isLive = isMatchLive && !isStream
+  const isUpcoming =
+    status === MatchStatusEnum.UPCOMING ||
+    status === MatchStatusEnum.UNKNOWN ||
+    state === MatchFootballStateEnum.NOT_STARTED
+  const isFinished =
+    status === MatchStatusEnum.FINISHED || state === MatchFootballStateEnum.END
+  return { isMatchLive, isStream, isLive, isUpcoming, isFinished }
 }
 
 export function buildMatchApiConfig(

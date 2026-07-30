@@ -9,8 +9,6 @@ import type {
 
 import { assertServerEnv, env } from "@/config/env"
 
-import { toast } from "@/components/ui/toast"
-
 /**
  * HTTP client (axios) gọi backend KimTV (Java) — CHỈ chạy trên server.
  *
@@ -135,8 +133,6 @@ async function request<T>(
     errorMessage,
     showSuccess = false,
     showError = true,
-    isMessageSuccess = false,
-    isMessageError = false,
     messageSuccess,
     messageError,
   } = options
@@ -150,7 +146,6 @@ async function request<T>(
     if (envelope?.status !== "success") {
       const serverMsg = envelope?.errorMsg ?? envelope?.message ?? "Yêu cầu thất bại"
       const errMsg = messageError ?? errorMessage ?? serverMsg
-      if (isMessageError) toast.error(errMsg)
       return {
         success: false,
         data: null,
@@ -161,7 +156,6 @@ async function request<T>(
     }
 
     const sucMsg = messageSuccess ?? successMessage ?? null
-    if (isMessageSuccess && sucMsg) toast.success(sucMsg)
     return {
       success: true,
       data: envelope.result,
@@ -172,7 +166,6 @@ async function request<T>(
   } catch (error) {
     const normalized = normalizeError(error)
     const errMsg = messageError ?? errorMessage ?? normalized.message
-    if (isMessageError) toast.error(errMsg)
     return {
       success: false,
       data: null,

@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation"
 import { useQuery } from "@tanstack/react-query"
 
 import { cn } from "@/lib/utils"
-import { useRouter } from "@/hooks/useRouter"
+import { useRouter } from "@/hooks/use-router"
 
 import { useTranslation } from "@/i18n"
 
@@ -21,9 +21,10 @@ import {
 } from "@/features/live-schedule/live-schedule.constants"
 import CarouselInfinity from "@/components/ui/carousel/carousel-infinity"
 import { Empty } from "@/components/ui/empty"
-import { MatchCardLive, type LiveSearchMatchInterface } from "@/components/ui/match/match-card-live"
-import { MatchStatusLabel } from "@/components/ui/match/match-status-label"
-import { MatchCardLiveSkeleton, MatchCardSkeleton } from "@/components/ui/match/skeleton"
+import type { LiveSearchMatchInterface } from "@/models/match.models"
+import { MatchCardLive } from "@/components/ui/match/card-live"
+import { BadgeStatus } from "@/components/ui/match/badge-status"
+import { CardLiveSkeleton, CardBasicSkeleton } from "@/components/ui/match/skeleton"
 
 function getTypeScreen(tab: LiveScheduleTab): number {
   return LIVE_SCHEDULE_FILTER_OPTIONS.find((o) => o.value === tab)?.typeScreen ?? 0
@@ -56,7 +57,7 @@ export function LiveMatchFilterSection({
     <section className="card-glow rounded-12 flex flex-col gap-4 p-5 max-sm:gap-3 max-sm:p-3">
       {/* Header */}
       <div className="flex items-center justify-between gap-3 max-sm:flex-col max-sm:items-start">
-        <MatchStatusLabel type="live" />
+        <BadgeStatus type="live" />
 
         {!hideFilter && (
           <div className="rounded-10 flex items-center gap-0.5 bg-white/5 p-1 max-sm:w-full max-sm:scrollbar-none max-sm:overflow-x-auto">
@@ -106,7 +107,7 @@ export function LiveMatchFilterSection({
             <div className="-ml-4 flex overflow-x-hidden">
               {Array.from({ length: 3 }).map((_, i) => (
                 <div key={i} className="shrink-0 basis-[85vw] pl-4">
-                  {renderCard ? <MatchCardSkeleton /> : <MatchCardLiveSkeleton />}
+                  {renderCard ? <CardBasicSkeleton /> : <CardLiveSkeleton />}
                 </div>
               ))}
             </div>
@@ -114,7 +115,7 @@ export function LiveMatchFilterSection({
           {/* Desktop skeleton grid */}
           <div className="grid grid-cols-4 gap-4 max-xl:grid-cols-3 max-lg:grid-cols-2 max-sm:hidden">
             {Array.from({ length: skeletonCount }).map((_, i) =>
-              renderCard ? <MatchCardSkeleton key={i} /> : <MatchCardLiveSkeleton key={i} />
+              renderCard ? <CardBasicSkeleton key={i} /> : <CardLiveSkeleton key={i} />
             )}
           </div>
         </>

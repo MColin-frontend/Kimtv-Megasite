@@ -33,7 +33,7 @@ export function PinItemRow({
   return (
     <div
       className={cn(
-        "rounded-4 relative flex flex-col gap-1 border-l-[3px] bg-[#241c00] py-1.5 pr-2 pl-2 text-[12px] text-white select-none",
+        "rounded-4 relative flex flex-col gap-1 border-l-[3px] bg-[#241c00] py-1.5 pr-2 pl-2 text-[12px] text-white select-none max-sm:py-1",
         "border-chat-pin"
       )}
     >
@@ -56,11 +56,14 @@ export function PinItemRow({
       )}
 
       {/* Content — collapsed = 1 dòng, expanded = wrap đầy đủ */}
-      <div className="flex cursor-pointer items-start gap-1" onClick={onToggle}>
+      <div className="flex items-start gap-1">
         <span
+          onClick={!isExpanded ? onToggle : undefined}
           className={cn(
             "min-w-0 flex-1 leading-relaxed break-words",
-            !isExpanded && "overflow-hidden text-ellipsis whitespace-nowrap"
+            !isExpanded
+              ? "cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap"
+              : "max-h-[180px] overflow-y-auto [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.15)_transparent]"
           )}
         >
           <Typography as="span" size="12" className="mr-1 leading-none">
@@ -75,13 +78,14 @@ export function PinItemRow({
             {pinLabel}:
           </Typography>
           <span
-            className="[&_a]:text-chat-link [&_a]:break-all [&_a]:underline [&_a]:underline-offset-2"
+            className="text-14 max-sm:text-12 [&_a]:text-chat-link [&_a]:break-all [&_a]:underline [&_a]:underline-offset-2"
             dangerouslySetInnerHTML={{ __html: parseLinks(msg.content) }}
           />
         </span>
         <span
+          onClick={onToggle}
           className={cn(
-            "mt-0.5 shrink-0 leading-none transition-transform duration-200",
+            "mt-0.5 shrink-0 cursor-pointer leading-none transition-transform duration-200",
             CHAT_CLASSES.pin
           )}
         >

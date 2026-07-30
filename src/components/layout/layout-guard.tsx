@@ -5,7 +5,7 @@ import { useParams } from "next/navigation"
 
 import type { KimtvUser } from "@/lib/auth-cookie"
 import { useAuth } from "@/hooks/use-auth"
-import { useRouter } from "@/hooks/useRouter"
+import { useRouter } from "@/hooks/use-router"
 
 import { getRoutes } from "@/config/routes"
 import type { LocaleType } from "@/i18n"

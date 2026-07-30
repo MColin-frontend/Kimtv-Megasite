@@ -173,6 +173,43 @@ interface GetPcGameMatchByConditionRequestInterface {
   leagueIds?: string
 }
 
+/** Trận đấu trả về từ live-search API (shape nhẹ hơn MatchInterface). */
+interface LiveSearchMatchInterface {
+  matchId: number
+  gameId: number
+  homeName: Nullable<string>
+  awayName: Nullable<string>
+  homeLogo: Nullable<string>
+  awayLogo: Nullable<string>
+  homeScore: number
+  awayScore: number
+  leagueName: Nullable<string>
+  leagueLogo: Nullable<string>
+  liveImage: Nullable<string>
+  liveUrl: Nullable<string>
+  liveUrlFlv: Nullable<string>
+  gameTime: Nullable<number>
+  state: Nullable<number>
+  status: Nullable<number>
+  onlineNum: Nullable<number>
+  homeCornerKick: Nullable<number>
+  awayCornerKick: Nullable<number>
+  homeYellowCard: Nullable<number>
+  awayYellowCard: Nullable<number>
+  homeRedCard: Nullable<number>
+  awayRedCard: Nullable<number>
+  startTime: Nullable<number>
+  language: Nullable<string>
+  seriesName: Nullable<string>
+  isLive: Nullable<boolean>
+  anchor: boolean
+  anchorName: Nullable<string>
+  anchorAvatar: Nullable<string>
+  anchorTitle: Nullable<string>
+  hotValue: Nullable<number>
+  roomId?: Nullable<number>
+}
+
 export type {
   MatchInterface,
   MatchLeagueInterface,
@@ -183,4 +220,5 @@ export type {
   MatchLiveUrlInterface,
   AnchorRoomVo,
   GetPcGameMatchByConditionRequestInterface,
+  LiveSearchMatchInterface,
 }

@@ -21,8 +21,8 @@ import icRedCard from "@assets/icons/match/ic-red-card-v2.svg"
 import icYellowCard from "@assets/icons/match/ic-yellow-card-v2.svg"
 import imgEmpty from "@assets/images/common/img-empty.png"
 
-import { ScoreBadge, StatCell } from "./parts/match-fixture-cells"
-import { FIXTURE_ROW_CLASS, FixtureListSkeleton } from "./skeleton"
+import { ScoreBadge, StatCell } from "./parts/fixture-cells"
+import { FIXTURE_ROW_CLASS, FixturesSkeleton } from "./skeleton"
 
 export interface ExtraColumnInterface {
   header: ReactNode
@@ -30,7 +30,7 @@ export interface ExtraColumnInterface {
   width?: string
 }
 
-export { FIXTURE_ROW_CLASS, FixtureListSkeleton }
+export { FIXTURE_ROW_CLASS, FixturesSkeleton }
 
 export interface MatchGroupInterface {
   key: string
@@ -75,7 +75,6 @@ export function FixtureRow({
   const isFinished = match.status === MatchStatusEnum.FINISHED
   const isUpcoming =
     match.status === MatchStatusEnum.UPCOMING || match.status === MatchStatusEnum.UNKNOWN
-  const isStream = isLive && !!(match.anchorRoomVos?.[0] ?? match.anchor)
 
   const statusInsetColor = isLive
     ? "var(--color-red-600)"
@@ -396,7 +395,7 @@ export function FixtureTableHeader({ extraColumn }: { extraColumn?: ExtraColumnI
   )
 }
 
-interface FixtureListProps {
+interface FixturesProps {
   groups: MatchGroupInterface[]
   loading: boolean
   page: number
@@ -408,7 +407,7 @@ interface FixtureListProps {
   className?: string
 }
 
-export function FixtureList({
+export function Fixtures({
   groups,
   loading,
   page,
@@ -418,10 +417,10 @@ export function FixtureList({
   onPageChange,
   onSelect,
   extraColumn,
-}: FixtureListProps) {
+}: FixturesProps) {
   const { t } = useTranslation()
 
-  if (loading) return <FixtureListSkeleton />
+  if (loading) return <FixturesSkeleton />
 
   return (
     <div className={cn("flex h-full flex-col gap-3", className)}>

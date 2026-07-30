@@ -1,4 +1,12 @@
 {
+  "not-found": {
+    "subtitle": "Oops! Trang bạn tìm kiếm",
+    "title": "Không tồn tại",
+    "description": "Rất tiếc, trang bạn đang tìm kiếm có thể đã bị xoá, đổi tên hoặc tạm thời không khả dụng.",
+    "home": "Về trang chủ",
+    "schedule": "Lịch thi đấu",
+    "hint": "Hoặc thử tìm kiếm trang khác"
+  },
   "yesterday": "Hôm qua",
   "today": "Hôm nay",
   "tomorrow": "Sắp diễn ra",

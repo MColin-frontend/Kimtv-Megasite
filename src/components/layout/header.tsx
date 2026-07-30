@@ -7,7 +7,7 @@ import { LogOut, Menu, UserRound, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/use-auth"
-import { useDisclosure } from "@/hooks/useDisclosure"
+import { useDisclosure } from "@/hooks/use-disclosure"
 
 import { SLUG_MAP, useTranslation } from "@/i18n"
 import { getRoutes } from "@/config/routes"
@@ -98,10 +98,10 @@ function AvatarDropdown({ user, userId, onLogout }: AvatarDropdownProps) {
           </div>
         </button>
 
-        <div className="flex items-center gap-2">
+        <div className="hidden items-center gap-2 lg:flex">
           <Typography
             weight="600"
-            className="max-sm:text-12 min-w-0 truncate text-left text-white [font-style:oblique_8deg]"
+            className="min-w-0 truncate text-left text-white [font-style:oblique_8deg]"
           >
             {displayName}
           </Typography>
@@ -113,7 +113,7 @@ function AvatarDropdown({ user, userId, onLogout }: AvatarDropdownProps) {
               height={32}
               unoptimized
               objectFit="contain"
-              className="!h-9 !w-auto shrink-0 max-sm:!h-6"
+              className="!h-9 !w-auto shrink-0"
             />
           )}
         </div>
@@ -235,84 +235,6 @@ function AvatarDropdown({ user, userId, onLogout }: AvatarDropdownProps) {
   )
 }
 
-/* TODO: restore search */
-/* ── Search ──────────────────────────────────────────────── */
-// function SearchInput() {
-//   const { t } = useTranslation()
-//   const { state, open, close } = useDisclosure("search")
-//   const [value, setValue] = useState<string>("")
-//   const inputRef = useRef<HTMLInputElement>(null)
-//   const wrapRef = useRef<HTMLDivElement>(null)
-
-//   const expand = () => {
-//     open("search")
-//     setTimeout(() => inputRef.current?.focus(), 50)
-//   }
-
-//   const collapse = () => {
-//     close("search")
-//     setValue("")
-//   }
-
-//   const handleBlur = () => {
-//     setTimeout(() => {
-//       if (!wrapRef.current?.contains(document.activeElement)) collapse()
-//     }, 100)
-//   }
-
-//   return (
-//     <div ref={wrapRef} className="relative hidden md:block" onBlur={handleBlur}>
-//       <button
-//         onClick={expand}
-//         aria-label={t("header.search.aria-label")}
-//         className={cn(
-//           "flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200",
-//           "border shadow-[0_1px_2px_rgba(0,0,0,0.3)]",
-//           state.search
-//             ? "border-white/25 bg-white/12 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]"
-//             : "text-muted border-white/10 bg-white/[0.05] hover:border-white/20 hover:bg-white/10 hover:text-white"
-//         )}
-//       >
-//         <Search className="h-[15px] w-[15px]" />
-//       </button>
-
-//       <div
-//         className={cn(
-//           "absolute top-1/2 right-0 z-50 -translate-y-1/2",
-//           "flex items-center gap-2.5",
-//           "h-9 rounded-full border border-white/15 bg-[#0d1829]",
-//           "pr-2.5 pl-3 shadow-[0_4px_24px_rgba(0,0,0,0.4)]",
-//           "origin-right transition-all duration-200 ease-out",
-//           state.search
-//             ? "pointer-events-auto w-56 scale-x-100 opacity-100"
-//             : "pointer-events-none w-8 scale-x-0 opacity-0"
-//         )}
-//       >
-//         <Search className="text-muted h-3.5 w-3.5 shrink-0" />
-//         <input
-//           ref={inputRef}
-//           type="text"
-//           value={value}
-//           onChange={(e) => setValue(e.target.value)}
-//           onKeyDown={(e) => e.key === "Escape" && collapse()}
-//           placeholder={t("header.search.placeholder")}
-//           className="text-13 placeholder:text-placeholder flex-1 bg-transparent text-white outline-none"
-//         />
-//         {value && (
-//           <button
-//             onClick={() => {
-//               setValue("")
-//               inputRef.current?.focus()
-//             }}
-//             className="text-muted hover:text-muted flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/10 transition-all hover:bg-white/20"
-//           >
-//             <X className="h-3 w-3" />
-//           </button>
-//         )}
-//       </div>
-//     </div>
-//   )
-// }
 
 /* ── Desktop Nav ─────────────────────────────────────────── */
 
@@ -465,7 +387,7 @@ export function Header() {
   return (
     <>
       <header id="site-header" className="bg-header sticky top-0 z-50 w-full">
-        <div className="container flex h-fit items-center gap-3 py-3">
+        <div className="container flex h-fit items-center gap-3 py-3 max-sm:gap-2 max-sm:py-2!">
           <Link href={routes.home} className="shrink-0" onClick={() => close("mobileMenu")}>
             <Img
               src={kimtvLogo}
@@ -474,22 +396,19 @@ export function Header() {
               height={48}
               priority
               objectFit="contain"
-              className="max-sm:!h-[37px] max-sm:!w-[100px]"
+              className="max-sm:!h-[30px] max-sm:!w-[82px]"
             />
           </Link>
 
           <DesktopNav items={MAIN_NAV_ITEMS} isActive={isActive} t={t} />
 
           <div className="ml-auto flex shrink-0 items-center gap-3 max-sm:gap-2">
-            {/* TODO: restore search */}
-            {/* <SearchInput /> */}
-
             {isLoggedIn && user ? (
               <AvatarDropdown user={user} userId={user.userId ?? user.uid} onLogout={logout} />
             ) : (
-              <Button variant="gradient" onClick={login} className="max-lg:hidden">
+              <Button variant="gradient" onClick={login} className="max-lg:size-6 max-lg:rounded-full max-lg:px-0">
                 <UserRound className="h-3.5 w-3.5" />
-                {t("header.auth.login")}
+                <span className="max-lg:hidden">{t("header.auth.login")}</span>
               </Button>
             )}
 
@@ -578,7 +497,7 @@ export function Header() {
         </nav>
 
         {!isLoggedIn && (
-          <div className="container pt-3 pb-5">
+          <div className="container pt-3 pb-5 lg:hidden">
             <Button
               variant="gradient"
               className="w-full"

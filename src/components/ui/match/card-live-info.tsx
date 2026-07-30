@@ -3,21 +3,19 @@
 import { useEffect, useState } from "react"
 import { Calendar, Trophy } from "lucide-react"
 
-import { formatFootballGameTime, formatMatchDate, formatMatchTime } from "@/lib/date"
+import { formatMatchDate, formatMatchTime } from "@/lib/date"
+import { deriveMatchStatusFlags } from "@/lib/match.utils"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/use-auth"
+import { useBoolean } from "@/hooks/use-boolean"
+import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard"
 import { useLiveNavigate } from "@/hooks/use-live-navigate"
-import { useDisclosure } from "@/hooks/useDisclosure"
-import { useFakeGameMinute } from "@/hooks/useFakeGameMinute"
+import { useDisclosure } from "@/hooks/use-disclosure"
+import { useFakeGameMinute } from "@/hooks/use-fake-game-minute"
 
 import { useTranslation } from "@/i18n"
-import { MATCH_HALF_LABEL } from "@/constants/common.constants"
-import {
-  MATCH_CARD_I18N_KEYS,
-  MATCH_HALF_LABEL_I18N_KEY,
-  MATCH_STAT_CONFIG,
-} from "@/constants/component/match-card.constants"
-import { MatchFootballStateEnum, MatchStatusEnum } from "@/enums/match.enum"
+import { buildMatchStats } from "@/constants/component/match-card.constants"
+import { MatchStatusEnum } from "@/enums/match.enum"
 import type { MatchInterface } from "@/models/match.models"
 
 import { closePollApi, createPollApi, getActivePollApi } from "@/features/live/api/poll.api"
@@ -36,8 +34,11 @@ import icShare from "@assets/icons/common/ic-share.svg"
 import imgStadiumBg from "@assets/images/common/img-no-source.png"
 import imgVs from "@assets/images/common/img-vs.png"
 
-import { MatchLiveIndicator } from "./parts/match-live-indicator"
-import { MatchStatusBadge } from "./parts/match-status-badge"
+import { BadgeLive } from "./parts/badge-live"
+import { CardBackground } from "./parts/card-background"
+import { GameMinuteBadge } from "./parts/game-minute-badge"
+import { LeagueTimeRow } from "./parts/league-time-row"
+import { MatchStatBar } from "./parts/stat-bar"
 
 /* ── Types ───────────────────────────────────────────────── */
 
@@ -56,33 +57,23 @@ interface ShareButtonState {
 }
 
 function useShareButton(): ShareButtonState {
-  const [open, setOpen] = useState(false)
-  const [copied, setCopied] = useState(false)
+  const { value: open, toggle, off } = useBoolean()
+  const { copied, copy: copyText } = useCopyToClipboard()
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       const el = document.getElementById("match-share-btn")
-      if (el && !el.contains(e.target as Node)) setOpen(false)
+      if (el && !el.contains(e.target as Node)) off()
     }
     document.addEventListener("mousedown", handleClick)
     return () => document.removeEventListener("mousedown", handleClick)
-  }, [])
+  }, [off])
 
   function copy() {
-    const url = window.location.href
-    navigator.clipboard?.writeText(url).catch(() => {
-      const input = document.createElement("input")
-      input.value = url
-      document.body.appendChild(input)
-      input.select()
-      document.execCommand("Copy")
-      document.body.removeChild(input)
-    })
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    copyText(window.location.href)
   }
 
-  return { open, copied, toggle: () => setOpen((v) => !v), copy }
+  return { open, copied, toggle, copy }
 }
 
 function ShareButton() {
@@ -92,17 +83,22 @@ function ShareButton() {
     <div id="match-share-btn" className="relative">
       <Button
         onClick={toggle}
-        className="group flex h-[30px] items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 text-white/80 backdrop-blur-sm transition-all hover:border-white/40 hover:bg-white/[0.18] hover:text-white max-sm:h-6 max-sm:px-2"
+        className="group flex h-[30px] items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 text-white/80 backdrop-blur-sm transition-all hover:border-white/40 hover:bg-white/[0.18] hover:text-white max-sm:h-5 max-sm:gap-1 max-sm:px-1.5"
       >
         <Img
           src={icShare}
           alt="share"
-          width={14}
-          height={14}
           objectFit="contain"
-          className="shrink-0 opacity-70 brightness-0 invert transition-opacity group-hover:opacity-100"
+          className="icon-gold size-3.5 shrink-0 transition-opacity max-sm:size-2.5"
         />
-        <span className="text-12 font-600 leading-none">Chia sẻ</span>
+        <Typography
+          as="span"
+          variant="caption"
+          weight="600"
+          className="tracking-0 text-gold max-sm:text-10! leading-none"
+        >
+          Chia sẻ
+        </Typography>
       </Button>
       {open && (
         <div className="rounded-8 absolute top-full right-0 z-50 mt-1.5 w-[280px] border border-white/10 bg-[#0c1526] p-3 shadow-[0_8px_32px_rgba(0,0,0,0.5)] max-sm:w-[calc(100vw-3rem)]">
@@ -215,39 +211,17 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
   const firstAnchor = anchorRoomVos?.[0] ?? null
   const thumbnail = firstAnchor?.cover ?? match.animationUrl ?? null
 
-  const isUpcoming =
-    match.status === MatchStatusEnum.UPCOMING || match.status === MatchStatusEnum.UNKNOWN
-  const isFinished = match.status === MatchStatusEnum.FINISHED
-  const isMatchLive = match.status === MatchStatusEnum.LIVE
-  // BLV đang stream → "Stream"
-  const isStream = !!firstAnchor
-  // Trận live không có BLV → "LIVE"
-  const isLive = isMatchLive && !isStream
-
-  const halfLabel = MATCH_HALF_LABEL[match.state as MatchFootballStateEnum] ?? "LIVE"
-  const periodI18nKey = MATCH_HALF_LABEL_I18N_KEY[halfLabel]
-  const periodLabel = periodI18nKey ? t(periodI18nKey as Parameters<typeof t>[0]) : halfLabel
+  const { isMatchLive, isStream, isLive, isUpcoming } = deriveMatchStatusFlags({
+    status: match.status,
+    anchor: match.anchor,
+    hasAnchorRoom: !!firstAnchor,
+  })
 
   const displayMinute = useFakeGameMinute(match.gameTime, isStream || isLive)
   const isSoccer = gameId === 202
   const showStats = isSoccer || (gameId != null && gameId > 200)
 
-  const stats = MATCH_STAT_CONFIG.map((cfg) => ({
-    ...cfg,
-    label: t(cfg.labelKey as Parameters<typeof t>[0]),
-    home:
-      cfg.alt === "yellow"
-        ? (match.homeYellowCard ?? 0)
-        : cfg.alt === "red"
-          ? (match.homeRedCard ?? 0)
-          : (match.homeCornerKick ?? 0),
-    away:
-      cfg.alt === "yellow"
-        ? (match.awayYellowCard ?? 0)
-        : cfg.alt === "red"
-          ? (match.awayRedCard ?? 0)
-          : (match.awayCornerKick ?? 0),
-  }))
+  const stats = buildMatchStats(match, (key) => t(key as Parameters<typeof t>[0]))
 
   return (
     <div
@@ -257,83 +231,26 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
         className
       )}
     >
-      {thumbnail ? (
-        <>
-          <div
-            className="pointer-events-none absolute inset-0 z-0"
-            style={{
-              backgroundImage: `url(${thumbnail})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center top",
-            }}
-          />
-          <div className="card-thumbnail-overlay pointer-events-none absolute inset-0 z-[1]" />
-          <div className="pointer-events-none absolute inset-0 z-[1]" />
-        </>
-      ) : (
-        <>
-          <div
-            className="pointer-events-none absolute inset-0 z-0 opacity-50"
-            style={{
-              backgroundImage: `url(${imgStadiumBg.src})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          />
-          {match.homeLogo && (
-            <div
-              className="pointer-events-none absolute inset-0 z-0"
-              style={{
-                backgroundImage: `url(${match.homeLogo})`,
-                backgroundSize: "160px",
-                backgroundPosition: "-10px center",
-                backgroundRepeat: "no-repeat",
-                filter: "blur(55px) saturate(2)",
-                opacity: 0.13,
-                transform: "scale(1.6)",
-              }}
-            />
-          )}
-          {match.awayLogo && (
-            <div
-              className="pointer-events-none absolute inset-0 z-0"
-              style={{
-                backgroundImage: `url(${match.awayLogo})`,
-                backgroundSize: "160px",
-                backgroundPosition: "calc(100% + 10px) center",
-                backgroundRepeat: "no-repeat",
-                filter: "blur(55px) saturate(2)",
-                opacity: 0.1,
-                transform: "scale(1.6)",
-              }}
-            />
-          )}
-          <div className="card-stadium-overlay pointer-events-none absolute inset-0 z-[1]" />
-          <div className="pointer-events-none absolute inset-0 z-[1] bg-black/20" />
-        </>
-      )}
+      <CardBackground
+        thumbnail={thumbnail}
+        homeLogo={match.homeLogo}
+        awayLogo={match.awayLogo}
+        stadiumSrc={imgStadiumBg.src}
+        stadiumClassName="opacity-50"
+        stadiumExtras={<div className="pointer-events-none absolute inset-0 z-[1] bg-black/20" />}
+      />
 
       {/* Content above bg */}
       <div className="relative z-[2] flex flex-col gap-2 max-lg:gap-3">
         {/* Row 1: live + time + share — ẩn trên mobile */}
         <div className="flex w-full items-center justify-between max-sm:-my-1 max-sm:origin-left">
           <div className="flex items-center gap-2 max-md:scale-90 max-sm:scale-75">
-            <MatchLiveIndicator label={isStream ? "Stream" : "LIVE"} />
+            <BadgeLive label={isStream ? "Stream" : "LIVE"} />
           </div>
           <div className="flex items-center gap-1.5">
             <div className="flex items-center gap-1.5">
               {displayMinute != null && displayMinute !== 0 && (
-                <div className="rounded-4 border-gold/30 bg-gold/10 border px-1.5 py-0.5 max-sm:px-1 max-sm:py-0">
-                  <Typography
-                    as="span"
-                    variant="label"
-                    weight="700"
-                    className="text-gold drop-shadow-gold"
-                  >
-                    {formatFootballGameTime(displayMinute)}
-                    <span className="animate-blink">&apos;</span>
-                  </Typography>
-                </div>
+                <GameMinuteBadge minute={displayMinute} />
               )}
             </div>
             <Button
@@ -341,17 +258,22 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
                 e.stopPropagation()
                 open("history")
               }}
-              className="group flex h-[30px] items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 text-white/80 backdrop-blur-sm transition-all hover:border-white/40 hover:bg-white/[0.18] hover:text-white max-sm:h-6 max-sm:px-2"
+              className="group flex h-[30px] items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 text-white/80 backdrop-blur-sm transition-all hover:border-white/40 hover:bg-white/[0.18] hover:text-white max-sm:h-5 max-sm:gap-1 max-sm:px-1.5"
             >
               <Img
                 src={icPoll}
                 alt="poll"
-                width={14}
-                height={14}
                 objectFit="contain"
-                className="shrink-0 opacity-70 brightness-0 invert transition-opacity group-hover:opacity-100"
+                className="icon-gold size-3.5 shrink-0 transition-opacity max-sm:size-2.5"
               />
-              <span className="text-12 font-600 leading-none">Lịch sử</span>
+              <Typography
+                as="span"
+                variant="caption"
+                weight="600"
+                className="tracking-0 text-gold max-sm:text-10! leading-none"
+              >
+                Lịch sử
+              </Typography>
             </Button>
             {isRoomOwner && (
               <Button
@@ -376,20 +298,20 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
         </div>
 
         {/* Row 2: teams + score */}
-        <div className="flex items-center justify-between gap-4 max-md:gap-2 max-sm:gap-2">
+        <div className="flex items-center justify-between gap-8 max-md:gap-4 max-sm:gap-2">
           {/* Home */}
-          <div className="flex min-w-0 flex-1 items-center justify-end gap-3 max-md:gap-2 max-sm:gap-1.5">
+          <div className="flex min-w-0 flex-1 items-center justify-end gap-6 max-md:gap-3 max-sm:gap-1.5">
+            <div className="flex size-16 shrink-0 items-center justify-center max-lg:size-14 max-md:size-10 max-sm:size-8">
+              <Img src={homeLogo} alt={homeName ?? ""} width={90} height={90} objectFit="contain" />
+            </div>
             <Typography
               as="span"
-              variant="body"
-              weight="700"
-              className="max-md:text-14 max-sm:!text-10 min-w-0 truncate text-right text-white"
+              size="24"
+              weight="600"
+              className="max-lg:text-20 max-md:!text-14 max-sm:!text-10 min-w-0 truncate text-right text-white"
             >
               {homeName}
             </Typography>
-            <div className="flex size-[64px] shrink-0 items-center justify-center max-lg:size-12 max-md:size-10 max-sm:size-10">
-              <Img src={homeLogo} alt={homeName ?? ""} width={64} height={64} objectFit="contain" />
-            </div>
           </div>
 
           {/* Score */}
@@ -401,113 +323,60 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
                 width={48}
                 height={48}
                 objectFit="contain"
-                className="max-md:size-9 max-sm:size-9"
+                className="max-md:size-9 max-sm:size-7"
               />
             ) : (
               <>
                 <div className="flex items-center gap-0.5">
                   <Typography
                     as="span"
-                    size="48"
+                    size="60"
                     weight="700"
-                    className="text-gold drop-shadow-gold-score max-md:!text-36 max-sm:!text-30 leading-none tabular-nums"
+                    className="text-gold drop-shadow-gold-score max-lg:!text-48 max-md:!text-36 max-sm:!text-24 leading-none tabular-nums"
                   >
                     {homeScore ?? 0}
                   </Typography>
                   <Typography
                     as="span"
-                    size="24"
+                    size="36"
                     weight="500"
-                    className="text-gold/60 max-md:!text-16 max-sm:!text-16 px-0.5 leading-100"
+                    className="text-gold/60 max-lg:!text-24 max-md:!text-16 max-sm:!text-14 px-0.5 leading-100"
                   >
                     :
                   </Typography>
                   <Typography
                     as="span"
-                    size="48"
+                    size="60"
                     weight="700"
-                    className="text-gold drop-shadow-gold-score max-md:!text-36 max-sm:!text-30 leading-none tabular-nums"
+                    className="text-gold drop-shadow-gold-score max-lg:!text-48 max-md:!text-36 max-sm:!text-24 leading-none tabular-nums"
                   >
                     {awayScore ?? 0}
                   </Typography>
                 </div>
-                {isLive && <MatchStatusBadge type="live" label={periodLabel} />}
-                {isFinished && (
-                  <MatchStatusBadge type="finished" label={t(MATCH_CARD_I18N_KEYS.finished)} />
-                )}
               </>
             )}
           </div>
 
           {/* Away */}
-          <div className="flex min-w-0 flex-1 items-center gap-3 max-md:gap-2 max-sm:gap-1.5">
-            <div className="flex size-[64px] shrink-0 items-center justify-center max-lg:size-12 max-md:size-10 max-sm:size-10">
-              <Img src={awayLogo} alt={awayName ?? ""} width={64} height={64} objectFit="contain" />
-            </div>
+          <div className="flex min-w-0 flex-1 items-center gap-6 max-md:gap-3 max-sm:gap-1.5">
             <Typography
               as="span"
-              variant="body"
-              weight="700"
-              className="max-md:text-14 max-sm:!text-10 min-w-0 truncate text-white"
+              size="24"
+              weight="600"
+              className="max-lg:text-20 max-md:!text-14 max-sm:!text-10 min-w-0 truncate text-white"
             >
               {awayName}
             </Typography>
+            <div className="flex size-16 shrink-0 items-center justify-center max-lg:size-14 max-md:size-10 max-sm:size-8">
+              <Img src={awayLogo} alt={awayName ?? ""} width={90} height={90} objectFit="contain" />
+            </div>
           </div>
         </div>
 
         {/* Row 3: stats + anchors */}
         {showStats && (
           <div className="flex items-center justify-center gap-3 max-sm:gap-1">
-            <div className="rounded-8 flex items-center justify-between bg-white/10 px-2 py-1.5 backdrop-blur-[80px] [will-change:transform] max-sm:px-1 max-sm:py-0.5">
-              {stats.map((s, i) => (
-                <div key={i} className="flex flex-1 items-center">
-                  {i > 0 && <div className="h-4 w-px shrink-0 bg-white/20 max-sm:h-2.5" />}
-                  <div className="flex flex-1 flex-col items-center gap-0.5 px-4 max-sm:px-1">
-                    <div className="flex items-center gap-1 max-sm:gap-0.5">
-                      <Img
-                        src={s.icon}
-                        alt={s.alt}
-                        width={16}
-                        height={16}
-                        objectFit="contain"
-                        className="max-sm:!size-[10px]"
-                      />
-                      <Typography
-                        as="span"
-                        variant="body-sm"
-                        weight="700"
-                        className="max-sm:!text-10 text-white tabular-nums"
-                      >
-                        {s.home}
-                      </Typography>
-                      <Typography
-                        as="span"
-                        variant="caption"
-                        className="text-white/50"
-                      >
-                        -
-                      </Typography>
-                      <Typography
-                        as="span"
-                        variant="body-sm"
-                        weight="700"
-                        className="max-sm:!text-10 text-white tabular-nums"
-                      >
-                        {s.away}
-                      </Typography>
-                    </div>
-                    <Typography
-                      as="span"
-                      variant="caption"
-                      weight="500"
-                      className="whitespace-nowrap text-white/80 max-sm:!text-[9px]"
-                    >
-                      {s.label}
-                    </Typography>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <MatchStatBar stats={stats} />
 
             {anchors && anchors.length > 0 && (
               <div className="flex items-center">
@@ -537,46 +406,12 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
           </div>
         )}
 
-        {/* Row 4: league + time */}
-        <div className="flex items-center justify-between px-0.5 py-1">
-          <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden">
-            {leagueLogo ? (
-              <Img
-                src={leagueLogo}
-                alt=""
-                width={20}
-                height={20}
-                objectFit="contain"
-                className="shrink-0"
-              />
-            ) : (
-              <Trophy className="text-gold size-3.5 shrink-0" />
-            )}
-            <Typography
-              as="span"
-              variant="caption"
-              weight="500"
-              className="max-sm:!text-10 min-w-0 truncate text-white/90"
-            >
-              {leagueName}
-            </Typography>
-          </div>
-          {match.startTime && (
-            <div className="flex shrink-0 items-center gap-1 max-sm:origin-right max-sm:scale-75">
-              <Calendar className="size-3 shrink-0 text-white/50" />
-              <Typography
-                as="span"
-                variant="caption"
-                weight="500"
-                className="text-white/70 tabular-nums"
-              >
-                {formatMatchTime(match.startTime)}
-                <span className="mx-1 inline-block h-2.5 w-px bg-white/30 align-middle" />
-                {formatMatchDate(match.startTime)}
-              </Typography>
-            </div>
-          )}
-        </div>
+        <LeagueTimeRow
+          leagueLogo={leagueLogo}
+          leagueName={leagueName}
+          startTime={match.startTime}
+          variant="info"
+        />
       </div>
       {state.poll && (
         <PollModal

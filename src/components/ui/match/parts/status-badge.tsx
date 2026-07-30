@@ -2,15 +2,15 @@ import { cn } from "@/lib/utils"
 
 import { Typography } from "@/components/ui/typography"
 
-type MatchStatusBadgeType = "live" | "finished"
+type StatusBadgeType = "live" | "finished"
 
-interface MatchStatusBadgeProps {
+interface StatusBadgeProps {
   label: string
-  type: MatchStatusBadgeType
+  type: StatusBadgeType
   className?: string
 }
 
-const STYLES: Record<MatchStatusBadgeType, { container: string; text: string }> = {
+const STYLES: Record<StatusBadgeType, { container: string; text: string }> = {
   live: {
     container: "border-live-green/30 bg-live-green-bg shadow-live-green-glow backdrop-blur-2xl",
     text: "text-live-green drop-shadow-live-green",
@@ -21,7 +21,7 @@ const STYLES: Record<MatchStatusBadgeType, { container: string; text: string }> 
   },
 }
 
-export function MatchStatusBadge({ label, type, className }: MatchStatusBadgeProps) {
+export function StatusBadge({ label, type, className }: StatusBadgeProps) {
   const s = STYLES[type]
   return (
     <div

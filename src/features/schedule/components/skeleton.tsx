@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils"
 
 import { SKELETON_BG } from "@/constants/common.constants"
 
-import { FixtureListSkeleton } from "@/components/ui/match/fixture-list"
+import { FixturesSkeleton } from "@/components/ui/match/fixtures"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export function ScheduleSkeleton() {
@@ -15,7 +15,7 @@ export function ScheduleSkeleton() {
           <Skeleton className={cn("h-9 w-36", SKELETON_BG)} />
         </div>
       </div>
-      <FixtureListSkeleton />
+      <FixturesSkeleton />
     </div>
   )
 }

@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from "react"
 import type { StaticImageData } from "next/image"
 
 import { VIDEO_EXT_RE } from "@/lib/regex"
 import { cn } from "@/lib/utils"
+import { useBoolean } from "@/hooks/use-boolean"
 
 import { Img } from "@/components/ui/image"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -28,7 +28,7 @@ function AdMedia({
   fallback: string | StaticImageData | null
   rounded?: string
 }) {
-  const [errored, setErrored] = useState(false)
+  const { value: errored, on: setErrored } = useBoolean()
   const url = errored && fallback ? fallback : src
 
   if (VIDEO_EXT_RE.test(url as string)) {
@@ -40,7 +40,7 @@ function AdMedia({
         muted
         playsInline
         className={cn("w-full", rounded)}
-        onError={() => fallback && !errored && setErrored(true)}
+        onError={() => fallback && !errored && setErrored()}
       >
         <source src={url as string} />
       </video>
@@ -55,7 +55,7 @@ function AdMedia({
       height={0}
       sizes="100vw"
       className={cn("h-auto w-full", rounded)}
-      onError={() => fallback && !errored && setErrored(true)}
+      onError={() => fallback && !errored && setErrored()}
     />
   )
 }

@@ -8,10 +8,10 @@ import type { MatchInterface } from "@/models/match.models"
 import CarouselInfinityApi from "@/components/ui/carousel/carousel-infinity-api"
 import { Empty } from "@/components/ui/empty"
 
-import { MatchCard } from "./match-card"
-import { MatchStatusLabel, type MatchStatusType } from "./match-status-label"
+import { Card } from "./card-basic"
+import { BadgeStatus, type MatchStatusType } from "./badge-status"
 
-interface MatchCarouselProps {
+interface CarouselProps {
   title?: string
   statusType?: MatchStatusType
   endpoint: string
@@ -21,27 +21,27 @@ interface MatchCarouselProps {
   hideFilter?: boolean
 }
 
-export function MatchCarousel({
+export function Carousel({
   statusType,
   endpoint,
   method = HTTP_METHOD.POST,
   params = MATCH_QUERY_PARAMS.ALL_GAMES,
   matchType = LIVE_MATCH_TYPE.LIVE,
-}: MatchCarouselProps) {
+}: CarouselProps) {
   const { t } = useTranslation()
   const isLive =
     statusType === LIVE_MATCH_TYPE.LIVE || (!statusType && matchType === LIVE_MATCH_TYPE.LIVE)
 
   return (
     <section className="card-glow rounded-12 flex flex-col gap-4 p-5 max-sm:gap-2 max-sm:p-3">
-      <MatchStatusLabel type={statusType || LIVE_MATCH_TYPE.LIVE} />
+      <BadgeStatus type={statusType || LIVE_MATCH_TYPE.LIVE} />
 
       <CarouselInfinityApi<MatchInterface>
         endpoint={endpoint}
         method={method}
         params={params}
         renderItem={(match, _, isLoading) => (
-          <MatchCard match={match} isLoading={isLoading} matchType={matchType} />
+          <Card match={match} isLoading={isLoading} matchType={matchType} />
         )}
         renderEmpty={() => <Empty tip={t("common.empty")} />}
         slideClassName={

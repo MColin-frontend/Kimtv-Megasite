@@ -5,9 +5,7 @@ import { getRequest } from "@/server/services/request"
 import { MATCH_API, MATCH_QUERY_PARAMS } from "@/lib/match.utils"
 
 import { FOOTBALL_GAME_MONGO_ID } from "@/constants/component/home.constants"
-import type { MatchInterface } from "@/models/match.models"
-
-import type { LiveSearchMatchInterface } from "@/components/ui/match/match-card-live"
+import type { LiveSearchMatchInterface, MatchInterface } from "@/models/match.models"
 
 /** Server-side — cùng endpoint và params với liveScheduleQueryOptions */
 export async function fetchLiveScheduleMatches(): Promise<LiveSearchMatchInterface[]> {

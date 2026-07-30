@@ -21,7 +21,7 @@ export const siteConfig = {
   og: {
     width: 1200,
     height: 630,
-    image: "/icon.png",
+    image: "/opengraph-image",
   },
 
   links: {

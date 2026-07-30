@@ -3,7 +3,7 @@
 import type { LocaleType } from "@/i18n"
 import { getRoutes } from "@/config/routes"
 
-import { useRouter } from "./useRouter"
+import { useRouter } from "./use-router"
 
 export function useLiveNavigate() {
   const { push, pathname } = useRouter()

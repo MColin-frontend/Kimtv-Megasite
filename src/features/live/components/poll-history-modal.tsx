@@ -157,7 +157,7 @@ function PollCard({ poll, index }: { poll: PollInterface; index: number }) {
   const votedKeys = poll.userVotedOptionKeys ?? []
 
   return (
-    <div className="rounded-16 bg-chat-bg relative flex flex-col px-4 pt-3.5 pb-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.5),0_8px_32px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-1px_0_rgba(0,0,0,0.3)]">
+    <div className="rounded-16 bg-chat-bg relative flex flex-col px-4 pt-3.5 pb-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.5),0_8px_32px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-1px_0_rgba(0,0,0,0.3)] max-sm:px-3 max-sm:pt-3 max-sm:pb-2">
       {/* Number badge */}
       <div className="bg-gradient-gold rounded-tl-16 rounded-br-12 text-16 font-800 tracking-0 absolute -top-px -left-px flex size-9 items-center justify-center rounded-tr-none rounded-bl-none text-black">
         {index + 1}
@@ -252,47 +252,45 @@ export function PollHistoryModal({ open, onOpenChange, chatroomId }: PollHistory
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm" />
-        <Dialog.Popup className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="rounded-16 bg-poll-modal relative flex h-[65vh] w-full max-w-7xl flex-col overflow-hidden shadow-[0_32px_100px_rgba(0,0,0,0.85)]">
+        <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/5 backdrop-blur-md" />
+        <Dialog.Popup className="fixed inset-0 z-50 flex items-center justify-center p-4 max-sm:p-3">
+          <div className="rounded-16 bg-poll-modal relative flex h-[65vh] w-full max-w-7xl flex-col overflow-hidden shadow-[0_32px_100px_rgba(0,0,0,0.85)] max-sm:h-[85vh]">
             {/* Close */}
             <button
               onClick={() => onOpenChange(false)}
-              className="absolute top-3 right-3 z-10 flex size-8 items-center justify-center rounded-full bg-white/8 text-white/60 transition-all hover:bg-white/15 hover:text-white"
+              className="absolute top-3 right-3 z-10 flex size-8 items-center justify-center rounded-full bg-white/8 text-white/60 transition-all hover:bg-white/15 hover:text-white hover:rotate-[120deg] max-sm:top-2 max-sm:right-2 max-sm:size-6"
             >
-              <X className="size-4" />
+              <X className="size-4 max-sm:size-3.5" />
             </button>
 
             {/* Header */}
-            <div className="flex shrink-0 items-center gap-3 border-b border-white/[0.07] px-5 py-4">
+            <div className="flex shrink-0 items-center gap-3 border-b border-white/[0.07] px-5 py-4 max-sm:gap-2 max-sm:px-3 max-sm:py-2.5">
               <Img
                 src={icPoll}
                 alt=""
-                width={32}
-                height={32}
                 objectFit="contain"
-                className="shrink-0"
+                className="size-8 shrink-0 icon-gold max-sm:size-6"
               />
               <div className="flex flex-col gap-1">
                 <Typography
                   as="span"
                   variant="h4"
                   weight="800"
-                  className="text-gold drop-shadow-gold"
+                  className="text-gold drop-shadow-gold max-sm:text-16"
                 >
                   Lịch sử bình chọn
                 </Typography>
-                <Typography as="span" variant="caption" className="text-white/35">
+                <Typography as="span" variant="caption" className="text-white/35 max-sm:text-10">
                   Bình chọn để nhận thưởng & xem kết quả trực tiếp
                 </Typography>
               </div>
             </div>
 
             {/* Body */}
-            <div className="flex min-h-0 flex-1 flex-col p-3.5">
+            <div className="flex min-h-0 flex-1 flex-col p-3.5 max-sm:p-2">
               <div className="flex min-h-0 flex-1 scrollbar-none flex-col overflow-y-auto">
                 {loading ? (
-                  <div className="grid grid-cols-3 gap-3 max-md:grid-cols-2 max-sm:grid-cols-1">
+                  <div className="grid grid-cols-3 gap-3 max-md:grid-cols-2 max-sm:grid-cols-1 max-sm:gap-2">
                     {Array.from({ length: 6 }).map((_, i) => (
                       <div
                         key={i}
@@ -321,7 +319,7 @@ export function PollHistoryModal({ open, onOpenChange, chatroomId }: PollHistory
                 ) : list.length === 0 ? (
                   <Empty tip="Chưa có lịch sử bình chọn" className="flex-1 py-0" />
                 ) : (
-                  <div className="grid grid-cols-3 gap-3 max-md:grid-cols-2 max-sm:grid-cols-1">
+                  <div className="grid grid-cols-3 gap-3 max-md:grid-cols-2 max-sm:grid-cols-1 max-sm:gap-2">
                     {list.map((poll, i) => (
                       <PollCard key={poll.pollId} poll={poll} index={i} />
                     ))}

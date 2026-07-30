@@ -32,6 +32,7 @@ export async function generateMetadata({ params, searchParams }: Props) {
       : "Xem bóng đá trực tiếp trên KimTV — tỉ số live, bình luận viên và phòng chat."
 
   const path = `/${lang}/truc-tiep/${id}`
+  const ogImage = match?.homeLogo ?? match?.awayLogo ?? null
 
   return createMetadata({
     title,
@@ -45,7 +46,12 @@ export async function generateMetadata({ params, searchParams }: Props) {
       ...(league ? [league] : []),
     ],
     alternates: { canonical: path },
-    openGraph: { url: path, title, description },
+    openGraph: {
+      url: path,
+      title,
+      description,
+      images: ogImage ? [{ url: ogImage, alt: title }] : undefined,
+    },
   })
 }
 

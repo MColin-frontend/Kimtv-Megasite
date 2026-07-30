@@ -4,7 +4,7 @@ import { useState } from "react"
 import { ChartBarStacked, Check, ChevronDown, Users, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { useDisclosure } from "@/hooks/useDisclosure"
+import { useDisclosure } from "@/hooks/use-disclosure"
 
 import { useTranslation } from "@/i18n"
 
@@ -12,11 +12,14 @@ import { PollTypeEnum, pollTypeFromApi } from "@/features/live/poll.constants"
 import type { PollInterface } from "@/features/live/poll.models"
 import { isPollActive, isPollVoted } from "@/features/live/poll.models"
 import { Button } from "@/components/ui/button"
-import { ConfirmModal } from "@/components/ui/modal/confirm"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Typography } from "@/components/ui/typography"
 
 /* ── Option row ──────────────────────────────────────────── */
+
+function stripHtml(str: string): string {
+  return str.replace(/<[^>]*>/g, "").trim()
+}
 
 function OptionRow({
   optionKey,
@@ -53,12 +56,12 @@ function OptionRow({
         !voted && !selected && "hover:bg-white/[0.06]"
       )}
     >
-      <div className="flex items-center gap-2.5 px-3 py-2">
+      <div className="flex items-center gap-2.5 px-3 py-2 max-sm:gap-1.5 max-sm:px-1.5 max-sm:py-1">
         {/* Radio / checkbox */}
         <div
           className={cn(
             "relative shrink-0 border-2 transition-all duration-150",
-            isMultiple ? "rounded-4 size-4" : "size-4 rounded-full",
+            isMultiple ? "rounded-4 size-4 max-sm:size-3" : "size-4 rounded-full max-sm:size-3",
             selected ? "border-gold" : "border-white/30"
           )}
         >
@@ -83,7 +86,7 @@ function OptionRow({
         >
           {/* Key badge — card shape với clip + gradient */}
           <div
-            className="relative flex w-12 shrink-0 items-center justify-center self-stretch transition-all"
+            className="relative flex w-12 shrink-0 items-center justify-center self-stretch transition-all max-sm:w-7"
             style={{
               background: selected
                 ? "linear-gradient(160deg, #ffd75a 0%, #f6c343 45%, #c8872a 100%)"
@@ -99,7 +102,7 @@ function OptionRow({
               variant="h6"
               weight="800"
               className={cn(
-                "leading-none select-none",
+                "leading-none select-none max-sm:!text-10",
                 selected ? "text-black/70" : "text-white/60"
               )}
             >
@@ -108,7 +111,7 @@ function OptionRow({
           </div>
 
           {/* Content */}
-          <div className="flex min-w-0 flex-1 flex-col gap-1.5 px-2.5 py-2">
+          <div className="flex min-w-0 flex-1 flex-col gap-1.5 px-2.5 py-2 max-sm:gap-0.5 max-sm:px-1.5 max-sm:py-1">
             <div className="flex items-center justify-between gap-2">
               <Tooltip>
                 <TooltipTrigger className="min-w-0 flex-1 cursor-default text-left">
@@ -117,36 +120,36 @@ function OptionRow({
                     variant="body-sm"
                     weight={selected ? "600" : "400"}
                     className={cn(
-                      "block w-fit truncate leading-none transition-colors",
+                      "line-clamp-2 w-fit leading-snug transition-colors max-sm:!text-10",
                       selected ? "text-white" : "text-white/70"
                     )}
                   >
-                    {label}
+                    {stripHtml(label)}
                   </Typography>
                 </TooltipTrigger>
-                <TooltipContent>{label}</TooltipContent>
+                <TooltipContent>{stripHtml(label)}</TooltipContent>
               </Tooltip>
 
               {showData && (
-                <div className="flex shrink-0 items-center gap-1.5">
+                <div className="flex shrink-0 items-center gap-1.5 max-sm:gap-1">
                   <div className="flex items-center gap-1 text-white/40">
-                    <Users className="size-3 shrink-0" />
+                    <Users className="size-3 shrink-0 max-sm:size-2.5" />
                     <Typography
                       as="span"
                       size="12"
                       weight={voteCount > 0 ? "700" : "400"}
-                      className={cn("leading-none tabular-nums", voteCount > 0 && "text-gold")}
+                      className={cn("leading-none tabular-nums max-sm:!text-10", voteCount > 0 && "text-gold")}
                     >
                       {voteCount}
                     </Typography>
                   </div>
-                  <div className="h-3 w-px bg-white/5" />
+                  <div className="h-3 w-px bg-white/5 max-sm:h-2" />
                   <Typography
                     as="span"
                     size="12"
                     weight="700"
                     className={cn(
-                      "leading-none tabular-nums",
+                      "leading-none tabular-nums max-sm:!text-10",
                       selected || pct > 0 ? "text-gold" : "text-white/50"
                     )}
                   >
@@ -219,11 +222,7 @@ export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewP
     })
   }
 
-  const { state, open, toggle, setOpen } = useDisclosure("confirmClose", "collapsed")
-
-  function openConfirmClose() {
-    open("confirmClose")
-  }
+  const { state, toggle } = useDisclosure("collapsed")
 
   function handleVote() {
     if (!selectedKeys.length || loading) return
@@ -244,23 +243,23 @@ export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewP
         <Button
           size="icon"
           variant="ghost"
-          onClick={openConfirmClose}
-          className="absolute -top-3.5 -right-2.5 z-10 size-7 rounded-full border border-white/15 bg-white/10 text-white/60 shadow-[0_2px_12px_rgba(0,0,0,0.4)] transition-all duration-150 hover:border-red-500/70 hover:bg-red-500/30 hover:text-red-300"
+          onClick={() => onClose?.()}
+          className="absolute -top-3.5 -right-2.5 z-10 size-7 rounded-full border border-white/15 bg-white/10 text-white/60 shadow-[0_2px_12px_rgba(0,0,0,0.4)] transition-all duration-150 hover:border-red-500/70 hover:bg-red-500/30 hover:text-red-300 max-sm:size-5 max-sm:-top-2.5 max-sm:-right-1.5"
         >
-          <X className="size-4" />
+          <X className="size-4 max-sm:size-3" />
         </Button>
       )}
       <div
         className={cn(
-          "rounded-12 panel-poll flex flex-col overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_0_1px_rgba(246,195,67,0.12),inset_0_1px_0_rgba(255,255,255,0.06)]",
+          "rounded-8 panel-poll flex flex-col overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_0_1px_rgba(246,195,67,0.12),inset_0_1px_0_rgba(255,255,255,0.06)]",
           className
         )}
       >
-        <div className="flex flex-col gap-3 p-4">
+        <div className="flex flex-col gap-3 p-4 max-sm:gap-2 max-sm:p-2">
           {/* Header */}
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <ChartBarStacked className="text-gold size-5 shrink-0" />
+          <div className="flex items-center justify-between gap-3 max-sm:gap-2">
+            <div className="flex items-center gap-2 max-sm:gap-1.5">
+              <ChartBarStacked className="text-gold size-5 shrink-0 max-sm:size-4" />
               <Typography
                 as="span"
                 variant="overline"
@@ -296,11 +295,11 @@ export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewP
               <button
                 type="button"
                 onClick={() => toggle("collapsed")}
-                className="border-gold/40 bg-gold/10 text-gold/70 hover:border-gold/60 hover:bg-gold/20 hover:text-gold flex size-6 items-center justify-center rounded-full border transition-all duration-200"
+                className="border-gold/40 bg-gold/10 text-gold/70 hover:border-gold/60 hover:bg-gold/20 hover:text-gold flex size-6 items-center justify-center rounded-full border transition-all duration-200 max-sm:size-4"
               >
                 <ChevronDown
                   className={cn(
-                    "size-4 stroke-[2.5] transition-transform duration-200",
+                    "size-4 stroke-[2.5] transition-transform duration-200 max-sm:size-3",
                     state.collapsed && "rotate-180"
                   )}
                 />
@@ -326,7 +325,7 @@ export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewP
 
               {/* Options */}
               <div className="max-h-55 [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.08)_transparent] overflow-y-auto">
-                <div className="flex flex-col gap-2 px-0.5 py-0.5">
+                <div className="flex flex-col gap-2 px-0.5 py-0.5 max-sm:gap-1">
                   {poll.options.map((opt) => (
                     <OptionRow
                       key={opt.optionKey}
@@ -360,7 +359,7 @@ export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewP
                         weight="600"
                         className="rounded-4 border-gold/30 bg-gold/10 text-gold px-2 py-0.5 leading-none"
                       >
-                        {key}. {opt?.label ?? key}
+                        {key}. {opt?.label ? stripHtml(opt.label) : key}
                       </Typography>
                     )
                   })}
@@ -368,19 +367,19 @@ export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewP
               )}
 
               {/* Footer */}
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <Users className="text-gold size-5 shrink-0" />
+              <div className="flex items-center justify-between gap-3 max-sm:gap-2">
+                <div className="flex items-center gap-2 max-sm:gap-1.5">
+                  <Users className="text-gold size-5 shrink-0 max-sm:size-4" />
                   <div className="flex flex-col gap-0.5">
                     <Typography
                       as="span"
                       variant="label"
                       weight="700"
-                      className="text-gold leading-none tabular-nums"
+                      className="text-gold leading-none tabular-nums max-sm:!text-10"
                     >
                       {poll.totalVotes}
                     </Typography>
-                    <Typography as="span" variant="caption" className="leading-none text-white/40">
+                    <Typography as="span" variant="caption" className="leading-none text-white/40 max-sm:!text-10">
                       {t("live.poll.labels.votes")}
                     </Typography>
                   </div>
@@ -392,7 +391,7 @@ export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewP
                     size="sm"
                     disabled={voted || !canVote}
                     onClick={handleVote}
-                    className="text-12 font-600 h-7 shrink-0 px-4"
+                    className="text-12 font-600 h-7 shrink-0 px-4 max-sm:text-10 max-sm:h-6 max-sm:px-3"
                   >
                     {loading
                       ? "..."
@@ -417,18 +416,6 @@ export function PollVoteView({ poll, onVote, onClose, className }: PollVoteViewP
         </div>
       </div>
 
-      {state.confirmClose && (
-        <ConfirmModal
-          open={state.confirmClose}
-          onOpenChange={(v) => setOpen("confirmClose", v)}
-          type="destructive"
-          title={t("live.poll.confirm.close-title")}
-          content={t("live.poll.confirm.close")}
-          confirmLabel={t("live.poll.confirm.confirm")}
-          cancelLabel={t("live.poll.confirm.cancel")}
-          onConfirm={() => onClose?.()}
-        />
-      )}
     </div>
   )
 }

@@ -306,7 +306,7 @@
   list-style: decimal;
 }
 .tiptap a {
-  color: theme(colors.amber.400);
+  color: var(--color-amber-400);
   text-decoration: underline;
 }
 .tiptap strong {
@@ -727,7 +727,7 @@
     padding-block: 24px;
   }
   @media (width < 768px) {
-    padding-block: 16px;
+    padding: 12px !important;
   }
 }
 
@@ -824,6 +824,10 @@
     0 0 40px color-mix(in srgb, var(--color-red-600) 45%, transparent),
     0 0 80px color-mix(in srgb, var(--color-red-600) 20%, transparent),
     inset 0 1px 0 color-mix(in srgb, var(--color-red-600) 15%, transparent);
+}
+@utility icon-gold {
+  filter: brightness(0) saturate(100%) invert(82%) sepia(49%) saturate(655%) hue-rotate(358deg)
+    brightness(101%);
 }
 @utility shadow-gold-label {
   box-shadow:
@@ -1189,6 +1193,92 @@
     opacity: 0;
     transform: scale(1);
   }
+}
+
+@keyframes poll-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@utility animate-poll-enter {
+  animation: poll-enter 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes poll-btn-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@utility animate-poll-btn-enter {
+  animation: poll-btn-enter 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes poll-shake {
+  0%,
+  100% {
+    transform: translateY(-50%) rotate(0deg);
+  }
+  15% {
+    transform: translateY(-50%) rotate(-8deg) scale(1.08);
+  }
+  30% {
+    transform: translateY(-50%) rotate(8deg) scale(1.1);
+  }
+  45% {
+    transform: translateY(-50%) rotate(-6deg) scale(1.07);
+  }
+  60% {
+    transform: translateY(-50%) rotate(6deg) scale(1.08);
+  }
+  75% {
+    transform: translateY(-50%) rotate(-3deg) scale(1.04);
+  }
+  90% {
+    transform: translateY(-50%) rotate(3deg) scale(1.02);
+  }
+}
+
+@utility animate-poll-shake {
+  animation: poll-shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes poll-glow-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes poll-breathe {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 10px rgba(246, 195, 67, 0.7))
+      drop-shadow(0 0 24px rgba(246, 195, 67, 0.4)) drop-shadow(0 0 40px rgba(246, 195, 67, 0.2));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(246, 195, 67, 1))
+      drop-shadow(0 0 48px rgba(246, 195, 67, 0.7)) drop-shadow(0 0 80px rgba(246, 195, 67, 0.4));
+  }
+}
+
+@utility animate-poll-breathe {
+  animation: poll-breathe 1s ease-in-out infinite;
 }
 
 /*

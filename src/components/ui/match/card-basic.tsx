@@ -4,40 +4,41 @@ import "react"
 
 import { Calendar, Trophy, Users, Video } from "lucide-react"
 
-import { formatFootballGameTime, formatMatchDate, formatMatchTime } from "@/lib/date"
 import { LIVE_MATCH_TYPE } from "@/lib/match.utils"
+import { deriveMatchStatusFlags } from "@/lib/match.utils"
 import { cn, formatViewers } from "@/lib/utils"
 import { useCountdown } from "@/hooks/use-countdown"
 import { useLiveNavigate } from "@/hooks/use-live-navigate"
-import { useFakeGameMinute } from "@/hooks/useFakeGameMinute"
+import { useFakeGameMinute } from "@/hooks/use-fake-game-minute"
 
 import { useTranslation } from "@/i18n"
-import { MATCH_HALF_LABEL } from "@/constants/common.constants"
 import {
-  COUNTDOWN_I18N_KEYS,
+  buildMatchStats,
+  COUNTDOWN_ITEMS_CONFIG,
   MATCH_CARD_I18N_KEYS,
-  MATCH_HALF_LABEL_I18N_KEY,
-  MATCH_STAT_CONFIG,
 } from "@/constants/component/match-card.constants"
-import { MatchFootballStateEnum, MatchStatusEnum } from "@/enums/match.enum"
+import { MatchStatusEnum } from "@/enums/match.enum"
 import type { AnchorRoomVo, MatchInterface } from "@/models/match.models"
 
 import icMic from "@assets/icons/match/ic-mic.svg"
-import imgStadiumBg from "@assets/images/common/img-stadium-card-bg.png"
-import imgStadiumUpcoming from "@assets/images/common/img-stadium-upcoming.png"
 import imgVs from "@assets/images/common/img-vs.png"
 
 import { Avatar, AvatarImage } from "../avatar"
 import { Img } from "../image"
 import { Tooltip, TooltipContent, TooltipTrigger } from "../tooltip"
 import { Typography } from "../typography"
-import { MatchLiveIndicator } from "./parts/match-live-indicator"
-import { MatchStatusBadge } from "./parts/match-status-badge"
-import { MatchCardSkeleton } from "./skeleton"
+import { BadgeLive } from "./parts/badge-live"
+import { CardBackground } from "./parts/card-background"
+import { GameMinuteBadge } from "./parts/game-minute-badge"
+import { LeagueTimeRow } from "./parts/league-time-row"
+import { MatchStatBar } from "./parts/stat-bar"
+import { StatusBadge } from "./parts/status-badge"
+import { ViewersBadge } from "./parts/viewers-badge"
+import { CardBasicSkeleton } from "./skeleton"
 
 type MatchCardType = (typeof LIVE_MATCH_TYPE)[keyof typeof LIVE_MATCH_TYPE]
 
-interface MatchCardProps {
+interface CardProps {
   match?: MatchInterface
   isLoading?: boolean
   matchType?: MatchCardType
@@ -46,7 +47,7 @@ interface MatchCardProps {
 
 /* ── Main Component ──────────────────────────────────────── */
 
-export function MatchCard({ match, isLoading, className }: MatchCardProps) {
+export function Card({ match, isLoading, className }: CardProps) {
   const { t } = useTranslation()
   const navigateToLive = useLiveNavigate()
   const countdown = useCountdown(match?.startTime)
@@ -56,48 +57,28 @@ export function MatchCard({ match, isLoading, className }: MatchCardProps) {
     countdown.minutes === 0 &&
     countdown.seconds === 0
 
-  if (isLoading || !match) return <MatchCardSkeleton className={className} />
-
-  const anchors: AnchorRoomVo[] = match.anchorRoomVos ?? []
+  const anchors: AnchorRoomVo[] = match?.anchorRoomVos ?? []
   const firstAnchor = anchors[0] ?? null
-  const thumbnail = firstAnchor?.cover ?? match.animationUrl ?? null
 
-  const isUpcoming =
-    match.status === MatchStatusEnum.UPCOMING || match.status === MatchStatusEnum.UNKNOWN
-  const isFinished = match.status === MatchStatusEnum.FINISHED
-  const isMatchLive = match.status === MatchStatusEnum.LIVE
-  // BLV đang stream → "Stream" (bất kể status trận)
-  const isStream = !!match.anchor || !!firstAnchor
-  // Trận live nhưng không có BLV → "LIVE"
-  const isLive = isMatchLive && !isStream
+  const { isMatchLive, isStream, isLive, isUpcoming, isFinished } = deriveMatchStatusFlags({
+    status: match?.status,
+    anchor: match?.anchor,
+    hasAnchorRoom: !!firstAnchor,
+  })
+
+  const displayMinute = useFakeGameMinute(match?.gameTime ?? null, isStream || isLive)
+
+  if (isLoading || !match) return <CardBasicSkeleton className={className} />
+
+  const thumbnail = firstAnchor?.cover ?? match.animationUrl ?? null
 
   function handleClick() {
     if (!match?.matchId || !match?.gameId) return
     if (!isLive && !isStream) return
     navigateToLive(match.matchId, match.gameId)
   }
-  const halfLabel = MATCH_HALF_LABEL[match.state as MatchFootballStateEnum] ?? "LIVE"
-  const periodI18nKey = MATCH_HALF_LABEL_I18N_KEY[halfLabel]
-  const periodLabel = periodI18nKey ? t(periodI18nKey as Parameters<typeof t>[0]) : halfLabel
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const displayMinute = useFakeGameMinute(match.gameTime, isStream || isLive)
 
-  const stats = MATCH_STAT_CONFIG.map((cfg) => ({
-    ...cfg,
-    label: t(cfg.labelKey as Parameters<typeof t>[0]),
-    home:
-      cfg.alt === "yellow"
-        ? (match.homeYellowCard ?? 0)
-        : cfg.alt === "red"
-          ? (match.homeRedCard ?? 0)
-          : (match.homeCornerKick ?? 0),
-    away:
-      cfg.alt === "yellow"
-        ? (match.awayYellowCard ?? 0)
-        : cfg.alt === "red"
-          ? (match.awayRedCard ?? 0)
-          : (match.awayCornerKick ?? 0),
-  }))
+  const stats = buildMatchStats(match, (key) => t(key as Parameters<typeof t>[0]))
 
   return (
     <div
@@ -110,97 +91,24 @@ export function MatchCard({ match, isLoading, className }: MatchCardProps) {
         className
       )}
     >
-      {thumbnail ? (
-        <>
-          {/* Thumbnail image bg */}
-          <div
-            className="pointer-events-none absolute inset-0 z-0"
-            style={{
-              backgroundImage: `url(${thumbnail})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center top",
-            }}
-          />
-          {/* Gradient: rõ trên, mờ dần xuống dưới */}
-          <div className="card-thumbnail-overlay pointer-events-none absolute inset-0 z-[1]" />
-        </>
-      ) : (
-        <>
-          {/* Fallback: stadium bg */}
-          <div
-            className="pointer-events-none absolute inset-0 z-0"
-            style={{
-              backgroundImage: `url(${isUpcoming ? imgStadiumUpcoming.src : imgStadiumBg.src})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          />
-          {/* Team logo glow overlay */}
-          {match.homeLogo && (
-            <div
-              className="pointer-events-none absolute inset-0 z-0"
-              style={{
-                backgroundImage: `url(${match.homeLogo})`,
-                backgroundSize: "160px",
-                backgroundPosition: "-10px center",
-                backgroundRepeat: "no-repeat",
-                filter: "blur(55px) saturate(2)",
-                opacity: 0.13,
-                transform: "scale(1.6)",
-              }}
-            />
-          )}
-          {match.awayLogo && (
-            <div
-              className="pointer-events-none absolute inset-0 z-0"
-              style={{
-                backgroundImage: `url(${match.awayLogo})`,
-                backgroundSize: "160px",
-                backgroundPosition: "calc(100% + 10px) center",
-                backgroundRepeat: "no-repeat",
-                filter: "blur(55px) saturate(2)",
-                opacity: 0.1,
-                transform: "scale(1.6)",
-              }}
-            />
-          )}
-          <div className="card-stadium-overlay pointer-events-none absolute inset-0 z-[1]" />
-        </>
-      )}
+      <CardBackground
+        thumbnail={thumbnail}
+        homeLogo={match.homeLogo}
+        awayLogo={match.awayLogo}
+        isUpcoming={isUpcoming}
+      />
 
-      <div className="relative z-10 flex h-full min-h-[300px] flex-col justify-between gap-2 p-3.5 max-md:gap-1.5 max-md:p-2.5 max-sm:gap-1.5 max-sm:p-2">
+      <div className="relative z-10 flex h-full min-h-[300px] flex-col justify-between gap-2 p-3.5 max-md:gap-1.5 max-md:p-2.5 max-sm:min-h-[250px] max-sm:gap-1.5 max-sm:p-2">
         {/* Row 1: LIVE badge | viewers + time (right) */}
         <div className="flex items-center justify-between max-sm:-my-1 max-sm:origin-left">
           <div className="flex items-center gap-2 max-sm:gap-1.5">
-            {isStream && <MatchLiveIndicator label="Stream" />}
-            {isLive && <MatchLiveIndicator label="LIVE" />}
+            {isStream && <BadgeLive label="Stream" />}
+            {isLive && <BadgeLive label="LIVE" />}
           </div>
           <div className="flex items-center gap-1.5 max-sm:gap-1">
-            {isLive && !!match.onlineNum && match.onlineNum > 0 && (
-              <div className="rounded-6 flex h-[30px] items-center gap-1 border border-white/20 bg-black/60 px-2 shadow-[0_2px_12px_rgba(0,0,0,0.7),0_0_6px_rgba(255,255,255,0.05)] backdrop-blur-md max-sm:h-5 max-sm:px-1">
-                <Users className="size-3.5 shrink-0 text-white/80 max-sm:size-2.5" aria-hidden />
-                <Typography
-                  as="p"
-                  size="14"
-                  weight="500"
-                  className="max-sm:!text-10 leading-none text-white tabular-nums"
-                >
-                  {formatViewers(match.onlineNum)}
-                </Typography>
-              </div>
-            )}
+            {isLive && <ViewersBadge count={match.onlineNum} />}
             {isLive && displayMinute != null && displayMinute !== 0 && (
-              <div className="rounded-4 border-gold/30 bg-gold/10 border px-1.5 py-0.5 max-sm:px-1">
-                <Typography
-                  as="span"
-                  variant="label"
-                  weight="700"
-                  className="text-gold max-sm:!text-12"
-                >
-                  {formatFootballGameTime(displayMinute)}
-                  <span className="animate-blink">&apos;</span>
-                </Typography>
-              </div>
+              <GameMinuteBadge minute={displayMinute} />
             )}
           </div>
         </div>
@@ -326,9 +234,9 @@ export function MatchCard({ match, isLoading, className }: MatchCardProps) {
                     {match.awayScore ?? 0}
                   </span>
                 </div>
-                {/* TODO: {isLive && <MatchStatusBadge type="live" label={periodLabel} />} */}
+                {/* TODO: {isLive && <StatusBadge type="live" label={periodLabel} />} */}
                 {isFinished && (
-                  <MatchStatusBadge type="finished" label={t(MATCH_CARD_I18N_KEYS.finished)} />
+                  <StatusBadge type="finished" label={t(MATCH_CARD_I18N_KEYS.finished)} />
                 )}
               </>
             )}
@@ -362,33 +270,39 @@ export function MatchCard({ match, isLoading, className }: MatchCardProps) {
         </div>
 
         {/* Row 4: Countdown (upcoming) */}
-        {isUpcoming && (
-          countdownDone ? (
+        {isUpcoming &&
+          (countdownDone ? (
             <div className="rounded-8 flex flex-col items-center justify-center gap-1 bg-white/[0.06] px-3 py-2 text-center backdrop-blur-2xl max-md:px-2 max-md:py-1 max-sm:px-1 max-sm:py-0.5">
               <span className="flex items-center gap-1">
-                <Video className="size-4 text-gold drop-shadow-[0_0_8px_rgba(245,197,24,0.8)]" aria-hidden />
+                <Video
+                  className="text-gold size-4 drop-shadow-[0_0_8px_rgba(245,197,24,0.8)]"
+                  aria-hidden
+                />
                 <Typography
                   as="span"
                   variant="overline"
                   className="text-gold drop-shadow-[0_0_8px_rgba(245,197,24,0.8)]"
                 >
-                  Trận đấu sắp bắt đầu
+                  {t(MATCH_CARD_I18N_KEYS.streamUpcomingLabel as Parameters<typeof t>[0])}
                 </Typography>
               </span>
-              <Typography variant="h6" weight="700" className="text-white drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]">
-                Chuẩn bị lên sóng
+              <Typography
+                variant="h6"
+                weight="700"
+                className="text-white drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]"
+              >
+                {t(MATCH_CARD_I18N_KEYS.streamUpcomingTitle as Parameters<typeof t>[0])}
               </Typography>
               <Typography as="span" variant="caption" color="white/80">
-                Đừng bỏ lỡ những diễn biến hấp dẫn!
+                {t(MATCH_CARD_I18N_KEYS.streamUpcomingSubtitle as Parameters<typeof t>[0])}
               </Typography>
             </div>
           ) : (
             <div className="flex items-center justify-center gap-3">
-              {[
-                { value: countdown.hours, label: t(COUNTDOWN_I18N_KEYS.hours) },
-                { value: countdown.minutes, label: t(COUNTDOWN_I18N_KEYS.minutes) },
-                { value: countdown.seconds, label: t(COUNTDOWN_I18N_KEYS.seconds) },
-              ].map(({ value, label }, i) => (
+              {COUNTDOWN_ITEMS_CONFIG.map((cfg) => ({
+                value: countdown[cfg.valueKey],
+                label: t(cfg.labelKey as Parameters<typeof t>[0]),
+              })).map(({ value, label }, i) => (
                 <div key={label} className="flex items-start gap-2">
                   <div className="flex flex-col items-center">
                     <Typography
@@ -410,87 +324,16 @@ export function MatchCard({ match, isLoading, className }: MatchCardProps) {
                 </div>
               ))}
             </div>
-          )
-        )}
+          ))}
 
         {/* Row 4: Stats (live/finished) */}
-        {!isUpcoming && (
-          <div className="rounded-8 flex items-center justify-between bg-white/10 px-2 py-1.5 [will-change:transform] backdrop-blur-[80px] max-sm:px-1 max-sm:py-0.5">
-            {stats.map((s, i) => (
-              <div key={i} className="flex flex-1 items-center">
-                {i > 0 && <div className="h-4 w-px shrink-0 bg-white/20 max-sm:h-2.5" />}
-                <div className="flex flex-1 flex-col items-center gap-0.5 px-4 max-sm:px-1">
-                  <div className="flex items-center gap-1 max-sm:gap-0.5">
-                    <Img
-                      src={s.icon}
-                      alt={s.alt}
-                      width={16}
-                      height={16}
-                      objectFit="contain"
-                      className="max-sm:!size-[10px]"
-                    />
-                    <span className="text-12 sm:text-14 leading-150 font-700 max-sm:!text-10 text-white tabular-nums">
-                      {s.home}
-                    </span>
-                    <span className="text-12 font-400 leading-150 tracking-1 text-white/50">-</span>
-                    <span className="text-12 sm:text-14 leading-150 font-700 max-sm:!text-10 text-white tabular-nums">
-                      {s.away}
-                    </span>
-                  </div>
-                  <span className="text-12 leading-150 tracking-1 font-500 whitespace-nowrap text-white/80 max-sm:!text-[9px]">
-                    {s.label}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        {!isUpcoming && <MatchStatBar stats={stats} />}
 
-        {/* Row 5: Bottom bar — league + time */}
-        <div className="flex items-center justify-between px-0.5 py-1">
-          <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden">
-            {match.leagueLogo ? (
-              <Img
-                src={match.leagueLogo}
-                alt=""
-                width={20}
-                height={20}
-                objectFit="contain"
-                className="shrink-0 max-sm:size-3.5"
-              />
-            ) : (
-              <Trophy className="text-gold size-3.5 shrink-0" />
-            )}
-            <Tooltip>
-              <TooltipTrigger className="block max-w-[120px] min-w-0 overflow-hidden">
-                <Typography
-                  as="span"
-                  variant="caption"
-                  weight="500"
-                  className="max-sm:!text-10 block truncate text-white/90"
-                >
-                  {match.leagueName}
-                </Typography>
-              </TooltipTrigger>
-              <TooltipContent>{match.leagueName}</TooltipContent>
-            </Tooltip>
-          </div>
-          {match.startTime && (
-            <div className="flex shrink-0 items-center gap-1">
-              <Calendar className="size-3 shrink-0 text-white/80" />
-              <Typography
-                as="span"
-                variant="caption"
-                weight="500"
-                className="max-sm:!text-10 text-white/70 tabular-nums"
-              >
-                {formatMatchTime(match.startTime)}
-                <span className="mx-1 inline-block h-2.5 w-px bg-white/30 align-middle" />
-                {formatMatchDate(match.startTime)}
-              </Typography>
-            </div>
-          )}
-        </div>
+        <LeagueTimeRow
+          leagueLogo={match.leagueLogo}
+          leagueName={match.leagueName}
+          startTime={match.startTime}
+        />
       </div>
     </div>
   )

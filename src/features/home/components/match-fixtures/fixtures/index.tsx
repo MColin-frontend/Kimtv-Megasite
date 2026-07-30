@@ -5,14 +5,14 @@ import dynamic from "next/dynamic"
 import { useLeagues } from "@/hooks/tanstack/use-leagues"
 import { useFixturesFilter } from "@/hooks/use-fixtures-filter"
 
-import { FixtureListSkeleton } from "@/components/ui/match/fixture-list"
-import { ScheduleSectionHeader } from "@/components/ui/match/schedule-section-header"
+import { FixturesSkeleton } from "@/components/ui/match/fixtures"
+import { ScheduleHeader } from "@/components/ui/match/parts/schedule-header"
 import { buildLeagueGroupsFromApi } from "@/components/ui/select/league-select"
 
 import HeroFixtures from "./hero-banner"
 
-const FixturesList = dynamic(() => import("./fixtures"), {
-  loading: () => <FixtureListSkeleton />,
+const FixturesList = dynamic(() => import("./fixtures-list"), {
+  loading: () => <FixturesSkeleton />,
 })
 
 function Fixtures() {
@@ -28,7 +28,7 @@ function Fixtures() {
 
   return (
     <section className="rounded-12 card-glow flex h-full flex-col gap-4 p-5 max-sm:p-3">
-      <ScheduleSectionHeader />
+      <ScheduleHeader />
 
       <HeroFixtures
         groups={groups}

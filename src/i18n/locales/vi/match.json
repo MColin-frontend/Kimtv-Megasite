@@ -29,6 +29,11 @@
       "live": "Đang diễn ra",
       "upcoming": "Sắp diễn ra",
       "finished": "Đã kết thúc"
+    },
+    "stream-upcoming": {
+      "label": "Trận đấu sắp bắt đầu",
+      "title": "Chuẩn bị lên sóng",
+      "subtitle": "Đừng bỏ lỡ những diễn biến hấp dẫn!"
     }
   },
   "fixture": {

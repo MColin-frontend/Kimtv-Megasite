@@ -1,7 +1,7 @@
 "use client"
 
 import { formatDateParam, parseDateParam } from "@/lib/date"
-import { useRouter } from "@/hooks/useRouter"
+import { useRouter } from "@/hooks/use-router"
 
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@/constants/common.constants"
 import {

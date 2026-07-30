@@ -8,8 +8,9 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { ChevronDown, Loader2, MonitorPlay, Pencil, UserCircle } from "lucide-react"
 
-import { useDisclosure } from "@/hooks/useDisclosure"
-import { useRouter } from "@/hooks/useRouter"
+import { useBoolean } from "@/hooks/use-boolean"
+import { useDisclosure } from "@/hooks/use-disclosure"
+import { useRouter } from "@/hooks/use-router"
 
 import { useTranslation } from "@/i18n/use-translation"
 import { getRoutes } from "@/config/routes"
@@ -88,7 +89,7 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
   const { getParam, setParams, push } = useRouter()
   const { state, open, close } = useDisclosure("ownerModal")
   const [coverUrl, setCoverUrl] = useState<string | null>(null)
-  const [cancelResOpen, setCancelResOpen] = useState(false)
+  const { value: cancelResOpen, on: openCancelRes, off: closeCancelRes, setValue: setCancelResOpen } = useBoolean()
   const queryClient = useQueryClient()
   const SESSION_STEP_KEY = "broadcast:step"
   const rawStep = (getParam("step") ||
@@ -312,7 +313,7 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
     const liveId = liveResult?.id ?? isBroadcast?.result?.responseVo?.id
     if (!liveId) return
     await doCancelRes(liveId)
-    setCancelResOpen(false)
+    closeCancelRes()
     setStep(null)
   }
 
@@ -878,7 +879,7 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
                 variant="cancel"
                 className="min-w-36"
                 disabled={isAnyLoading}
-                onClick={() => setCancelResOpen(true)}
+                onClick={() => openCancelRes()}
               >
                 {t("broadcast.stream-settings.actions.cancel-reservation")}
               </Button>

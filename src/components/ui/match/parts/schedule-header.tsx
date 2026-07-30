@@ -7,7 +7,7 @@ import { Typography } from "@/components/ui/typography"
 
 import imgTrophy from "@assets/images/common/img-trophy.png"
 
-export function ScheduleSectionHeader() {
+export function ScheduleHeader() {
   const { t } = useTranslation()
 
   return (

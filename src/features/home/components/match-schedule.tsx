@@ -7,9 +7,9 @@ import { useTranslation } from "@/i18n"
 import { liveMatchCardQueryOptions } from "@/features/live-schedule/live-schedule.api"
 import CarouselInfinity from "@/components/ui/carousel/carousel-infinity"
 import { Empty } from "@/components/ui/empty"
-import { MatchCard } from "@/components/ui/match/match-card"
-import { MatchStatusLabel } from "@/components/ui/match/match-status-label"
-import { MatchCardSkeleton } from "@/components/ui/match/skeleton"
+import { Card } from "@/components/ui/match/card-basic"
+import { BadgeStatus } from "@/components/ui/match/badge-status"
+import { CardBasicSkeleton } from "@/components/ui/match/skeleton"
 
 export function MatchSchedule() {
   const { t } = useTranslation()
@@ -18,7 +18,7 @@ export function MatchSchedule() {
   return (
     <section className="card-glow rounded-12 flex flex-col gap-4 p-5 max-sm:gap-3 max-sm:p-3">
       <div className="flex items-center justify-between gap-3 max-sm:flex-col max-sm:items-start">
-        <MatchStatusLabel type="live" />
+        <BadgeStatus type="live" />
       </div>
 
       {isLoading ? (
@@ -27,21 +27,21 @@ export function MatchSchedule() {
             <div className="-ml-4 flex overflow-x-hidden">
               {Array.from({ length: 3 }).map((_, i) => (
                 <div key={i} className="shrink-0 basis-[85vw] pl-4">
-                  <MatchCardSkeleton />
+                  <CardBasicSkeleton />
                 </div>
               ))}
             </div>
           </div>
           <div className="grid grid-cols-4 gap-4 max-xl:grid-cols-3 max-lg:grid-cols-2 max-sm:hidden">
             {Array.from({ length: 8 }).map((_, i) => (
-              <MatchCardSkeleton key={i} />
+              <CardBasicSkeleton key={i} />
             ))}
           </div>
         </>
       ) : matches.length > 0 ? (
         <CarouselInfinity
           items={matches}
-          renderItem={(match, i) => <MatchCard key={`${match.matchId}-${i}`} match={match} />}
+          renderItem={(match, i) => <Card key={`${match.matchId}-${i}`} match={match} />}
           slideClassName="basis-1/5 max-lg:basis-1/3 max-sm:basis-full"
           gapClassName="gap-3"
           keyExtractor={(m, i) => `${m.matchId}-${i}`}

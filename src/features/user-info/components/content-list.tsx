@@ -8,7 +8,7 @@ import { Heart, MessageCircle, Play } from "lucide-react"
 import { getLoginUserIdFromUser } from "@/lib/auth-cookie"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/use-auth"
-import { useRouter } from "@/hooks/useRouter"
+import { useRouter } from "@/hooks/use-router"
 
 import { useTranslation } from "@/i18n"
 import { getRoutes } from "@/config/routes"

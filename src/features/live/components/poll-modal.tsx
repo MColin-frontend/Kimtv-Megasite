@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useFieldArray, useForm, useWatch } from "react-hook-form"
 import { Dialog } from "@base-ui/react/dialog"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -200,7 +200,7 @@ export function PollModal({ open, onOpenChange, onSubmit, activePoll, onEndPoll 
   })
 
   // Pre-fill form khi có activePoll
-  useMemo(() => {
+  useEffect(() => {
     if (!activePoll) {
       reset(POLL_DEFAULTS)
       return
@@ -214,7 +214,7 @@ export function PollModal({ open, onOpenChange, onSubmit, activePoll, onEndPoll 
       minSelect: activePoll.minSelect ?? undefined,
       maxSelect: activePoll.maxSelect ?? undefined,
     })
-  }, [activePoll?.pollId])
+  }, [activePoll?.pollId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const { fields, append, remove } = useFieldArray({ control, name: "options" })
   const question = useWatch({ control, name: "question" })

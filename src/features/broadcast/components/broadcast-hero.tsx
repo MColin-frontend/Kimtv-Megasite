@@ -11,7 +11,7 @@ import { useTranslation } from "@/i18n/use-translation"
 
 import { fetchIsBroadcastWithTime } from "@/features/broadcast/broadcast.api"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
-import { StreamLiveBadge } from "@/components/ui/match/parts/stream-live-badge"
+import { BadgeLive } from "@/components/ui/match/parts/badge-live"
 import { Typography } from "@/components/ui/typography"
 
 export function BroadcastHero() {
@@ -78,7 +78,7 @@ export function BroadcastHero() {
 
         {streaming ? (
           <div className="flex items-end gap-2 max-sm:mx-auto max-sm:items-center">
-            <StreamLiveBadge label={t("broadcast.hero.channel")} />
+            <BadgeLive label={t("broadcast.hero.channel")} />
             {elapsed > 0 && (
               <span className="rounded-6 bg-white/8 px-2 py-0.5">
                 <Typography size="13" weight="600" className="font-mono text-amber-300">

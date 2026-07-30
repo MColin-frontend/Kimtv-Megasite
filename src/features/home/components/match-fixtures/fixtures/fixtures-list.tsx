@@ -5,7 +5,7 @@ import { useMemo } from "react"
 import { useFixtureData } from "@/hooks/use-fixture-data"
 import { useFixturesFilter } from "@/hooks/use-fixtures-filter"
 
-import { FixtureList, groupMatches } from "@/components/ui/match/fixture-list"
+import { groupMatches, Fixtures } from "@/components/ui/match/fixtures"
 
 function FixturesList() {
   const filter = useFixturesFilter()
@@ -13,7 +13,7 @@ function FixturesList() {
   const groups = useMemo(() => groupMatches(filteredMatches), [filteredMatches])
 
   return (
-    <FixtureList
+    <Fixtures
       groups={groups}
       loading={loading}
       page={filter.page}

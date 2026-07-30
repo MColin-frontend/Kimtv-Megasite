@@ -14,7 +14,9 @@ import {
 import { getTokenFromCookie, type KimtvUser } from "@/lib/auth-cookie"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/use-auth"
-import { useRouter } from "@/hooks/useRouter"
+import { useBoolean } from "@/hooks/use-boolean"
+import { useRouter } from "@/hooks/use-router"
+
 import { useTranslation } from "@/i18n"
 import { env } from "@/config/env"
 import { siteConfig } from "@/config/site"
@@ -28,7 +30,11 @@ import {
   CHAT_SCROLLBAR_STYLE,
   CHAT_SOCIAL_NAMES,
   CHAT_USER_ROLE,
+  POLL_PARAM_KEY,
+  POLL_VISIBLE,
+  POLL_HIDDEN,
 } from "@/constants/ui/ui-chat.constants"
+
 import { getActivePollApi, votePollApi } from "@/features/live/api/poll.api"
 import { PollVoteView } from "@/features/live/components/poll-vote-view"
 import { PollChannelEnum } from "@/features/live/poll.constants"
@@ -43,10 +49,10 @@ import imgFacebook from "@assets/images/layout/img-facebook.png"
 import imgTele from "@assets/images/layout/img-tele.png"
 import imgZalo from "@assets/images/layout/img-zalo.png"
 
-import type { ChatMessage, ChatProps, ChatSocials, ConnectionStatus, UserRole } from "./types"
 import { MessageItem } from "./parts/message-item"
 import { PinItemRow } from "./parts/pin-item-row"
 import { UserPopup } from "./parts/user-popup"
+import type { ChatMessage, ChatProps, ChatSocials, ConnectionStatus, UserRole } from "./types"
 
 export type { ChatMessage, ChatSocials, ChatProps, UserRole, ConnectionStatus }
 export type { ChatMessageType } from "./types"
@@ -85,7 +91,7 @@ export function Chat({
   externalPoll = false,
 }: ChatProps) {
   const { t } = useTranslation()
-  const { getParam, pathname } = useRouter()
+  const { getParam, setParams, removeParams, pathname } = useRouter()
   const { isLoggedIn, user } = useAuth()
 
   const userRole = resolveChatRole(user, isLoggedIn)
@@ -93,6 +99,7 @@ export function Chat({
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [pinnedMessages, setPinnedMessages] = useState<ChatMessage[]>([])
   const [poll, setPoll] = useState<PollInterface | null>(null)
+  const [pollHidden, setPollHidden] = useState(false)
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
     CHAT_CONNECTION_STATUS.DISCONNECTED
   )
@@ -112,7 +119,7 @@ export function Chat({
     resolver: zodResolver(chatSchema),
     defaultValues: { content: "" },
   })
-  const [showNewMsg, setShowNewMsg] = useState(false)
+  const { value: showNewMsg, on: showNewMsgOn, off: showNewMsgOff } = useBoolean()
   const [expandedPinId, setExpandedPinId] = useState<string | number | null>(null)
   const [popupMessage, setPopupMessage] = useState<ChatMessage | null>(null)
 
@@ -123,6 +130,18 @@ export function Chat({
   // eslint-disable-next-line react-hooks/refs
   onPollMessageRef.current = onPollMessage
   const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const isPollHidden = poll !== null && pollHidden
+
+  function handleClosePoll() {
+    setPollHidden(true)
+    setParams({ [POLL_PARAM_KEY]: POLL_HIDDEN }, { replace: true, scroll: false })
+  }
+
+  function handleRestorePoll() {
+    setPollHidden(false)
+    setParams({ [POLL_PARAM_KEY]: POLL_VISIBLE }, { replace: true, scroll: false })
+  }
 
   async function handlePollVote(optionKeys: string[]) {
     if (!poll?.pollId) return
@@ -219,7 +238,6 @@ export function Chat({
 
         ws.addEventListener("message", ({ data: raw }) => {
           if (ws !== wsRef.current || raw === "ping") return
-          console.log("[Chat] WS message received:", raw)
 
           try {
             const res = JSON.parse(raw) as Record<string, unknown>
@@ -230,6 +248,8 @@ export function Chat({
                 const p = res.data as PollInterface
                 if (res.channel === PollChannelEnum.START) {
                   setPoll(p)
+                  setPollHidden(false)
+                  setParams({ [POLL_PARAM_KEY]: POLL_VISIBLE }, { replace: true, scroll: false })
                 } else if (res.channel === PollChannelEnum.ACTIVE) {
                   setPoll((prev) =>
                     prev
@@ -254,6 +274,8 @@ export function Chat({
                   )
                 } else if (res.channel === PollChannelEnum.CLOSED) {
                   setPoll(null)
+                  setPollHidden(false)
+                  removeParams(POLL_PARAM_KEY, { replace: true, scroll: false })
                 }
               }
               return
@@ -351,8 +373,16 @@ export function Chat({
   useEffect(() => {
     if (!pollChatroomId || externalPoll) return
     getActivePollApi(pollChatroomId).then((p) => {
-      if (p) setPoll(p)
+      if (p) {
+        setPoll(p)
+        setParams({ [POLL_PARAM_KEY]: POLL_VISIBLE }, { replace: true, scroll: false })
+      } else {
+        setPoll(null)
+        // Không đưa removeParams vào deps để tránh loop — chỉ gọi 1 lần khi mount
+        removeParams(POLL_PARAM_KEY, { replace: true, scroll: false })
+      }
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pollChatroomId, externalPoll])
 
   useEffect(() => {
@@ -397,7 +427,7 @@ export function Chat({
     if (isAtBottomRef.current) {
       scrollToBottom()
     } else {
-      setShowNewMsg(true)
+      showNewMsgOn()
     }
   }, [messages, scrollToBottom])
 
@@ -406,7 +436,7 @@ export function Chat({
     if (!el) return
     const atBottom = Math.abs(el.scrollHeight - el.scrollTop - el.clientHeight) < 2
     isAtBottomRef.current = atBottom
-    if (atBottom) setShowNewMsg(false)
+    if (atBottom) showNewMsgOff()
     if (el.scrollTop <= 60 && hasMoreMessages) handleLoadMore()
   }, [hasMoreMessages, handleLoadMore])
 
@@ -461,7 +491,7 @@ export function Chat({
   return (
     <div
       className={cn(
-        "card-glow rounded-12 relative flex h-full min-h-0 w-full flex-1 flex-col gap-4 overflow-hidden p-4 backdrop-blur-2xl max-sm:p-2",
+        "card-glow rounded-12 relative flex h-full min-h-0 w-full flex-1 flex-col gap-4 overflow-hidden p-4 backdrop-blur-2xl max-sm:gap-2 max-sm:p-2",
         className
       )}
     >
@@ -541,32 +571,39 @@ export function Chat({
         )}
       </div>
       {/* Poll slot */}
-      {!externalPoll && poll && (
-        <PollVoteView poll={poll} onVote={handlePollVote} onClose={() => setPoll(null)} />
+      {!externalPoll && poll && !isPollHidden && (
+        <div className="animate-poll-enter">
+          <PollVoteView poll={poll} onVote={handlePollVote} onClose={handleClosePoll} />
+        </div>
       )}
       {topContent && <div className="shrink-0">{topContent}</div>}
 
       {/* Messages section */}
       <div className="rounded-6 relative flex min-h-0 flex-1 flex-col overflow-hidden bg-white/[0.03] backdrop-blur-xl">
-        <div className="flex shrink-0 items-center justify-between border-b border-white/8 px-3 pt-2.5 pb-1.5">
-          <div className="flex items-center gap-2">
-            <div className="border-gold/30 rounded-full border p-1">
-              <div className="border-gold/60 bg-gold rounded-full border p-1">
-                <Img src={imgChat} alt="chat" width={16} height={16} objectFit="contain" />
+        <div className="flex shrink-0 items-center justify-between border-b border-white/8 px-3 pt-2.5 pb-1.5 max-sm:px-2 max-sm:py-1.5">
+          <div className="flex items-center gap-2 max-sm:gap-1.5">
+            <div className="border-gold/30 rounded-full border p-1 max-sm:p-0.5">
+              <div className="border-gold/60 bg-gold rounded-full border p-1 max-sm:p-0.5">
+                <Img
+                  src={imgChat}
+                  alt="chat"
+                  objectFit="contain"
+                  className="size-4 max-sm:size-3"
+                />
               </div>
             </div>
             <Typography
               as="span"
               variant="h4"
               weight="800"
-              className="tracking-widest uppercase italic"
+              className="max-sm:text-14 tracking-widest uppercase italic"
             >
               <span className="text-gold drop-shadow-gold">Live</span>
               <span className="text-white"> Chat</span>
             </Typography>
           </div>
           {/* Live badge */}
-          <div className="bg-live-green-bg border-live-green/30 shadow-live-green-sm flex items-center gap-1.5 rounded-full border px-2.5 py-1">
+          <div className="bg-live-green-bg border-live-green/30 shadow-live-green-sm flex items-center gap-1.5 rounded-full border px-2.5 py-1 max-sm:gap-1 max-sm:px-2 max-sm:py-0.5">
             <span className="relative flex size-2 shrink-0">
               <span className="bg-live-green absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
               <span className="bg-live-green relative inline-flex size-2 rounded-full" />
@@ -584,7 +621,7 @@ export function Chat({
 
         {/* Pinned messages */}
         {pinnedMessages.length > 0 && (
-          <div className="absolute top-[55px] right-0 left-0 z-20 flex flex-col gap-1 border-b border-white/6 bg-[#1a1300] pr-3">
+          <div className="absolute top-[55px] right-0 left-0 z-20 flex flex-col gap-1 border-b border-white/6 pr-3 max-sm:top-[40px] max-sm:pr-0">
             {pinnedMessages.map((msg) => {
               const isExpanded = expandedPinId === msg.id
               const canUnpin =
@@ -692,7 +729,7 @@ export function Chat({
             variant="gradient"
             onClick={() => {
               scrollToBottom()
-              setShowNewMsg(false)
+              showNewMsgOff()
             }}
             className="absolute bottom-[58px] left-1/2 z-10 -translate-x-1/2 max-sm:zoom-75"
           >

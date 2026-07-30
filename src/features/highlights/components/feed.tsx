@@ -20,7 +20,7 @@ import {
 
 import { cn, formatCount, formatDuration } from "@/lib/utils"
 import { useAuth } from "@/hooks/use-auth"
-import { useDisclosure } from "@/hooks/useDisclosure"
+import { useDisclosure } from "@/hooks/use-disclosure"
 
 import { useTranslation } from "@/i18n"
 import { getRoutes } from "@/config/routes"
@@ -43,7 +43,6 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Typography } from "@/components/ui/typography"
 import type { VideoFeedPlayerHandle } from "@/components/ui/video-feed-player"
 
-import icShare from "@assets/icons/common/ic-share.svg"
 import icDiscount from "@assets/icons/video/ic-discount.svg"
 import icGuide from "@assets/icons/video/ic-guide.svg"
 import icNews from "@assets/icons/video/ic-news.svg"

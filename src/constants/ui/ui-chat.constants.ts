@@ -1,3 +1,9 @@
+/* ── Poll URL params ─────────────────────────────────────── */
+
+export const POLL_PARAM_KEY = "poll" as const
+export const POLL_VISIBLE = "visible" as const
+export const POLL_HIDDEN = "hidden" as const
+
 /* ── Enums ───────────────────────────────────────────────── */
 
 export const CHAT_MESSAGE_TYPE = {

@@ -1,5 +1,8 @@
 import { createMetadata } from "@/lib/metadata"
+import { getRequest } from "@/server/services/request"
 
+import type { UserInfoModel } from "@/features/user-info/user-info.models"
+import { USER_INFO_API } from "@/features/user-info/user-info.constants"
 import { UserInfoPage } from "@/features/user-info/components"
 
 export const dynamic = "force-dynamic"
@@ -11,13 +14,28 @@ export async function generateMetadata({
 }) {
   const { lang, id } = await params
   const path = `/${lang}/nguoi-dung/${id}`
+
+  const user = await getRequest<UserInfoModel>(USER_INFO_API.PROFILE, {
+    params: { userId: id },
+  } as Parameters<typeof getRequest>[1]).catch(() => null)
+
+  const name = user?.name?.trim() || null
+  const title = name ? `${name} — KimTV` : "Hồ sơ người dùng | KimTV"
+  const description = name
+    ? `Xem hồ sơ ${name} trên KimTV — bài viết, video${user?.followerCount ? `, ${user.followerCount} người theo dõi` : ""} và hoạt động cộng đồng bóng đá.`
+    : "Hồ sơ người dùng KimTV — bài viết đã đăng, video, người theo dõi và hoạt động cộng đồng bóng đá."
+
   return createMetadata({
-    title: "Thông tin người dùng",
-    description:
-      "Hồ sơ người dùng KimTV — tin đã đăng, video, người theo dõi và hoạt động trên cộng đồng bóng đá.",
-    keywords: ["hồ sơ người dùng", "KimTV", "cộng đồng bóng đá"],
+    title,
+    description,
+    keywords: ["hồ sơ người dùng", "KimTV", "cộng đồng bóng đá", ...(name ? [name] : [])],
     alternates: { canonical: path },
-    openGraph: { url: path },
+    openGraph: {
+      url: path,
+      title,
+      description,
+      images: user?.avatar ? [{ url: user.avatar, alt: title }] : undefined,
+    },
   })
 }
 

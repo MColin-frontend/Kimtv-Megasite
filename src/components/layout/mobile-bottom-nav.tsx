@@ -5,6 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 import { cn } from "@/lib/utils"
+import { useBoolean } from "@/hooks/use-boolean"
 
 import { SLUG_MAP, useTranslation } from "@/i18n"
 import { getRoutes } from "@/config/routes"
@@ -16,10 +17,6 @@ const BAR_COLOR = "#111d35" // noticeably lighter than page (#091320) so notch i
 const BAR_H = 64
 const CIRCLE_R = 35
 const NOTCH_R = 39 // tight around circle: gap = 39-35 = 4px
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const CURVE_S = 8
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const CORNER_R = 0
 
 /** SVG path: bar with true circular notch using 2-segment bezier approximation */
 function buildPath(W: number, cx: number): string {
@@ -53,7 +50,7 @@ export function MobileBottomNav() {
   const navRef = useRef<HTMLDivElement>(null)
   const [cx, setCx] = useState(0)
   const [W, setW] = useState(375)
-  const [ready, setReady] = useState(false)
+  const { value: ready, on: setReady } = useBoolean()
 
   function isActive(href: string, relatedSlugs?: string[]): boolean {
     if (href === `/${locale}`) return pathname === `/${locale}`
@@ -71,7 +68,7 @@ export function MobileBottomNav() {
     setW(width)
     const active = nav.querySelector<HTMLElement>("[data-active='true']")
     if (active) setCx(active.offsetLeft + active.offsetWidth / 2)
-    setReady(true)
+    setReady()
   }, [pathname])
 
   const path = ready ? buildPath(W, cx) : null

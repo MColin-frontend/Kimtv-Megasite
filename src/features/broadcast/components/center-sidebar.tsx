@@ -6,7 +6,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { CalendarClock, ChevronDown, Radio, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { useRouter } from "@/hooks/useRouter"
+import { useRouter } from "@/hooks/use-router"
 
 import { useTranslation } from "@/i18n/use-translation"
 import { getRoutes } from "@/config/routes"
