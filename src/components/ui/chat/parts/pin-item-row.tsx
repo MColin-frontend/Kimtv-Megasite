@@ -15,8 +15,8 @@ export function PinItemRow({
   onUnpin,
   pinLabel,
   tooltipUnpin,
-  tooltipCollapse,
-  tooltipExpand,
+  tooltipCollapse: _tooltipCollapse,
+  tooltipExpand: _tooltipExpand,
   parseLinks,
 }: {
   msg: ChatMessage

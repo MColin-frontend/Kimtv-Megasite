@@ -1,8 +1,6 @@
 "use client"
 
-import { Calendar, Trophy, Users } from "lucide-react"
-
-import { cn, formatViewers } from "@/lib/utils"
+import { cn } from "@/lib/utils"
 import { deriveMatchStatusFlags } from "@/lib/match.utils"
 import { useLiveNavigate } from "@/hooks/use-live-navigate"
 
@@ -37,7 +35,7 @@ export function MatchCardLive({
   const { t } = useTranslation()
   const navigateToLive = useLiveNavigate()
 
-  const { isMatchLive, isStream, isLive, isUpcoming, isFinished } = deriveMatchStatusFlags({
+  const { isStream, isLive, isUpcoming, isFinished } = deriveMatchStatusFlags({
     status: match.status,
     state: match.state,
     anchor: match.anchor,

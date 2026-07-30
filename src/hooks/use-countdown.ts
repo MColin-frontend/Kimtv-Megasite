@@ -8,18 +8,17 @@ export interface CountdownResult {
   seconds: number
 }
 
+const ZERO: CountdownResult = { hours: 0, minutes: 0, seconds: 0 }
+
 export function useCountdown(startTime: number | null | undefined): CountdownResult {
-  const [countdown, setCountdown] = useState<CountdownResult>({ hours: 0, minutes: 0, seconds: 0 })
+  const [countdown, setCountdown] = useState<CountdownResult>(ZERO)
 
   useEffect(() => {
-    if (!startTime) {
-      setCountdown({ hours: 0, minutes: 0, seconds: 0 })
-      return
-    }
+    if (!startTime) return
     const update = () => {
       const diff = startTime * 1000 - Date.now()
       if (diff <= 0) {
-        setCountdown({ hours: 0, minutes: 0, seconds: 0 })
+        setCountdown(ZERO)
         return
       }
       const total = Math.floor(diff / 1000)
@@ -34,5 +33,5 @@ export function useCountdown(startTime: number | null | undefined): CountdownRes
     return () => clearInterval(id)
   }, [startTime])
 
-  return countdown
+  return !startTime ? ZERO : countdown
 }
