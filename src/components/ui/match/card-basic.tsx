@@ -2,7 +2,7 @@
 
 import "react"
 
-import { Calendar, Trophy, Users, Video } from "lucide-react"
+import { Users, Video } from "lucide-react"
 
 import { LIVE_MATCH_TYPE } from "@/lib/match.utils"
 import { deriveMatchStatusFlags } from "@/lib/match.utils"
@@ -17,7 +17,6 @@ import {
   COUNTDOWN_ITEMS_CONFIG,
   MATCH_CARD_I18N_KEYS,
 } from "@/constants/component/match-card.constants"
-import { MatchStatusEnum } from "@/enums/match.enum"
 import type { AnchorRoomVo, MatchInterface } from "@/models/match.models"
 
 import icMic from "@assets/icons/match/ic-mic.svg"
@@ -60,7 +59,7 @@ export function Card({ match, isLoading, className }: CardProps) {
   const anchors: AnchorRoomVo[] = match?.anchorRoomVos ?? []
   const firstAnchor = anchors[0] ?? null
 
-  const { isMatchLive, isStream, isLive, isUpcoming, isFinished } = deriveMatchStatusFlags({
+  const { isStream, isLive, isUpcoming, isFinished } = deriveMatchStatusFlags({
     status: match?.status,
     anchor: match?.anchor,
     hasAnchorRoom: !!firstAnchor,

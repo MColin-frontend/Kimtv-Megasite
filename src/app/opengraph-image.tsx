@@ -37,7 +37,6 @@ export default function OgImage() {
 
         {/* Logo + name */}
         <div style={{ display: "flex", alignItems: "center", gap: 24, marginBottom: 28 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="https://kimtv.net/icon.png"
             width={100}

@@ -69,7 +69,7 @@ export function MobileBottomNav() {
     const active = nav.querySelector<HTMLElement>("[data-active='true']")
     if (active) setCx(active.offsetLeft + active.offsetWidth / 2)
     setReady()
-  }, [pathname])
+  }, [pathname, setReady])
 
   const path = ready ? buildPath(W, cx) : null
 

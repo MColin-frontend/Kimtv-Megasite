@@ -1,9 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Calendar, Trophy } from "lucide-react"
-
-import { formatMatchDate, formatMatchTime } from "@/lib/date"
 import { deriveMatchStatusFlags } from "@/lib/match.utils"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/use-auth"
@@ -15,7 +12,6 @@ import { useFakeGameMinute } from "@/hooks/use-fake-game-minute"
 
 import { useTranslation } from "@/i18n"
 import { buildMatchStats } from "@/constants/component/match-card.constants"
-import { MatchStatusEnum } from "@/enums/match.enum"
 import type { MatchInterface } from "@/models/match.models"
 
 import { closePollApi, createPollApi, getActivePollApi } from "@/features/live/api/poll.api"
@@ -211,7 +207,7 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
   const firstAnchor = anchorRoomVos?.[0] ?? null
   const thumbnail = firstAnchor?.cover ?? match.animationUrl ?? null
 
-  const { isMatchLive, isStream, isLive, isUpcoming } = deriveMatchStatusFlags({
+  const { isStream, isLive, isUpcoming } = deriveMatchStatusFlags({
     status: match.status,
     anchor: match.anchor,
     hasAnchorRoom: !!firstAnchor,

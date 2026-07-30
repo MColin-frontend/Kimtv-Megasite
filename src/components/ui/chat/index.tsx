@@ -138,10 +138,6 @@ export function Chat({
     setParams({ [POLL_PARAM_KEY]: POLL_HIDDEN }, { replace: true, scroll: false })
   }
 
-  function handleRestorePoll() {
-    setPollHidden(false)
-    setParams({ [POLL_PARAM_KEY]: POLL_VISIBLE }, { replace: true, scroll: false })
-  }
 
   async function handlePollVote(optionKeys: string[]) {
     if (!poll?.pollId) return
@@ -307,7 +303,7 @@ export function Chat({
           }
         })
 
-        ws.addEventListener("close", (_ev) => {
+        ws.addEventListener("close", () => {
           if (ws !== wsRef.current) return
           setConnectionStatus(CHAT_CONNECTION_STATUS.DISCONNECTED)
           clearHeartbeat()
@@ -319,7 +315,7 @@ export function Chat({
             }, WS_RECONNECT_DELAY)
           }
         })
-        ws.addEventListener("error", (_ev) => {
+        ws.addEventListener("error", () => {
           if (ws !== wsRef.current) return
           setConnectionStatus(CHAT_CONNECTION_STATUS.DISCONNECTED)
         })
@@ -327,7 +323,7 @@ export function Chat({
         setConnectionStatus(CHAT_CONNECTION_STATUS.DISCONNECTED)
       }
     },
-    [closeWs, startHeartbeat, clearHeartbeat, externalPoll]
+    [closeWs, startHeartbeat, clearHeartbeat, externalPoll, setParams, removeParams]
   )
 
   useEffect(() => {
@@ -429,7 +425,7 @@ export function Chat({
     } else {
       showNewMsgOn()
     }
-  }, [messages, scrollToBottom])
+  }, [messages, scrollToBottom, showNewMsgOn])
 
   const handleScroll = useCallback(() => {
     const el = listRef.current
@@ -438,7 +434,7 @@ export function Chat({
     isAtBottomRef.current = atBottom
     if (atBottom) showNewMsgOff()
     if (el.scrollTop <= 60 && hasMoreMessages) handleLoadMore()
-  }, [hasMoreMessages, handleLoadMore])
+  }, [hasMoreMessages, handleLoadMore, showNewMsgOff])
 
   const handleDoubleClick = useCallback(
     (msg: ChatMessage) => {
