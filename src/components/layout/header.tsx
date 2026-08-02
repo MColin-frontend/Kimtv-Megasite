@@ -91,7 +91,7 @@ function AvatarDropdown({ user, userId, onLogout }: AvatarDropdownProps) {
           className="flex w-fit items-center gap-2 rounded-full transition-all max-sm:gap-1.5"
           aria-label={t("header.user.aria-label")}
         >
-          <div className="border-gradient-gold-radiant flex shrink-0 items-center justify-center rounded-full !border-[4px]">
+          <div className="border-gradient-gold-radiant flex shrink-0 items-center justify-center rounded-full !border-[2px]">
             <Avatar size={50} className="max-sm:!size-[38px]">
               <AvatarImage src={user?.avatar} />
             </Avatar>
@@ -234,7 +234,6 @@ function AvatarDropdown({ user, userId, onLogout }: AvatarDropdownProps) {
     </div>
   )
 }
-
 
 /* ── Desktop Nav ─────────────────────────────────────────── */
 
@@ -406,7 +405,11 @@ export function Header() {
             {isLoggedIn && user ? (
               <AvatarDropdown user={user} userId={user.userId ?? user.uid} onLogout={logout} />
             ) : (
-              <Button variant="gradient" onClick={login} className="max-lg:size-6 max-lg:rounded-full max-lg:px-0">
+              <Button
+                variant="gradient"
+                onClick={login}
+                className="max-lg:size-6 max-lg:rounded-full max-lg:px-0"
+              >
                 <UserRound className="h-3.5 w-3.5" />
                 <span className="max-lg:hidden">{t("header.auth.login")}</span>
               </Button>

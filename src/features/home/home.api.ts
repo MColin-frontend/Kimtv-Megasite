@@ -6,6 +6,7 @@ import { FOOTBALL_GAME_ID } from "@/constants/component/home.constants"
 import { DateRangeEnum } from "@/enums/common.enum"
 
 import type { LiveMatch } from "@/features/home/components/hero-video"
+import type { FootballHubResultInterface } from "@/features/home/home.models"
 import type {
   FeaturedNewsResult,
   LatestNewsResult,
@@ -14,6 +15,7 @@ import type {
 } from "@/features/news/news.models"
 
 export type { ApiConfig, LeagueApiItem, LeagueApiResult } from "@/features/home/home.models"
+
 export type { NewsItem } from "@/features/news/news.models"
 
 export const HOME_API = {
@@ -24,6 +26,7 @@ export const HOME_API = {
   NEWS_POPULAR: "/news/get-popular-news-by-game",
   NEWS_LATEST: "/v4/0/new/1",
   MATCH_LIVE: "/v2/match/get-pc-live-game-match",
+  FOOTBALL_HUB: "/football-hub",
 } as const
 
 function fetchLatestNewsAction(): Promise<NewsItem | null> {
@@ -117,11 +120,18 @@ function fetchPopularNewsAction(gameIds = FOOTBALL_GAME_ID): Promise<NewsItem[]>
     })
 }
 
+function fetchFootballHubAction(limit = 10): Promise<FootballHubResultInterface | null> {
+  return getRequest<FootballHubResultInterface>(HOME_API.FOOTBALL_HUB, {
+    params: { gameId: FOOTBALL_GAME_ID, limit },
+  })
+}
+
 export {
   fetchLatestNewsAction,
   fetchLatestNewsListAction,
   fetchFeaturedNewsAction,
   fetchPopularNewsAction,
   fetchLiveMatchesAction,
+  fetchFootballHubAction,
   getEndpointByDate,
 }

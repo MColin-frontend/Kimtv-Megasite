@@ -46,7 +46,7 @@ export function LivePage({ match }: LivePageProps) {
             />
           )}
         </div>
-        <div className={`flex w-[420px] shrink-0 flex-col overflow-hidden max-lg:h-auto max-lg:w-full ${hasPollVisible ? "max-sm:h-[720px]" : "max-sm:h-[560px]"}`}>
+        <div className={`flex w-[420px] shrink-0 flex-col overflow-hidden max-lg:h-auto max-lg:w-full ${hasPollVisible ? "max-sm:h-[60vh]" : "max-sm:h-[50vh]"}`}>
           <Chat />
         </div>
       </div>

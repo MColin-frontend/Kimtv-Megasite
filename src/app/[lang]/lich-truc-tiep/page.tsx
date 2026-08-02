@@ -1,4 +1,5 @@
 import { createMetadata } from "@/lib/metadata"
+import { fetchLiveScheduleMatches } from "@/features/live-schedule/live-schedule.api"
 
 import { LiveSchedulePage } from "@/features/live-schedule/components"
 
@@ -7,6 +8,11 @@ export const dynamic = "force-dynamic"
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params
   const path = `/${lang}/lich-truc-tiep`
+
+  const matches = await fetchLiveScheduleMatches().catch(() => [])
+  const first = matches[0] ?? null
+  const ogImage = first?.liveImage ?? first?.homeLogo ?? null
+
   return createMetadata({
     title: "Lịch trực tiếp",
     description:
@@ -20,7 +26,10 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       "KimTV",
     ],
     alternates: { canonical: path },
-    openGraph: { url: path },
+    openGraph: {
+      url: path,
+      images: ogImage ? [{ url: ogImage, alt: "Lịch trực tiếp | KimTV" }] : undefined,
+    },
   })
 }
 

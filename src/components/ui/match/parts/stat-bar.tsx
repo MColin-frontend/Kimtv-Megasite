@@ -38,11 +38,11 @@ export function MatchStatBar({ stats, className }: MatchStatBarProps) {
                 objectFit="contain"
                 className="max-sm:!size-[10px]"
               />
-              <span className="text-12 sm:text-14 font-700 max-sm:!text-10 leading-150 text-white tabular-nums">
+              <span className="text-14 font-700 max-sm:!text-10 leading-150 text-white tabular-nums">
                 {s.home}
               </span>
               <span className="text-12 font-400 tracking-1 leading-150 text-white/50">-</span>
-              <span className="text-12 sm:text-14 font-700 max-sm:!text-10 leading-150 text-white tabular-nums">
+              <span className="text-14 font-700 max-sm:!text-10 leading-150 text-white tabular-nums">
                 {s.away}
               </span>
             </div>

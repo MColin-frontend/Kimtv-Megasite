@@ -219,14 +219,12 @@ export function Chat({
       try {
         const token = getTokenFromCookie() ?? ""
         const wsUrl = `${env.wsBaseUrl}/chat?chatroom_id=${cId}&game_id=${gId}&token=${token}&lan=vi`
-        console.log("[Chat] initWs → connecting to:", wsUrl, "| token:", token ? "✓" : "✗ (empty)")
         const ws = new WebSocket(wsUrl)
 
         wsRef.current = ws
 
         ws.addEventListener("open", () => {
           if (ws !== wsRef.current) return
-          console.log("[Chat] WebSocket OPEN ✓ | chatroomId:", cId, "| gameId:", gId)
           setConnectionStatus(CHAT_CONNECTION_STATUS.CONNECTED)
           startHeartbeat()
           reconnectCountRef.current = 0
@@ -390,21 +388,8 @@ export function Chat({
   }, [chatroomId, gameId, isLoggedIn, initWs, closeWs])
 
   const handleSendMessage = ({ content }: ChatFormType) => {
-    console.log("[Chat] handleSendMessage called", { content })
-    console.log("[Chat] wsRef.current:", wsRef.current)
-    console.log(
-      "[Chat] readyState:",
-      wsRef.current?.readyState,
-      "(OPEN=1, CONNECTING=0, CLOSING=2, CLOSED=3)"
-    )
-    console.log("[Chat] chatroomId:", chatroomId, "| gameId:", gameId)
-    console.log("[Chat] isLoggedIn:", isLoggedIn)
-    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
-      console.warn("[Chat] Cannot send — WebSocket not OPEN")
-      return
-    }
+    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return
     const payload = JSON.stringify({ type: 1, content: content })
-    console.log("[Chat] Sending payload:", payload)
     wsRef.current.send(payload)
     resetForm()
   }

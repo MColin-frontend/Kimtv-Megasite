@@ -41,7 +41,7 @@ export function HeroVideoClientSkeleton({ className }: { className?: string }) {
       </div>
 
       {/* Chat sidebar */}
-      <div className="flex w-[420px] shrink-0 flex-col overflow-hidden max-lg:hidden">
+      <div className="flex w-[min(30vw,420px)] shrink-0 flex-col overflow-hidden max-lg:w-full max-sm:h-[50vh]">
         <Skeleton className={cn("rounded-12 h-full w-full", SKELETON_BG)} />
       </div>
     </div>
@@ -129,7 +129,7 @@ export function HeroVideoClient({ matches, defaultMatchId, className }: HeroVide
         )}
       </div>
 
-      <div className="flex w-[420px] shrink-0 flex-col overflow-hidden max-lg:hidden">
+      <div className="flex w-[min(30vw,420px)] shrink-0 flex-col overflow-hidden max-lg:w-full max-sm:h-[50vh]">
         <Chat chatroomId={activeMatch?.id} gameId={activeMatch?.gameId} />
       </div>
     </div>

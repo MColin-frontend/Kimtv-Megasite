@@ -380,6 +380,7 @@ export function HighlightsFeed({
   const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null)
   const menuDragRef = useRef({
     active: false,
+    dragging: false,
     startClientY: 0,
     startClientX: 0,
     startTop: 0,
@@ -1050,13 +1051,17 @@ export function HighlightsFeed({
         }
         onPointerDown={(e) => {
           if (window.innerWidth >= 768) return
-          const rect = e.currentTarget.getBoundingClientRect()
+          // Dùng menuPos state trực tiếp thay vì getBoundingClientRect()
+          // để tránh race condition giữa React state commit và DOM paint
+          const currentTop = menuPos !== null ? menuPos.top : window.innerHeight / 2
+          const currentLeft = menuPos !== null ? menuPos.left : 0
           menuDragRef.current = {
             active: true,
+            dragging: false,
             startClientY: e.clientY,
             startClientX: e.clientX,
-            startTop: rect.top + rect.height / 2,
-            startLeft: rect.left,
+            startTop: currentTop,
+            startLeft: currentLeft,
           }
           e.currentTarget.setPointerCapture(e.pointerId)
           e.stopPropagation()
@@ -1064,20 +1069,28 @@ export function HighlightsFeed({
         onPointerMove={(e) => {
           if (!menuDragRef.current.active) return
           const { startClientY, startClientX, startTop, startLeft } = menuDragRef.current
+          const dy = e.clientY - startClientY
+          const dx = e.clientX - startClientX
+
+          if (!menuDragRef.current.dragging) {
+            if (Math.hypot(dy, dx) < 10) return
+            // Re-anchor tại điểm threshold để frame đầu tiên có delta = 0, không giật
+            menuDragRef.current.dragging = true
+            menuDragRef.current.startClientY = e.clientY
+            menuDragRef.current.startClientX = e.clientX
+            e.stopPropagation()
+            return
+          }
+
           const menuW = 64 // max-md:w-16
-          const newTop = Math.max(
-            60,
-            Math.min(window.innerHeight - 60, startTop + (e.clientY - startClientY))
-          )
-          const newLeft = Math.max(
-            0,
-            Math.min(window.innerWidth - menuW, startLeft + (e.clientX - startClientX))
-          )
+          const newTop = Math.max(60, Math.min(window.innerHeight - 60, startTop + dy))
+          const newLeft = Math.max(0, Math.min(window.innerWidth - menuW, startLeft + dx))
           setMenuPos({ top: newTop, left: newLeft })
           e.stopPropagation()
         }}
         onPointerUp={(e) => {
           menuDragRef.current.active = false
+          menuDragRef.current.dragging = false
           e.stopPropagation()
         }}
       >

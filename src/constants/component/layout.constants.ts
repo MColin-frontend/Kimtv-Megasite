@@ -6,7 +6,7 @@ import {
   HouseSimple,
   NewspaperClipping,
 } from "@phosphor-icons/react"
-import { MonitorPlay, SlidersHorizontal } from "lucide-react"
+import { MonitorPlay } from "lucide-react"
 
 import type { TranslationKey } from "@/i18n"
 import type { Routes } from "@/config/routes"
@@ -28,13 +28,6 @@ export const HEADER_DROPDOWN_ITEMS: DropdownItemInterface[] = [
     icon: MonitorPlay,
     iconColor: "text-gold",
     getHref: (r) => r.broadcastCenter,
-  },
-  {
-    key: "settings",
-    labelKey: "header.user.menu.settings",
-    icon: SlidersHorizontal,
-    iconColor: "text-gold",
-    getHref: () => "#",
   },
 ]
 

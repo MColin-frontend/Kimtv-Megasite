@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 
+import { FootballHub, FootballHubSkeleton } from "./football-hub"
 import { ScrollReveal } from "@/components/ui/scroll-reveal"
 
 import { HeroBanner } from "./hero-banner"
@@ -17,17 +18,23 @@ export function HomePage() {
         </Suspense>
       </ScrollReveal>
 
-      <ScrollReveal variant="fade-up" duration={600} distance={32} threshold={0.06}>
+      <ScrollReveal variant="blur" duration={600} distance={32} threshold={0.06}>
         <Suspense>
           <MatchSchedule />
         </Suspense>
       </ScrollReveal>
 
-      <ScrollReveal variant="blur" duration={700} distance={16} threshold={0.1}>
+      <ScrollReveal variant="fade-down" duration={700} distance={16} threshold={0.1}>
         <HeroBanner />
       </ScrollReveal>
 
-      <ScrollReveal variant="fade-up" duration={600} distance={28} threshold={0.04}>
+      <ScrollReveal variant="fade-up" duration={600} distance={28} threshold={0.1}>
+        <Suspense fallback={<FootballHubSkeleton />}>
+          <FootballHub />
+        </Suspense>
+      </ScrollReveal>
+
+      <ScrollReveal variant="scale" duration={600} distance={28} threshold={0.1}>
         <Suspense>
           <MatchFixtures />
         </Suspense>
