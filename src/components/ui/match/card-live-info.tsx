@@ -237,7 +237,7 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
       />
 
       {/* Content above bg */}
-      <div className="relative z-[2] flex flex-col gap-2 max-lg:gap-3">
+      <div className="relative z-[2] flex flex-col gap-2 max-lg:gap-1">
         {/* Row 1: live + time + share — ẩn trên mobile */}
         <div className="flex w-full items-center justify-between max-sm:-my-1 max-sm:origin-left">
           <div className="flex items-center gap-2 max-md:scale-90 max-sm:scale-75">
@@ -294,10 +294,10 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
         </div>
 
         {/* Row 2: teams + score */}
-        <div className="flex items-center justify-between gap-8 max-md:gap-4 max-sm:gap-2">
+        <div className="mt-2 flex items-center justify-between gap-10 max-md:gap-6 max-sm:gap-3">
           {/* Home */}
-          <div className="flex min-w-0 flex-1 items-center justify-end gap-6 max-md:gap-3 max-sm:gap-1.5">
-            <div className="flex size-16 shrink-0 items-center justify-center max-lg:size-14 max-md:size-10 max-sm:size-8">
+          <div className="flex min-w-0 flex-1 items-center justify-end gap-8 max-md:gap-4 max-sm:gap-2">
+            <div className="flex size-20 shrink-0 items-center justify-center max-lg:size-16 max-md:size-12 max-sm:size-10">
               <Img src={homeLogo} alt={homeName ?? ""} width={90} height={90} objectFit="contain" />
             </div>
             <Typography
@@ -354,7 +354,7 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
           </div>
 
           {/* Away */}
-          <div className="flex min-w-0 flex-1 items-center gap-6 max-md:gap-3 max-sm:gap-1.5">
+          <div className="flex min-w-0 flex-1 items-center gap-8 max-md:gap-4 max-sm:gap-2">
             <Typography
               as="span"
               size="24"
@@ -363,7 +363,7 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
             >
               {awayName}
             </Typography>
-            <div className="flex size-16 shrink-0 items-center justify-center max-lg:size-14 max-md:size-10 max-sm:size-8">
+            <div className="flex size-20 shrink-0 items-center justify-center max-lg:size-16 max-md:size-12 max-sm:size-10">
               <Img src={awayLogo} alt={awayName ?? ""} width={90} height={90} objectFit="contain" />
             </div>
           </div>

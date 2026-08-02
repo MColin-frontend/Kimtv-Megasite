@@ -10,6 +10,26 @@
   "match-schedule": {
     "title": "Các trận đấu"
   },
+  "football-hub": {
+    "title": "Football Hub",
+    "subtitle": "Thống kê & xếp hạng",
+    "top10": "TOP 10",
+    "leagues": "GIẢI ĐẤU",
+    "teams": "ĐỘI BÓNG",
+    "players": "CẦU THỦ",
+    "leagues-subtitle": "Các giải đấu được theo dõi nhiều nhất",
+    "teams-subtitle": "Các câu lạc bộ đang hot nhất hiện tại",
+    "players-subtitle": "Những ngôi sao đang tỏa sáng nhất",
+    "empty-leagues": "Chưa có giải đấu nổi bật",
+    "empty-teams": "Chưa có đội bóng nổi bật",
+    "empty-players": "Chưa có cầu thủ nổi bật",
+    "upcoming": "Sắp diễn ra",
+    "match-unit": "trận",
+    "heat-unit": "điểm",
+    "form-win": "Thắng",
+    "form-lose": "Thua",
+    "form-draw": "Hòa"
+  },
   "league-select": {
     "all": "Tất cả giải",
     "unit": "giải",

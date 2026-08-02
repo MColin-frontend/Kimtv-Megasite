@@ -48,7 +48,7 @@ export function MobileBottomNav() {
   const pathname = usePathname()
   const routes = getRoutes(locale)
   const navRef = useRef<HTMLDivElement>(null)
-  const [cx, setCx] = useState(0)
+  const [cx, setCx] = useState<number | null>(null)
   const [W, setW] = useState(375)
   const { value: ready, on: setReady } = useBoolean()
 
@@ -67,11 +67,11 @@ export function MobileBottomNav() {
     const width = nav.offsetWidth
     setW(width)
     const active = nav.querySelector<HTMLElement>("[data-active='true']")
-    if (active) setCx(active.offsetLeft + active.offsetWidth / 2)
+    setCx(active ? active.offsetLeft + active.offsetWidth / 2 : null)
     setReady()
   }, [pathname, setReady])
 
-  const path = ready ? buildPath(W, cx) : null
+  const path = ready && cx !== null ? buildPath(W, cx) : null
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-50 lg:hidden">

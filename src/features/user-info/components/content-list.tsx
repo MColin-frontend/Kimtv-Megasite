@@ -495,12 +495,12 @@ function AllTabView({ items, videoItems, routes, page, total, onPageChange }: Al
     <div
       className={
         hasVideo
-          ? "mt-8 grid grid-cols-10 gap-7 max-lg:grid-cols-1 max-md:mt-4 max-md:gap-4"
+          ? "mt-8 flex w-full gap-7 max-lg:flex-col max-md:mt-4 max-md:gap-4"
           : "mt-8 max-md:mt-4"
       }
     >
       {items.length > 0 && (
-        <div className={hasVideo ? "col-span-7 max-lg:col-span-full" : undefined}>
+        <div className={hasVideo ? "min-w-0 flex-1" : undefined}>
           <ArticleSection
             items={items}
             routes={routes}
@@ -515,7 +515,7 @@ function AllTabView({ items, videoItems, routes, page, total, onPageChange }: Al
           variant="fade-left"
           duration={500}
           distance={20}
-          className="col-span-3 max-lg:order-first max-lg:col-span-full lg:sticky lg:top-20 lg:self-start"
+          className="w-[min(30vw,420px)] shrink-0 self-start sticky top-23 max-lg:order-first max-lg:static max-lg:w-full"
         >
           <VideoPanel items={videos} routes={routes} />
         </ScrollReveal>

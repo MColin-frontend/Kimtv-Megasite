@@ -27,15 +27,15 @@ export default async function MatchFixtures() {
   const showSidebar = await hasNewsContent()
 
   return (
-    <section className="grid grid-cols-10 gap-4 max-lg:flex max-lg:flex-col">
+    <section className="flex w-full gap-4 max-lg:flex-col">
       {/* Fixtures */}
-      <div className={showSidebar ? "col-span-7 max-lg:order-2" : "col-span-10"}>
+      <div className={showSidebar ? "min-w-0 flex-1 max-lg:order-2" : "w-full"}>
         <Fixtures />
       </div>
 
       {/* News sidebar — mobile: lên trên full width, desktop: sticky sidebar */}
       {showSidebar && (
-        <div className="news-sidebar col-span-3 self-start lg:sticky lg:top-19">
+        <div className="news-sidebar sticky top-23 w-[min(30vw,420px)] shrink-0 self-start max-lg:static max-lg:order-1 max-lg:w-full">
           <Suspense fallback={<NewsSidebarSkeleton />}>
             <News />
           </Suspense>

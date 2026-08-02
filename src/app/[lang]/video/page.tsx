@@ -1,4 +1,6 @@
 import { createMetadata } from "@/lib/metadata"
+import { fetchInitialHighlights } from "@/features/highlights/api/highlights.server"
+import { FeedMenu } from "@/enums/highlights.enum"
 
 import { HighlightsPage } from "@/features/highlights/components/index"
 
@@ -7,6 +9,10 @@ export const dynamic = "force-dynamic"
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params
   const path = `/${lang}/video`
+
+  const data = await fetchInitialHighlights(FeedMenu.Featured).catch(() => ({ videos: [], hasMore: false }))
+  const firstVideo = data.videos[0] ?? null
+
   return createMetadata({
     title: "Highlight thể thao",
     description:
@@ -19,7 +25,10 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       "KimTV",
     ],
     alternates: { canonical: path },
-    openGraph: { url: path },
+    openGraph: {
+      url: path,
+      images: firstVideo?.coverUrl ? [{ url: firstVideo.coverUrl, alt: "Highlight thể thao | KimTV" }] : undefined,
+    },
   })
 }
 

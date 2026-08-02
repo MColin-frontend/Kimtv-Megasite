@@ -19,17 +19,17 @@ interface LeagueTimeRowProps {
 
 const V = {
   card: {
-    wrapper: "px-0.5 py-1",
+    wrapper: "",
     innerGap: "gap-1.5",
-    logoClass: "size-4 shrink-0 md:size-5 max-sm:size-3.5",
-    nameClass: "md:!text-14 max-sm:!text-10 block truncate text-white/90",
+    logoClass: "size-5 shrink-0 max-md:size-4 max-sm:size-3.5",
+    nameClass: "!text-14 max-sm:!text-10 block truncate text-white/90",
     showTooltip: true,
-    calendarClass: "size-3 shrink-0 text-white/80 md:size-3.5 max-sm:size-2.5",
+    calendarClass: "size-3.5 shrink-0 text-white/80 max-md:size-3 max-sm:size-2.5",
     timeWrapperClass: "gap-1",
-    timeClass: "md:!text-14 max-sm:!text-10 text-white/70 tabular-nums",
+    timeClass: "!text-14 max-sm:!text-10 text-white/70 tabular-nums",
   },
   live: {
-    wrapper: "px-0.5",
+    wrapper: "",
     innerGap: "gap-1.5 max-md:gap-1 max-sm:gap-1",
     logoClass: "size-3.5 shrink-0 max-md:size-3 max-sm:size-3",
     nameClass: "max-md:!text-10 max-sm:!text-10 block truncate text-white",
@@ -39,14 +39,14 @@ const V = {
     timeClass: "max-md:!text-10 max-sm:!text-10 text-white/90 tabular-nums",
   },
   info: {
-    wrapper: "px-0.5 py-1",
+    wrapper: "",
     innerGap: "gap-1.5",
-    logoClass: "size-4 shrink-0 md:size-5 max-sm:size-3.5",
+    logoClass: "size-5 shrink-0 max-md:size-4 max-sm:size-3.5",
     nameClass: "!text-14 max-sm:!text-10 min-w-0 truncate text-white/90",
     showTooltip: false,
-    calendarClass: "size-3 shrink-0 text-white/50 md:size-3.5 max-sm:size-2.5",
+    calendarClass: "size-3.5 shrink-0 text-white/50 max-md:size-3 max-sm:size-2.5",
     timeWrapperClass: "gap-1",
-    timeClass: "md:!text-14 max-sm:!text-10 text-white/70 tabular-nums",
+    timeClass: "!text-14 max-sm:!text-10 text-white/70 tabular-nums",
   },
 } as const
 

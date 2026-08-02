@@ -989,6 +989,10 @@
   align-items: center !important;
 }
 
+main .xgplayer .flex-controls .xg-inner-controls {
+  justify-content: space-between !important;
+}
+
 /* Icon play giữa màn hình khi pause — style giống feed-player */
 .xgplayer.xgplayer-pause::after {
   content: "";
