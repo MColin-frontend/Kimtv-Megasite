@@ -90,6 +90,7 @@ export function LeagueSelect({
     <div className={cn("flex items-center gap-2", className)}>
       <Popover.Root>
         <Popover.Trigger
+          aria-label={displayLabel()}
           className={cn(
             "group/trigger inline-flex h-9 w-[160px] max-sm:w-full items-center justify-between gap-2.5",
             "rounded-8 border px-3.5 backdrop-blur-sm",
@@ -185,6 +186,7 @@ export function LeagueSelect({
                   {search && (
                     <button
                       onClick={() => setSearch("")}
+                      aria-label="Xoá tìm kiếm"
                       className="hover:text-muted flex size-4 cursor-pointer items-center justify-center rounded-full text-white"
                     >
                       <X className="size-3" />

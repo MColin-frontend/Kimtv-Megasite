@@ -152,6 +152,7 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(
       >
         {/* ── Trigger ── */}
         <SelectPrimitive.Trigger
+          aria-label={label ? `${label}: ${selectedOpt?.label ?? placeholder}` : (selectedOpt?.label ?? placeholder)}
           className={cn(
             triggerVariants({ variant, size }),
             fullWidth && "w-full",
@@ -162,10 +163,6 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(
             triggerClassName
           )}
         >
-          {/* sr-only for a11y; visual display is below */}
-          <span className="sr-only">
-            <SelectPrimitive.Value placeholder={placeholder} />
-          </span>
           <span className="flex min-w-0 flex-1 items-center gap-1.5">
             {selectedOpt?.icon && (
               <span className="flex shrink-0 items-center">{selectedOpt.icon}</span>
@@ -176,6 +173,7 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(
           {clearable && value && (
             <span
               role="button"
+              aria-label="Xoá"
               onClick={(e) => {
                 e.stopPropagation()
                 onValueChange?.(null)

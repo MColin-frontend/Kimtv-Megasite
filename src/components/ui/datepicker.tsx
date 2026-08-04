@@ -392,6 +392,7 @@ export function DatePicker({
         {selected ? (
           <span
             role="button"
+            aria-label="Xoá ngày đã chọn"
             onClick={(e) => {
               e.stopPropagation()
               update(null)

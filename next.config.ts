@@ -1,4 +1,7 @@
+import path from "path"
 import type { NextConfig } from "next"
+
+const POLYFILL_STUB = path.resolve("./src/lib/empty-polyfill.js")
 
 const nextConfig: NextConfig = {
   turbopack: {
@@ -7,6 +10,19 @@ const nextConfig: NextConfig = {
       "*.mov": { type: "asset" },
       "*.webm": { type: "asset" },
     },
+    resolveAlias: {
+      // Replace Next.js built-in polyfills (Array.prototype.at, Object.hasOwn, etc.)
+      // with a no-op — all are Baseline features covered by our .browserslistrc targets.
+      "next/dist/build/polyfills/polyfill-module": POLYFILL_STUB,
+    },
+  },
+  webpack(config) {
+    // Same replacement for non-Turbopack builds
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "next/dist/build/polyfills/polyfill-module": POLYFILL_STUB,
+    }
+    return config
   },
   reactStrictMode: false,
   // Bundle server tối giản cho Docker — chỉ copy `.next/standalone` vào image runner.

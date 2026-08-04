@@ -75,10 +75,14 @@ export function MessageInput({
               "hover:!bg-white/35 hover:shadow-[0_0_14px_rgba(255,255,255,0.2)]",
               size === "sm" ? "size-7" : "size-10"
             )}
-            aria-label={t("chat.placeholder")}
+            aria-label={t("chat.send")}
           >
             <ReactSVG
               src={typeof icSend === "string" ? icSend : (icSend as { src: string }).src}
+              beforeInjection={(svg) => {
+                svg.setAttribute("aria-hidden", "true")
+                svg.removeAttribute("role")
+              }}
               className={cn(
                 "group-focus-within:text-gold group-hover:text-gold text-white/30 transition-colors duration-200 [&>div]:flex [&>div]:size-full [&>div]:items-center [&>div]:justify-center",
                 size === "sm"

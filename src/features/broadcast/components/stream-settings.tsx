@@ -373,6 +373,7 @@ export function StreamSettings({ liveId = 528 }: { liveId?: number }) {
                       </Typography>
                       <span
                         role="button"
+                        aria-label="Chỉnh sửa chủ phòng"
                         tabIndex={0}
                         onClick={(e) => {
                           e.stopPropagation()

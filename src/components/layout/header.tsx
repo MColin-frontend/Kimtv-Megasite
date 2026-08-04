@@ -343,10 +343,10 @@ function DesktopNav({
               as="span"
               variant="caption"
               weight="500"
-              color={active ? "gold" : "white/45"}
+              color={active ? "gold" : "white/60"}
               className={cn(
                 "relative z-10 leading-none whitespace-nowrap transition-colors duration-200",
-                active ? "" : "group-hover:text-white/70"
+                active ? "" : "group-hover:text-white/80"
               )}
               style={
                 active
