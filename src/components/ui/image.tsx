@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { memo, useState } from "react"
 import NextImage, { type ImageProps } from "next/image"
 
 import { cn } from "@/lib/utils"
@@ -26,7 +26,7 @@ function normalizeSrc(src: AppImageProps["src"]): ImageProps["src"] | null {
   return src
 }
 
-export function Img({
+export const Img = memo(function Img({
   src,
   alt = "",
   fallback = FALLBACK_SRC,
@@ -92,4 +92,4 @@ export function Img({
       className={cn(roundedClass, "transition-opacity duration-300", className)}
     />
   )
-}
+})

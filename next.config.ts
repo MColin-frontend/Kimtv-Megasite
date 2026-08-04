@@ -34,6 +34,10 @@ const nextConfig: NextConfig = {
   // Bundle server tối giản cho Docker — chỉ copy `.next/standalone` vào image runner.
   output: "standalone",
   images: {
+    // Cache optimized images for 30 days on the /_next/image CDN edge.
+    // The OSS origin serves no Cache-Control header; this ensures at least
+    // the Next.js-optimized copies are cached long-term.
+    minimumCacheTTL: 2592000,
     remotePatterns: [
       {
         protocol: "https",
@@ -64,6 +68,17 @@ const nextConfig: NextConfig = {
         hostname: "img.antdata.cc",
       },
     ],
+  },
+  async headers() {
+    return [
+      {
+        // Next.js static assets are content-hashed — safe to cache indefinitely
+        source: "/_next/static/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+    ]
   },
 }
 

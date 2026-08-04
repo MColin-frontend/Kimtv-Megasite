@@ -1,10 +1,18 @@
 "use client"
 
+import { useEffect } from "react"
 import { ToastContainer } from "react-toastify"
 
-import "react-toastify/dist/ReactToastify.css"
-
 export function Toaster() {
+  useEffect(() => {
+    if (!document.getElementById("react-toastify-css")) {
+      const link = document.createElement("link")
+      link.id = "react-toastify-css"
+      link.rel = "stylesheet"
+      link.href = "/react-toastify.css"
+      document.head.appendChild(link)
+    }
+  }, [])
   return (
     <ToastContainer
       position="top-right"

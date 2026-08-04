@@ -441,10 +441,21 @@ export function HighlightsFeed({
     updateLayout() // eslint-disable-line react-hooks/set-state-in-effect
   }, [updateLayout])
 
-  // Resize listener không cần synchronous
+  // Throttle resize to one layout read per animation frame to avoid forced reflow on every pixel
   useEffect(() => {
-    window.addEventListener("resize", updateLayout)
-    return () => window.removeEventListener("resize", updateLayout)
+    let rafId: ReturnType<typeof requestAnimationFrame> | null = null
+    function onResize() {
+      if (rafId != null) return
+      rafId = requestAnimationFrame(() => {
+        rafId = null
+        updateLayout()
+      })
+    }
+    window.addEventListener("resize", onResize)
+    return () => {
+      window.removeEventListener("resize", onResize)
+      if (rafId != null) cancelAnimationFrame(rafId)
+    }
   }, [updateLayout])
 
   // ── Derived ──────────────────────────────────────────────────────────────────
@@ -927,11 +938,9 @@ export function HighlightsFeed({
   onPlayerTapRef.current = onPlayerTap
 
   // ── Progress bar ──────────────────────────────────────────────────────────────
-  function seekToX(clientX: number, trackEl: HTMLElement) {
+  function seekToX(clientX: number, rect: DOMRect) {
     const p = playerRef.current
-    if (!p) return
-    const rect = trackEl.getBoundingClientRect()
-    if (!rect.width) return
+    if (!p || !rect.width) return
     const ratio = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1)
     const dur = p.getDuration()
     if (!Number.isFinite(dur) || dur <= 0) return
@@ -942,12 +951,15 @@ export function HighlightsFeed({
   function onProgressMouseDown(e: React.MouseEvent<HTMLDivElement>) {
     const trackEl = e.currentTarget.querySelector<HTMLElement>(".feed-progress__track")
     if (!trackEl) return
-    seekToX(e.clientX, trackEl)
+    // Read the rect once at drag start — it won't change mid-drag, and re-reading
+    // it on every mousemove would force a synchronous layout each event.
+    const rect = trackEl.getBoundingClientRect()
+    seekToX(e.clientX, rect)
     isDragging.current = true
 
     const onMove = (ev: MouseEvent) => {
       if (!isDragging.current) return
-      seekToX(ev.clientX, trackEl)
+      seekToX(ev.clientX, rect)
     }
     const onUp = () => {
       isDragging.current = false

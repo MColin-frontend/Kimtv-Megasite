@@ -630,8 +630,6 @@ export async function FootballHub() {
 
   const hubData = await fetchFootballHubAction(10)
 
-  console.log("hubData", hubData)
-
   const leagues = hubData?.leagues ?? []
   const teams = hubData?.teams ?? []
   const players = hubData?.players ?? []

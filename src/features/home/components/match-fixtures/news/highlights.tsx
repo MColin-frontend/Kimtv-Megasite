@@ -11,9 +11,17 @@ import { getRoutes } from "@/config/routes"
 
 import type { NewsItem } from "@/features/home/home.api"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
-import CarouselInfinity, {
-  type CarouselInfinityApi,
+import dynamic from "next/dynamic"
+
+import type {
+  default as CarouselInfinityComponent,
+  CarouselInfinityApi,
 } from "@/components/ui/carousel/carousel-infinity"
+
+const CarouselInfinity = dynamic(
+  () => import("@/components/ui/carousel/carousel-infinity"),
+  { ssr: false }
+) as typeof CarouselInfinityComponent
 import { Img } from "@/components/ui/image"
 import { Typography } from "@/components/ui/typography"
 
