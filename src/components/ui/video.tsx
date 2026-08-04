@@ -12,8 +12,6 @@ import { useTranslation } from "@/i18n"
 
 import { Typography } from "@/components/ui/typography"
 
-import "xgplayer/dist/index.min.css"
-
 import imgLiveSmall from "@assets/images/common/img-live-small.gif"
 import imgNoSource from "@assets/images/common/img-no-source.png"
 import videoBanner from "@assets/videos/common/video-banner.mp4"
@@ -21,6 +19,12 @@ import videoBanner from "@assets/videos/common/video-banner.mp4"
 const AdBanner = dynamic(() => import("@/components/ui/ad-banner").then((m) => m.AdBanner), {
   ssr: false,
 })
+
+// Load xgplayer CSS only when player mounts — keeps it out of initial CSS bundle
+const XgplayerCSS = dynamic(
+  () => import("@/components/ui/xgplayer-css").then((m) => m.XgplayerCSS),
+  { ssr: false }
+)
 
 export interface VideoSource {
   url: string
@@ -202,6 +206,7 @@ export function VideoPlayer({
         className
       )}
     >
+      <XgplayerCSS />
       {!hasSource && (
         <div>
           <div
