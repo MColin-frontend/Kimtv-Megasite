@@ -204,7 +204,7 @@ export function LeagueSelect({
               >
                 {filteredGroups.length === 0 && filteredFavorites.length === 0 && (
                   <div className="flex h-full flex-col items-center justify-center gap-3">
-                    <Img src={imgEmpty} alt="empty" width={80} height={80} className="opacity-50" />
+                    <Img src={imgEmpty} alt="empty" width={80} height={80} className="opacity-50" quality={40} />
                     <Typography variant="body" className="text-white">
                       {t("home.league-select.empty")}
                     </Typography>

@@ -4,6 +4,7 @@ import { useEffect, useId, useRef } from "react"
 import dynamic from "next/dynamic"
 import type { SimplePlayer } from "xgplayer"
 
+import { getOptimizedBgUrl } from "@/lib/image.utils"
 import { cn } from "@/lib/utils"
 import { useAdPlacements } from "@/hooks/tanstack/use-ad-placements"
 
@@ -206,7 +207,7 @@ export function VideoPlayer({
           <div
             className="absolute inset-0 z-0 opacity-30"
             style={{
-              backgroundImage: `url(${imgNoSource.src})`,
+              backgroundImage: `url(${getOptimizedBgUrl(imgNoSource.src, 1080, 50)})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}
