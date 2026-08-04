@@ -1,0 +1,161 @@
+/* xgplayer custom overrides — loaded lazily alongside xgplayer.min.css */
+.xgplayer .xgplayer-controls,
+.xgplayer .xg-inner-controls,
+.xgplayer .xg-right-grid,
+.xgplayer .xg-options-icon {
+  overflow: visible !important;
+}
+
+.xgplayer .xg-options-list {
+  position: absolute !important;
+  bottom: 100% !important;
+  right: 0 !important;
+  left: auto !important;
+  top: auto !important;
+  width: auto !important;
+  min-width: 130px !important;
+  max-height: 240px !important;
+  overflow-y: auto !important;
+  z-index: 999 !important;
+  background: #1e2133 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 6px !important;
+  padding: 4px 4px 8px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+  /* Bridge gap: padding-bottom tạo vùng hover xuống đến controls */
+  margin-bottom: 0 !important;
+}
+
+.xgplayer .xg-options-list .option-item {
+  display: flex !important;
+  align-items: center !important;
+  height: 36px !important;
+  padding: 0 12px !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-size: 13px !important;
+  border-radius: 4px !important;
+  transition: background 0.15s !important;
+}
+
+.xgplayer .xg-options-list .option-item:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+}
+
+.xgplayer-controls {
+  z-index: 12 !important;
+}
+
+/* Ẩn center grid (big play button area) */
+.xgplayer .xg-center-grid {
+  display: none !important;
+}
+
+/* Controls ẩn mặc định, hiện khi hover */
+.xgplayer .xgplayer-controls {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease !important;
+  height: auto !important;
+  min-height: unset !important;
+  padding: 8px 12px !important;
+  z-index: 11 !important;
+}
+
+.xgplayer:hover .xgplayer-controls,
+.xgplayer.xgplayer-pause .xgplayer-controls {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+.xgplayer .xg-inner-controls {
+  height: auto !important;
+  align-items: center !important;
+  bottom: 10px !important;
+  left: 0 !important;
+  right: 0 !important;
+}
+
+.xgplayer .xg-left-grid,
+.xgplayer .xg-right-grid {
+  height: auto !important;
+  align-items: center !important;
+}
+
+main .xgplayer .flex-controls .xg-inner-controls {
+  justify-content: space-between !important;
+}
+
+/* Icon play giữa màn hình khi pause — style giống feed-player */
+.xgplayer.xgplayer-pause::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 72'%3E%3Ccircle cx='36' cy='36' r='35' fill='rgba(0%2C0%2C0%2C0.28)' stroke='rgba(255%2C255%2C255%2C0.92)' stroke-width='2'/%3E%3Cpath d='M27 19 L27 53 L55 36 Z' fill='white'/%3E%3C/svg%3E")
+    center / 72px no-repeat;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* xgplayer mobile responsive (< 640px) */
+@media (width < 640px) {
+  .xgplayer .xgplayer-controls {
+    padding: 4px 8px !important;
+  }
+
+  .xgplayer .xg-inner-controls {
+    bottom: 4px !important;
+  }
+
+  .xgplayer xg-icon {
+    height: 28px !important;
+    margin-left: 4px !important;
+    margin-right: 4px !important;
+  }
+
+  .xgplayer xg-icon svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .xgplayer .btn-text {
+    font-size: 10px !important;
+    height: 20px !important;
+  }
+  .xgplayer .btn-text span,
+  .xgplayer .icon-text {
+    min-width: 32px !important;
+    height: 20px !important;
+    line-height: 20px !important;
+    font-size: 10px !important;
+    padding: 0 4px !important;
+  }
+
+  .xgplayer .xg-cur,
+  .xgplayer .xg-separator,
+  .xgplayer .xg-dur {
+    font-size: 11px !important;
+  }
+
+  .xgplayer .xg-seek-icon svg {
+    width: 13px !important;
+    height: 6px !important;
+  }
+
+  .xgplayer .xg-playbackrate span {
+    font-size: 12px !important;
+  }
+
+  .xgplayer .xgplayer-progress {
+    height: 14px !important;
+  }
+
+  .xgplayer.xgplayer-pause::after {
+    background-size: 50px !important;
+  }
+}

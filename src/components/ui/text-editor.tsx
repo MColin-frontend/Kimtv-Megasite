@@ -1,5 +1,6 @@
 "use client"
 
+import "./tiptap.css"
 import { useEditor, EditorContent } from "@tiptap/react"
 import { useEffect } from "react"
 import StarterKit from "@tiptap/starter-kit"
