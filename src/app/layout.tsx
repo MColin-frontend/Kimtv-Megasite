@@ -37,6 +37,21 @@ export const metadata = createMetadata({
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="vi" className={`${oswald.variable} ${inter.variable} h-full antialiased`}>
+      {/*
+        Preload Oswald Latin Extended (U+100-2BA, U+1E00+) — the Vietnamese-range font file.
+        next/font preloads only the .p. (basic latin) variant; this file is discovered late
+        when the browser parses the font CSS and finds characters needing this range.
+        Hash is content-based (changes only if Google Fonts updates Oswald).
+      */}
+      <head>
+        <link
+          rel="preload"
+          as="font"
+          type="font/woff2"
+          href="/_next/static/media/037b6aa687f94b32-s.0evsli58wo2lo.woff2"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body className="flex min-h-full flex-col">
         <div className="fixed inset-0 -z-10">
           <Image
