@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
 
+import { getOptimizedBgUrl } from "@/lib/image.utils"
 import { cn } from "@/lib/utils"
 
 import imgStadiumBg from "@assets/images/common/img-stadium-card-bg.png"
@@ -35,7 +36,7 @@ export function CardBackground({
         <>
           <div
             className="pointer-events-none absolute inset-0 z-0 bg-cover bg-[center_top]"
-            style={{ backgroundImage: `url(${thumbnail})` }}
+            style={{ backgroundImage: `url(${getOptimizedBgUrl(thumbnail, 800)})` }}
           />
           <div className="card-thumbnail-overlay pointer-events-none absolute inset-0 z-[1]" />
           {thumbnailExtras}
@@ -47,18 +48,18 @@ export function CardBackground({
               "pointer-events-none absolute inset-0 z-0 bg-cover bg-center",
               stadiumClassName,
             )}
-            style={{ backgroundImage: `url(${resolvedStadiumSrc})` }}
+            style={{ backgroundImage: `url(${getOptimizedBgUrl(resolvedStadiumSrc, 640)})` }}
           />
           {homeLogo && (
             <div
               className="pointer-events-none absolute inset-0 z-0 scale-[1.6] bg-no-repeat opacity-[0.13] [background-position:-10px_center] [background-size:160px] [filter:blur(55px)_saturate(2)]"
-              style={{ backgroundImage: `url(${homeLogo})` }}
+              style={{ backgroundImage: `url(${getOptimizedBgUrl(homeLogo, 160, 30)})` }}
             />
           )}
           {awayLogo && (
             <div
               className="pointer-events-none absolute inset-0 z-0 scale-[1.6] bg-no-repeat opacity-10 [background-position:calc(100%_+_10px)_center] [background-size:160px] [filter:blur(55px)_saturate(2)]"
-              style={{ backgroundImage: `url(${awayLogo})` }}
+              style={{ backgroundImage: `url(${getOptimizedBgUrl(awayLogo, 160, 30)})` }}
             />
           )}
           <div className="card-stadium-overlay pointer-events-none absolute inset-0 z-[1]" />

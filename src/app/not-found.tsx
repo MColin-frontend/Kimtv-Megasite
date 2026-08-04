@@ -9,6 +9,8 @@ import { Typography } from "@/components/ui/typography"
 
 import imgStadiumBg from "@assets/images/common/img-stadium-bg.png"
 
+import { getOptimizedBgUrl } from "@/lib/image.utils"
+
 export default function RootNotFound() {
   const lang = DEFAULT_LOCALE
   const { t } = useTranslation()
@@ -18,7 +20,7 @@ export default function RootNotFound() {
           {/* Background */}
           <div
             className="pointer-events-none absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url(${imgStadiumBg.src})` }}
+            style={{ backgroundImage: `url(${getOptimizedBgUrl(imgStadiumBg.src, 1920)})` }}
           />
           <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-black/55 via-black/45 to-black/75" />
 
