@@ -432,6 +432,7 @@ export function Fixtures({
             width={120}
             height={120}
             objectFit="contain"
+            quality={40}
           />
           <Typography variant="body-sm" color="foreground/40">
             {t("match.fixture.empty")}

@@ -20,7 +20,7 @@ export default function RootNotFound() {
           {/* Background */}
           <div
             className="pointer-events-none absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url(${getOptimizedBgUrl(imgStadiumBg.src, 1920)})` }}
+            style={{ backgroundImage: `url(${getOptimizedBgUrl(imgStadiumBg.src, 1920, 45)})` }}
           />
           <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-black/55 via-black/45 to-black/75" />
 

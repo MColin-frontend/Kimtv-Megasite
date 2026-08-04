@@ -48,7 +48,7 @@ export function CardBackground({
               "pointer-events-none absolute inset-0 z-0 bg-cover bg-center",
               stadiumClassName,
             )}
-            style={{ backgroundImage: `url(${getOptimizedBgUrl(resolvedStadiumSrc, 640)})` }}
+            style={{ backgroundImage: `url(${getOptimizedBgUrl(resolvedStadiumSrc, 640, 50)})` }}
           />
           {homeLogo && (
             <div

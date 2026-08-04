@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   images: {
     formats: ["image/avif", "image/webp"],
+    quality: 65,
     remotePatterns: [
       {
         protocol: "https",
