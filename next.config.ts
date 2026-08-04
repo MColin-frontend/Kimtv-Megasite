@@ -13,7 +13,14 @@ const nextConfig: NextConfig = {
     resolveAlias: {
       // Replace Next.js built-in polyfills with a no-op.
       // All listed features are Baseline and supported by our .browserslistrc targets.
+      //
+      // Two aliases are needed because Turbopack resolves aliases against the import
+      // specifier string, not the resolved path. `polyfill-module` catches bare-specifier
+      // imports; `app-globals` catches the *relative* import inside that file
+      // (import '../build/polyfills/polyfill-module') which bypasses the first alias.
       "next/dist/build/polyfills/polyfill-module": POLYFILL_STUB,
+      "next/dist/client/app-globals": POLYFILL_STUB,
+      "next/dist/esm/client/app-globals": POLYFILL_STUB,
     },
   },
   webpack(config, { webpack: wp, isServer }) {
@@ -38,6 +45,9 @@ const nextConfig: NextConfig = {
     // The OSS origin serves no Cache-Control header; this ensures at least
     // the Next.js-optimized copies are cached long-term.
     minimumCacheTTL: 2592000,
+    // Add 400px step so fill images sized ~400px (featured news cards) pick
+    // 400w instead of jumping straight to 640w in the srcset.
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384, 400],
     remotePatterns: [
       {
         protocol: "https",

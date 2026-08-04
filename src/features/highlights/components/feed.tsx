@@ -137,6 +137,11 @@ function FeedStackSlide({
   onProgressMouseDown?: (e: React.MouseEvent<HTMLDivElement>) => void
 }) {
   const cover = item.coverUrl ?? ""
+  // Route cover through /_next/image so the browser gets WebP + 30-day Cache-Control.
+  // The native <video poster> attribute bypasses next/image, so we build the URL manually.
+  const optimizedCover = cover
+    ? `/_next/image?url=${encodeURIComponent(cover)}&w=640&q=70`
+    : ""
   const showCover = !isActive || !videoReady
 
   return (
@@ -145,7 +150,7 @@ function FeedStackSlide({
         <VideoFeedPlayer
           ref={isActive ? playerRef : undefined}
           url={item.videoUrl}
-          poster={cover}
+          poster={optimizedCover}
           muted={isActive ? isMuted : true}
           volume={isActive ? 0.8 : 0}
           autoplay={false}
@@ -165,7 +170,6 @@ function FeedStackSlide({
           alt={item.title ?? ""}
           fill
           objectFit="contain"
-          unoptimized
           sizes="100vw"
           wrapperClassName="absolute inset-0 z-2"
         />

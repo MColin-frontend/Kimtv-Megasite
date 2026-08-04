@@ -65,7 +65,6 @@ export function GuideButton() {
                             width={800}
                             height={450}
                             className="h-auto w-full object-contain"
-                            unoptimized
                           />
                         </div>
                       ))}
