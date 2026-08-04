@@ -30,6 +30,7 @@ export function NewsItemFeatured({ item, href, categoryLabel, className }: NewsI
         src={item.coverUrl}
         alt={item.title}
         fill
+        quality={65}
         rounded="8"
         objectFit="cover"
         sizes="(max-width: 1280px) 400px, 300px"
@@ -78,6 +79,7 @@ export function NewsItemRow({ item, href, categoryLabel, className }: NewsItemRo
         alt={item.title}
         width={168}
         height={112}
+        quality={65}
         rounded="8"
         objectFit="cover"
         sizes="168px"
