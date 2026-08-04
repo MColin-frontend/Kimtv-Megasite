@@ -48,7 +48,6 @@ export function MobileBottomNav() {
   const pathname = usePathname()
   const routes = getRoutes(locale)
   const navRef = useRef<HTMLDivElement>(null)
-  const [cx, setCx] = useState<number | null>(null)
   const [W, setW] = useState(375)
   const { value: ready, on: setReady } = useBoolean()
 
@@ -61,15 +60,24 @@ export function MobileBottomNav() {
     return !!relatedSlugs?.some((s) => pathname.includes(`/${s}`))
   }
 
+  // Measure width once on mount via ResizeObserver — no DOM reads on pathname change
   useEffect(() => {
     const nav = navRef.current
     if (!nav) return
-    const width = nav.offsetWidth
-    setW(width)
-    const active = nav.querySelector<HTMLElement>("[data-active='true']")
-    setCx(active ? active.offsetLeft + active.offsetWidth / 2 : null)
-    setReady()
-  }, [pathname, setReady])
+    const ro = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width
+      if (w) { setW(w); setReady() }
+    })
+    ro.observe(nav)
+    return () => ro.disconnect()
+  }, [setReady])
+
+  // Compute cx from active item index — avoids offsetLeft/offsetWidth DOM reads
+  const visibleItems = MAIN_NAV_ITEMS.filter((item) => item.icon)
+  const activeIndex = visibleItems.findIndex((item) =>
+    isActive(item.getHref(routes), item.relatedSlugs)
+  )
+  const cx = activeIndex >= 0 ? (activeIndex + 0.5) * (W / visibleItems.length) : null
 
   const path = ready && cx !== null ? buildPath(W, cx) : null
 

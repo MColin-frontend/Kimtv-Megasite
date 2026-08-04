@@ -134,6 +134,9 @@ export function VideoPlayer({
         cssFullscreen: false,
         playbackRate: !isLive,
         ignores: ["start"],
+        // Single tap plays/pauses directly; double tap still handles seek gesture
+        closedbClick: true,
+        focusVideoClick: true,
       })
 
       const player = playerRef.current

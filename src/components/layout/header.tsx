@@ -255,9 +255,8 @@ function DesktopNav({
     if (!nav) return
     const active = nav.querySelector<HTMLElement>("[data-active='true']")
     if (active) {
-      const navRect = nav.getBoundingClientRect()
-      const rect = active.getBoundingClientRect()
-      setIndicator({ left: rect.left - navRect.left + rect.width / 2 - 16, opacity: 1 })
+      // offsetLeft is nav-relative (nav is offsetParent) — avoids a second getBoundingClientRect
+      setIndicator({ left: active.offsetLeft + active.offsetWidth / 2 - 16, opacity: 1 })
     } else {
       setIndicator((s) => ({ ...s, opacity: 0 }))
     }
