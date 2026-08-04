@@ -7,7 +7,14 @@ import type { LocaleType } from "@/i18n"
 import { localePath, useTranslation } from "@/i18n"
 
 import type { NewsItem } from "@/features/home/home.api"
-import CarouselInfinity from "@/components/ui/carousel/carousel-infinity"
+import dynamic from "next/dynamic"
+
+import type CarouselInfinityComponent from "@/components/ui/carousel/carousel-infinity"
+
+const CarouselInfinity = dynamic(
+  () => import("@/components/ui/carousel/carousel-infinity"),
+  { ssr: false }
+) as typeof CarouselInfinityComponent
 import { Img } from "@/components/ui/image"
 import { Typography } from "@/components/ui/typography"
 

@@ -14,7 +14,7 @@ import "./globals.css"
 const oswald = Oswald({
   variable: "--font-oswald",
   subsets: ["latin", "vietnamese"],
-  weight: ["200", "300", "400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 })
 
@@ -51,6 +51,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="/_next/static/media/037b6aa687f94b32-s.0evsli58wo2lo.woff2"
           crossOrigin="anonymous"
         />
+        {/* Preconnect to external origins hit early in page load */}
+        <link rel="preconnect" href="https://kimtv-oss.99kimtvs.top" />
+        <link rel="dns-prefetch" href="https://kimtv-oss.99kimtvs.top" />
+        <link rel="preconnect" href="https://identity.99kim.llc" />
+        <link rel="dns-prefetch" href="https://identity.99kim.llc" />
       </head>
       <body className="flex min-h-full flex-col">
         <div className="fixed inset-0 -z-10">

@@ -1,5 +1,6 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import { useEffect, useState } from "react"
 import { deriveMatchStatusFlags } from "@/lib/match.utils"
 import { cn } from "@/lib/utils"
@@ -15,8 +16,16 @@ import { buildMatchStats } from "@/constants/component/match-card.constants"
 import type { MatchInterface } from "@/models/match.models"
 
 import { closePollApi, createPollApi, getActivePollApi } from "@/features/live/api/poll.api"
-import { PollHistoryModal } from "@/features/live/components/poll-history-modal"
-import { PollModal } from "@/features/live/components/poll-modal"
+// Deferred — each modal pulls in react-hook-form, zod, and @base-ui/react/dialog.
+// Only load when the user opens the poll UI.
+const PollHistoryModal = dynamic(() =>
+  import("@/features/live/components/poll-history-modal").then((m) => m.PollHistoryModal),
+  { ssr: false }
+)
+const PollModal = dynamic(() =>
+  import("@/features/live/components/poll-modal").then((m) => m.PollModal),
+  { ssr: false }
+)
 import { POLL_TYPE_MAP, PollTypeEnum } from "@/features/live/poll.constants"
 import type { CreatePollPayloadInterface, PollInterface } from "@/features/live/poll.models"
 import type { PollFormType } from "@/features/live/poll.schema"

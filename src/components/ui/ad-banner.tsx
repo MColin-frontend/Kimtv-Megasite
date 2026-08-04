@@ -78,12 +78,21 @@ export function AdBanner({
   const activeSrc = src || fallback
   if (!activeSrc) return null
 
-  // Strip cache-busting query params (e.g. ?t=timestamp) from CDN URLs so the
-  // browser can cache the asset by its stable path across visits.
-  const stableSrc =
-    typeof activeSrc === "string" && activeSrc.startsWith("http")
-      ? activeSrc.split("?")[0]
-      : activeSrc
+  // Strip cache-busting query params and route OSS assets through our proxy so
+  // the browser receives a Cache-Control header (OSS origin sends none).
+  const stableSrc = (() => {
+    if (typeof activeSrc !== "string" || !activeSrc.startsWith("http")) return activeSrc
+    const clean = activeSrc.split("?")[0]
+    try {
+      const url = new URL(clean)
+      if (url.hostname === "kimtv-oss.99kimtvs.top") {
+        return `/api/oss${url.pathname}`
+      }
+    } catch {
+      // invalid URL — use as-is
+    }
+    return clean
+  })()
 
   const media = (
     <AdMedia src={stableSrc as string} fallback={fallback as string} rounded={rounded} />
