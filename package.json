@@ -12,7 +12,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "next typegen && tsc --noEmit",
-    "prepare": "husky"
+    "prepare": "husky && cp node_modules/xgplayer/dist/index.min.css public/xgplayer.min.css"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

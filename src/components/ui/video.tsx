@@ -11,10 +11,8 @@ import { useTranslation } from "@/i18n"
 
 import { Typography } from "@/components/ui/typography"
 
-import "xgplayer/dist/index.min.css"
-
 import imgLiveSmall from "@assets/images/common/img-live-small.gif"
-import imgNoSource from "@assets/images/common/img-no-source.png"
+import imgNoSource from "@assets/images/common/img-no-source.webp"
 import videoBanner from "@assets/videos/common/video-banner.mp4"
 
 const AdBanner = dynamic(() => import("@/components/ui/ad-banner").then((m) => m.AdBanner), {
@@ -80,6 +78,16 @@ export function VideoPlayer({
   const { t } = useTranslation()
   const { data: ads } = useAdPlacements()
   const playerOverlay = ads?.playerOverlay || []
+
+  useEffect(() => {
+    if (!document.getElementById("xgplayer-css")) {
+      const link = document.createElement("link")
+      link.id = "xgplayer-css"
+      link.rel = "stylesheet"
+      link.href = "/xgplayer.min.css"
+      document.head.appendChild(link)
+    }
+  }, [])
 
   useEffect(() => {
     let destroyed = false

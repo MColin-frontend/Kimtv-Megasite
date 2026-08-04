@@ -27,7 +27,7 @@ import { Typography } from "@/components/ui/typography"
 
 import icPoll from "@assets/icons/common/ic-poll.svg"
 import icShare from "@assets/icons/common/ic-share.svg"
-import imgStadiumBg from "@assets/images/common/img-no-source.png"
+import imgStadiumBg from "@assets/images/common/img-no-source.webp"
 import imgVs from "@assets/images/common/img-vs.png"
 
 import { BadgeLive } from "./parts/badge-live"

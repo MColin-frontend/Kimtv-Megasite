@@ -7,7 +7,7 @@ import { DEFAULT_LOCALE, useTranslation } from "@/i18n"
 
 import { Typography } from "@/components/ui/typography"
 
-import imgStadiumBg from "@assets/images/common/img-stadium-bg.png"
+import imgStadiumBg from "@assets/images/common/img-stadium-bg.webp"
 
 export default function RootNotFound() {
   const lang = DEFAULT_LOCALE

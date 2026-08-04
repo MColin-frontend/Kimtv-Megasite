@@ -10,9 +10,13 @@ import { SKELETON_BG } from "@/constants/common.constants"
 import { HERO_VIDEO_PARAMS } from "@/constants/component/home.constants"
 import type { AnchorRoomVo, MatchInterface } from "@/models/match.models"
 
-import { Chat, type UserRole } from "@/components/ui/chat"
-import { MatchLiveInfoBar } from "@/components/ui/match/card-live-info"
+import type { UserRole } from "@/components/ui/chat/types"
 import { Skeleton } from "@/components/ui/skeleton"
+
+const Chat = dynamic(() => import("@/components/ui/chat").then((m) => m.Chat), { ssr: false })
+const MatchLiveInfoBar = dynamic(() =>
+  import("@/components/ui/match/card-live-info").then((m) => m.MatchLiveInfoBar)
+)
 
 import type { LiveMatch } from "./hero-video"
 

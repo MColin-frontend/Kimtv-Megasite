@@ -1,9 +1,7 @@
 /**
  * Client-side HTTP — gọi `/java/*` (proxy backend) hoặc `/api/*` (Next routes).
- * Dùng axios + KimTV headers, luôn resolve không throw.
+ * Dùng fetch + KimTV headers, luôn resolve không throw.
  */
-
-import axios, { type AxiosRequestConfig } from "axios"
 
 import type { ApiEnvelopeInterface } from "@/server/request.models"
 import { getTokenFromCookie } from "@/lib/auth-cookie"
@@ -26,24 +24,78 @@ export interface ClientRequestOptions {
   messageError?: string
 }
 
-const clientHttp = axios.create({
-  withCredentials: true,
-  headers: {
-    Accept: "application/json",
-    "Content-Type": "application/json",
-  },
-})
-
-clientHttp.interceptors.request.use((config) => {
+function buildHeaders(extra?: Record<string, string | undefined>): Record<string, string> {
   const token = getTokenFromCookie()
-  Object.assign(config.headers, {
+  const headers: Record<string, string> = {
     Accept: "application/json, text/plain, */*",
+    "Content-Type": "application/json",
     lan: "vi",
     sysType: "PC",
     ...(token ? { token } : {}),
-  })
-  return config
-})
+  }
+  if (extra) {
+    for (const [k, v] of Object.entries(extra)) {
+      if (v === undefined) delete headers[k]
+      else headers[k] = v
+    }
+  }
+  return headers
+}
+
+function buildUrl(url: string, params?: ClientParams): string {
+  if (!params) return url
+  const sp = new URLSearchParams()
+  for (const [k, v] of Object.entries(params)) {
+    if (v !== null && v !== undefined) sp.set(k, String(v))
+  }
+  const qs = sp.toString()
+  return qs ? `${url}${url.includes("?") ? "&" : "?"}${qs}` : url
+}
+
+interface RequestConfig {
+  method: string
+  url: string
+  params?: ClientParams
+  data?: unknown
+  headers?: Record<string, string | undefined>
+}
+
+async function request<T>(
+  config: RequestConfig,
+  options: ClientRequestOptions = {}
+): Promise<ClientRequestResult<T>> {
+  const { isMessageError, isMessageSuccess, messageSuccess, messageError } = options
+  const isFormData = config.data instanceof FormData
+
+  const headers = buildHeaders(
+    isFormData ? { ...config.headers, "Content-Type": undefined } : config.headers
+  )
+
+  const init: RequestInit = {
+    method: config.method,
+    headers,
+    credentials: "include",
+  }
+  if (config.data !== undefined) {
+    init.body = isFormData ? (config.data as FormData) : JSON.stringify(config.data)
+  }
+
+  try {
+    const res = await fetch(buildUrl(config.url, config.params), init)
+    const data = (await res.json().catch(() => null)) as T | null
+
+    if (!res.ok) {
+      if (isMessageError === true) toast.error(messageError ?? "Yêu cầu thất bại")
+      return { success: false, data, httpStatus: res.status }
+    }
+
+    if (isMessageSuccess && messageSuccess) toast.success(messageSuccess)
+    return { success: true, data: data!, httpStatus: res.status }
+  } catch {
+    if (isMessageError === true) toast.error(messageError ?? "Yêu cầu thất bại")
+    return { success: false, data: null, httpStatus: 0 }
+  }
+}
 
 /** Prefix backend path → Next.js Java proxy URL. Vd. `/news/foo` → `/java/news/foo` */
 export function javaUrl(path: string): string {
@@ -62,23 +114,6 @@ export function getJavaErrorMessage(
   return res.errorMsg ?? res.message ?? null
 }
 
-async function request<T>(
-  config: AxiosRequestConfig,
-  options: ClientRequestOptions = {}
-): Promise<ClientRequestResult<T>> {
-  const { isMessageError, isMessageSuccess, messageSuccess, messageError } = options
-  try {
-    const res = await clientHttp.request<T>(config)
-    if (isMessageSuccess && messageSuccess) toast.success(messageSuccess)
-    return { success: true, data: res.data, httpStatus: res.status }
-  } catch (error) {
-    const httpStatus = axios.isAxiosError(error) ? (error.response?.status ?? 0) : 0
-    const errMsg = messageError ?? "Yêu cầu thất bại"
-    if (isMessageError === true) toast.error(errMsg)
-    return { success: false, data: null, httpStatus }
-  }
-}
-
 export function clientGet<T>(
   url: string,
   options?: ClientRequestOptions
@@ -94,21 +129,13 @@ export function clientPost<T>(
   return request<T>({ method: "POST", url, params: options?.params, data: body }, options)
 }
 
-/** Upload multipart/form-data — bỏ Content-Type để axios/browser tự set boundary. */
+/** Upload multipart/form-data — bỏ Content-Type để browser tự set boundary. */
 export function clientUpload<T>(
   url: string,
   formData: FormData,
   options?: ClientRequestOptions
 ): Promise<ClientRequestResult<T>> {
-  return request<T>(
-    {
-      method: "POST",
-      url,
-      data: formData,
-      headers: { "Content-Type": undefined },
-    },
-    options
-  )
+  return request<T>({ method: "POST", url, data: formData }, options)
 }
 
 export function clientDelete<T>(

@@ -496,7 +496,7 @@ export function Chat({
               as="span"
               variant="caption"
               weight="600"
-              className="max-sm:text-10 leading-none text-white"
+              className="max-sm:text-10 leading-none text-gray-900"
             >
               {CHAT_SOCIAL_NAMES.TELEGRAM}
             </Typography>
@@ -507,7 +507,7 @@ export function Chat({
             href={mergedSocials.facebook}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#1877f2] py-1.5 no-underline shadow-[0_2px_8px_rgba(24,119,242,0.3)] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(24,119,242,0.45)] hover:brightness-110 active:scale-95 max-sm:gap-1 max-sm:px-2 max-sm:py-1"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#1462d8] py-1.5 no-underline shadow-[0_2px_8px_rgba(24,119,242,0.3)] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(24,119,242,0.45)] hover:brightness-110 active:scale-95 max-sm:gap-1 max-sm:px-2 max-sm:py-1"
           >
             <Img
               src={imgFacebook.src}
@@ -695,7 +695,7 @@ export function Chat({
                 variant="ghost"
                 size="sm"
                 onClick={handleReconnect}
-                className="bg-chat-status hover:bg-chat-status/80 gap-1.5 rounded-full text-white"
+                className="bg-chat-status hover:bg-chat-status/80 gap-1.5 rounded-full text-gray-900"
               >
                 <RefreshCw className="size-3.5" />
                 {t("chat.reconnect")}
