@@ -12,7 +12,7 @@ import type { LeagueApiItem } from "@/features/home/home.models"
 import { Img } from "@/components/ui/image"
 import { Typography } from "@/components/ui/typography"
 
-import imgEmpty from "@assets/images/common/img-empty.png"
+import imgEmpty from "@assets/images/common/img-empty.webp"
 
 export interface LeagueItem {
   id: number

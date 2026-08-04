@@ -25,7 +25,7 @@ export function ScheduleHeader({ image, title, subtitle }: ScheduleHeaderProps) 
   return (
     <div className="relative flex items-center">
       <div className="img-blend-dark relative shrink-0">
-        <Img src={resolvedImage} alt="" width={80} height={80} className="max-sm:!h-16 max-sm:!w-16" />
+        <Img src={resolvedImage} alt="" width={80} height={80} sizes="112px" className="max-sm:!h-16 max-sm:!w-16" />
       </div>
       <div className="bg-gold mr-5 h-8 w-0.5 shrink-0 max-sm:mr-3 max-sm:h-6" />
       <div className="flex min-w-0 flex-col gap-1 overflow-visible">

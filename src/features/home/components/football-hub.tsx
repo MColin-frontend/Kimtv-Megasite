@@ -21,7 +21,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Typography } from "@/components/ui/typography"
 
-import imgFootballHub from "@assets/images/common/img-football-hub.png"
+import imgFootballHub from "@assets/images/common/img-football-hub.webp"
 
 import { fetchFootballHubAction } from "../home.api"
 import type { HotLeagueInterface, HotTeamInterface, PlayerStatInterface } from "../home.models"

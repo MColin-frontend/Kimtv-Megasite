@@ -19,7 +19,7 @@ import { Typography } from "@/components/ui/typography"
 import icCornerKick from "@assets/icons/match/ic-corner-flag.png"
 import icRedCard from "@assets/icons/match/ic-red-card-v2.svg"
 import icYellowCard from "@assets/icons/match/ic-yellow-card-v2.svg"
-import imgEmpty from "@assets/images/common/img-empty.png"
+import imgEmpty from "@assets/images/common/img-empty.webp"
 
 import { ScoreBadge, StatCell } from "./parts/fixture-cells"
 import { FIXTURE_ROW_CLASS, FixturesSkeleton } from "./skeleton"

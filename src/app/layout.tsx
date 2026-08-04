@@ -59,6 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             alt=""
             fill
             priority
+            quality={55}
             className="object-cover object-top"
             sizes="100vw"
           />
