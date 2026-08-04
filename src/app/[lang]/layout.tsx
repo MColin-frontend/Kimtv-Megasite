@@ -9,7 +9,7 @@ import { Header } from "@/components/layout/header"
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav"
 import { BackToTop } from "@/components/ui/back-to-top"
 import { PollFloatButton } from "@/components/ui/poll-float-button"
-import { Toaster } from "@/components/ui/toast"
+import { ToasterWrapper } from "@/components/ui/toaster-wrapper"
 
 export function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }))
@@ -50,7 +50,7 @@ export default async function LangLayout({
       <MobileBottomNav />
       <PollFloatButton />
       <BackToTop />
-      <Toaster />
+      <ToasterWrapper />
     </>
   )
 }

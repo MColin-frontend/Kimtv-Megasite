@@ -264,10 +264,15 @@ function DesktopNav({
   }, [])
 
   useEffect(() => {
-    updateIndicator()
+    // Defer the geometry read to after the browser has finished layout for this frame,
+    // avoiding a forced synchronous reflow immediately after React's commit phase.
+    const raf = requestAnimationFrame(updateIndicator)
     const ro = new ResizeObserver(updateIndicator)
     if (navRef.current) ro.observe(navRef.current)
-    return () => ro.disconnect()
+    return () => {
+      cancelAnimationFrame(raf)
+      ro.disconnect()
+    }
   }, [pathname, updateIndicator])
 
   return (

@@ -1,3 +1,5 @@
+import { unstable_cache } from "next/cache"
+
 import { getRequest } from "@/server/services/request"
 
 import { env } from "@/config/env"
@@ -33,13 +35,17 @@ const LIVE_API = {
 const EMPTY: LivePageDataInterface = { match: null, chatAnnouncement: [] }
 
 /** Fetch theo roomId (bình luận viên live) — dùng cho route /truc-tiep/[id] */
-export function fetchAnchorLiveData(roomId: string): Promise<LivePageDataInterface> {
-  return getRequest<AnchorLiveDetailInterface>(LIVE_API.ANCHOR_DETAIL, {
-    params: { roomId },
-  } as Parameters<typeof getRequest>[1])
-    .then((res) => (res ? { match: res.match ?? null, chatAnnouncement: [] } : EMPTY))
-    .catch(() => EMPTY)
-}
+export const fetchAnchorLiveData = unstable_cache(
+  async (roomId: string): Promise<LivePageDataInterface> => {
+    return getRequest<AnchorLiveDetailInterface>(LIVE_API.ANCHOR_DETAIL, {
+      params: { roomId },
+    } as Parameters<typeof getRequest>[1])
+      .then((res) => (res ? { match: res.match ?? null, chatAnnouncement: [] } : EMPTY))
+      .catch(() => EMPTY)
+  },
+  ["anchor-live-data"],
+  { revalidate: 30 }
+)
 
 /** Fetch theo matchId + gameId — dùng cho route /truc-tiep/[id] */
 export function fetchMatchLiveData(

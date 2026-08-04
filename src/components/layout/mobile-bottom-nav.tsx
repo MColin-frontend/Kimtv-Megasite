@@ -64,11 +64,24 @@ export function MobileBottomNav() {
   useEffect(() => {
     const nav = navRef.current
     if (!nav) return
-    const width = nav.offsetWidth
-    setW(width)
-    const active = nav.querySelector<HTMLElement>("[data-active='true']")
-    setCx(active ? active.offsetLeft + active.offsetWidth / 2 : null)
-    setReady()
+
+    function measure() {
+      const el = navRef.current
+      if (!el) return
+      // Batch all reads before any writes to avoid layout thrashing
+      const width = el.offsetWidth
+      const active = el.querySelector<HTMLElement>("[data-active='true']")
+      const activeCx = active != null ? active.offsetLeft + active.offsetWidth / 2 : null
+      // Commit all writes together
+      setW(width)
+      setCx(activeCx)
+      setReady()
+    }
+
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(nav)
+    return () => ro.disconnect()
   }, [pathname, setReady])
 
   const path = ready && cx !== null ? buildPath(W, cx) : null

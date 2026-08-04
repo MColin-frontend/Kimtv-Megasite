@@ -78,8 +78,15 @@ export function AdBanner({
   const activeSrc = src || fallback
   if (!activeSrc) return null
 
+  // Strip cache-busting query params (e.g. ?t=timestamp) from CDN URLs so the
+  // browser can cache the asset by its stable path across visits.
+  const stableSrc =
+    typeof activeSrc === "string" && activeSrc.startsWith("http")
+      ? activeSrc.split("?")[0]
+      : activeSrc
+
   const media = (
-    <AdMedia src={activeSrc as string} fallback={fallback as string} rounded={rounded} />
+    <AdMedia src={stableSrc as string} fallback={fallback as string} rounded={rounded} />
   )
 
   if (href) {

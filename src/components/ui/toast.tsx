@@ -1,28 +1,10 @@
 "use client"
 
-import { toast as reactToast, ToastContainer } from "react-toastify"
+import { toast as reactToast } from "react-toastify"
 import Image from "next/image"
 import { AlertTriangle, CheckCircle, Info, X, XCircle } from "lucide-react"
 
 import { Typography } from "@/components/ui/typography"
-
-import "react-toastify/dist/ReactToastify.css"
-
-export function Toaster() {
-  return (
-    <ToastContainer
-      position="top-right"
-      autoClose={4000}
-      hideProgressBar
-      closeOnClick={false}
-      pauseOnHover
-      draggable={false}
-      closeButton={false}
-      toastStyle={{ background: "transparent", boxShadow: "none", padding: 0, marginBottom: 6 }}
-      style={{ width: "360px" }}
-    />
-  )
-}
 
 const VARIANTS = {
   success: {

@@ -11,16 +11,22 @@ const nextConfig: NextConfig = {
       "*.webm": { type: "asset" },
     },
     resolveAlias: {
-      // Replace Next.js built-in polyfills (Array.prototype.at, Object.hasOwn, etc.)
-      // with a no-op — all are Baseline features covered by our .browserslistrc targets.
+      // Replace Next.js built-in polyfills with a no-op.
+      // All listed features are Baseline and supported by our .browserslistrc targets.
       "next/dist/build/polyfills/polyfill-module": POLYFILL_STUB,
     },
   },
-  webpack(config) {
-    // Same replacement for non-Turbopack builds
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      "next/dist/build/polyfills/polyfill-module": POLYFILL_STUB,
+  webpack(config, { webpack: wp, isServer }) {
+    if (!isServer) {
+      // NormalModuleReplacementPlugin intercepts the raw import request before
+      // webpack resolves it, so it catches both the bare name and the relative
+      // path ("../build/polyfills/polyfill-module") used inside Next.js internals.
+      config.plugins!.push(
+        new wp.NormalModuleReplacementPlugin(
+          /polyfills[\\/]polyfill-module(\.js)?$/,
+          POLYFILL_STUB
+        )
+      )
     }
     return config
   },

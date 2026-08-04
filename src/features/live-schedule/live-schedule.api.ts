@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache"
 import { queryOptions } from "@tanstack/react-query"
 
 import { javaGet, javaPost } from "@/server/services/client-request"
@@ -8,12 +9,16 @@ import { FOOTBALL_GAME_MONGO_ID } from "@/constants/component/home.constants"
 import type { LiveSearchMatchInterface, MatchInterface } from "@/models/match.models"
 
 /** Server-side — cùng endpoint và params với liveScheduleQueryOptions */
-export async function fetchLiveScheduleMatches(): Promise<LiveSearchMatchInterface[]> {
-  const data = await getRequest<LiveSearchMatchInterface[]>(MATCH_API.LIVE_SEARCH, {
-    params: { id: FOOTBALL_GAME_MONGO_ID, typeScreen: 0 },
-  } as Parameters<typeof getRequest>[1]).catch(() => null)
-  return Array.isArray(data) ? data : []
-}
+export const fetchLiveScheduleMatches = unstable_cache(
+  async (): Promise<LiveSearchMatchInterface[]> => {
+    const data = await getRequest<LiveSearchMatchInterface[]>(MATCH_API.LIVE_SEARCH, {
+      params: { id: FOOTBALL_GAME_MONGO_ID, typeScreen: 0 },
+    } as Parameters<typeof getRequest>[1]).catch(() => null)
+    return Array.isArray(data) ? data : []
+  },
+  ["live-schedule-matches"],
+  { revalidate: 30 }
+)
 
 export function liveScheduleQueryOptions() {
   return queryOptions({
