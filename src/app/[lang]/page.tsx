@@ -2,7 +2,7 @@ import { createMetadata } from "@/lib/metadata"
 
 import { HomePage } from "@/features/home/components"
 
-export const dynamic = "force-dynamic"
+export const revalidate = 30
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params

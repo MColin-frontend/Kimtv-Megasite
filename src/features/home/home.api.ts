@@ -1,3 +1,5 @@
+import { unstable_cache } from "next/cache"
+
 import { getRequest, postRequest } from "@/server/services/request"
 import { MATCH_API } from "@/lib/match.utils"
 
@@ -41,10 +43,17 @@ function fetchLatestNewsListAction(limit = 5): Promise<NewsItem[]> {
   ).then((data) => (data?.records ?? []).slice(0, limit))
 }
 
+const _fetchFeaturedNews = unstable_cache(
+  (gameIds: string): Promise<NewsItem[]> =>
+    getRequest<FeaturedNewsResult>(`${HOME_API.NEWS_FEATURED}?gameIds=${gameIds}`)
+      .then((data) => data?.news ?? [])
+      .catch((): NewsItem[] => []),
+  ["home-featured-news"],
+  { revalidate: 60 }
+)
+
 function fetchFeaturedNewsAction(gameIds = FOOTBALL_GAME_ID): Promise<NewsItem[]> {
-  return getRequest<FeaturedNewsResult>(`${HOME_API.NEWS_FEATURED}?gameIds=${gameIds}`)
-    .then((data) => data?.news ?? [])
-    .catch(() => [])
+  return _fetchFeaturedNews(`${gameIds}`)
 }
 
 function getEndpointByDate(date: string | null): string {
@@ -111,19 +120,30 @@ function fetchLiveMatchesAction(): Promise<LiveMatch[]> {
     .catch(() => [])
 }
 
+const _fetchPopularNews = unstable_cache(
+  (gameIds: string): Promise<NewsItem[]> =>
+    getRequest<PopularNewsResult>(`${HOME_API.NEWS_POPULAR}?gameIds=${gameIds}`)
+      .then((data) => data?.videos ?? [])
+      .catch((): NewsItem[] => []),
+  ["home-popular-news"],
+  { revalidate: 60 }
+)
+
 function fetchPopularNewsAction(gameIds = FOOTBALL_GAME_ID): Promise<NewsItem[]> {
-  return getRequest<PopularNewsResult>(`${HOME_API.NEWS_POPULAR}?gameIds=${gameIds}`)
-    .then((data) => data?.videos ?? [])
-    .catch((err) => {
-      console.error("fetchPopularNewsAction error:", err)
-      return []
-    })
+  return _fetchPopularNews(`${gameIds}`)
 }
 
+const _fetchFootballHub = unstable_cache(
+  (limit: number): Promise<FootballHubResultInterface | null> =>
+    getRequest<FootballHubResultInterface>(HOME_API.FOOTBALL_HUB, {
+      params: { gameId: FOOTBALL_GAME_ID, limit },
+    }),
+  ["home-football-hub"],
+  { revalidate: 300 }
+)
+
 function fetchFootballHubAction(limit = 10): Promise<FootballHubResultInterface | null> {
-  return getRequest<FootballHubResultInterface>(HOME_API.FOOTBALL_HUB, {
-    params: { gameId: FOOTBALL_GAME_ID, limit },
-  })
+  return _fetchFootballHub(limit)
 }
 
 export {
