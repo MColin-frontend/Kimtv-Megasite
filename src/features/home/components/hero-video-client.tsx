@@ -12,8 +12,9 @@ import type { AnchorRoomVo, MatchInterface } from "@/models/match.models"
 
 import type { UserRole } from "@/components/ui/chat/types"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Typography } from "@/components/ui/typography"
 
-const Chat = dynamic(() => import("@/components/ui/chat").then((m) => m.Chat), { ssr: false })
+const Chat = dynamic(() => import("@/components/ui/chat").then((m) => m.Chat))
 const MatchLiveInfoBar = dynamic(() =>
   import("@/components/ui/match/card-live-info").then((m) => m.MatchLiveInfoBar)
 )
@@ -44,9 +45,25 @@ export function HeroVideoClientSkeleton({ className }: { className?: string }) {
         </div>
       </div>
 
-      {/* Chat sidebar */}
+      {/* Chat sidebar skeleton — header text is real markup so LCP is measured from initial HTML */}
       <div className="flex w-[min(30vw,420px)] shrink-0 flex-col overflow-hidden max-lg:w-full max-sm:h-[50vh]">
-        <Skeleton className={cn("rounded-12 h-full w-full", SKELETON_BG)} />
+        <div className={cn("card-glow rounded-12 flex h-full flex-col gap-4 overflow-hidden p-4 backdrop-blur-2xl max-sm:gap-2 max-sm:p-2", SKELETON_BG)}>
+          <Skeleton className={cn("h-8 w-full shrink-0 rounded-full", SKELETON_BG)} />
+          <div className="rounded-6 flex min-h-0 flex-1 flex-col overflow-hidden bg-white/[0.03] backdrop-blur-xl">
+            <div className="flex shrink-0 items-center border-b border-white/8 px-3 pt-2.5 pb-1.5 max-sm:px-2 max-sm:py-1.5">
+              <Typography
+                as="span"
+                variant="h4"
+                weight="800"
+                className="max-sm:text-14 tracking-widest uppercase italic"
+              >
+                <span className="text-gold drop-shadow-gold">Live</span>
+                <span className="text-white"> Chat</span>
+              </Typography>
+            </div>
+            <Skeleton className={cn("flex-1", SKELETON_BG)} />
+          </div>
+        </div>
       </div>
     </div>
   )

@@ -17,11 +17,9 @@ const MatchSchedule = dynamic(() =>
 export function HomePage() {
   return (
     <div className="relative container flex flex-col gap-10 max-lg:gap-6 max-md:gap-4">
-      <ScrollReveal variant="scale" duration={700} threshold={0.04}>
-        <Suspense fallback={<HeroVideoClientSkeleton />}>
-          <HeroVideo />
-        </Suspense>
-      </ScrollReveal>
+      <Suspense fallback={<HeroVideoClientSkeleton />}>
+        <HeroVideo />
+      </Suspense>
 
       <ScrollReveal variant="blur" duration={600} distance={32} threshold={0.06}>
         <Suspense>
