@@ -78,6 +78,14 @@ const nextConfig: NextConfig = {
           { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
         ],
       },
+      {
+        // Disable nginx/proxy response buffering for all pages so React's
+        // streaming SSR (Suspense) actually streams — buffered proxies hold
+        // the entire response in memory and only forward it once the stream
+        // closes, turning a fast first-flush into a slow full-page TTFB.
+        source: "/(.*)",
+        headers: [{ key: "X-Accel-Buffering", value: "no" }],
+      },
     ]
   },
 }
