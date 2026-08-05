@@ -18,16 +18,19 @@ interface AdBannerProps {
   className?: string
   skeletonClassName?: string
   ariaLabel?: string
+  sizes?: string
 }
 
 function AdMedia({
   src,
   fallback,
   rounded,
+  sizes = "100vw",
 }: {
   src: string | StaticImageData | null
   fallback: string | StaticImageData | null
   rounded?: string
+  sizes?: string
 }) {
   const { value: errored, on: setErrored } = useBoolean()
   const url = errored && fallback ? fallback : src
@@ -54,7 +57,7 @@ function AdMedia({
       alt=""
       width={0}
       height={0}
-      sizes="100vw"
+      sizes={sizes}
       className={cn("h-auto w-full", rounded)}
       onError={() => fallback && !errored && setErrored()}
     />
@@ -70,6 +73,7 @@ export function AdBanner({
   className,
   skeletonClassName,
   ariaLabel = "Quảng cáo",
+  sizes,
 }: AdBannerProps) {
   if (isLoading) {
     return <Skeleton className={cn("w-full", rounded, skeletonClassName)} />
@@ -95,7 +99,7 @@ export function AdBanner({
   })()
 
   const media = (
-    <AdMedia src={stableSrc as string} fallback={fallback as string} rounded={rounded} />
+    <AdMedia src={stableSrc as string} fallback={fallback as string} rounded={rounded} sizes={sizes} />
   )
 
   if (href) {

@@ -257,6 +257,7 @@ export function VideoPlayer({
         fallback={imgLiveSmall}
         className="video-ad-banner absolute top-1 left-1 z-10 w-16 max-md:w-12 max-sm:w-8"
         skeletonClassName="aspect-[60/25]"
+        sizes="(max-width:640px) 32px, (max-width:768px) 48px, 64px"
       />
     </div>
   )
