@@ -1,5 +1,4 @@
 import { Suspense } from "react"
-import { isEmpty } from "lodash"
 
 import { getTranslation } from "@/i18n/get-locale"
 import { getRoutes } from "@/config/routes"
@@ -15,7 +14,7 @@ export default async function NewsList() {
   const items = await fetchFeaturedNewsAction()
   const validItems = items?.filter((item) => item.coverUrl && item.title) ?? []
 
-  if (isEmpty(validItems)) return null
+  if (!validItems.length) return null
 
   return (
     <Suspense fallback={<NewsSectionSkeleton />}>

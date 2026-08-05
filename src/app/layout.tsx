@@ -7,7 +7,7 @@ import { MouseGlowProvider } from "@/components/providers/mouse-glow-provider"
 import { QueryProvider } from "@/components/providers/query-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
 
-import bgStadium from "@assets/images/common/img-stadium-bg.png"
+import bgStadium from "@assets/images/common/img-stadium-bg.webp"
 
 import "./globals.css"
 
@@ -37,20 +37,7 @@ export const metadata = createMetadata({
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="vi" className={`${oswald.variable} ${inter.variable} h-full antialiased`}>
-      {/*
-        Preload Oswald Latin Extended (U+100-2BA, U+1E00+) — the Vietnamese-range font file.
-        next/font preloads only the .p. (basic latin) variant; this file is discovered late
-        when the browser parses the font CSS and finds characters needing this range.
-        Hash is content-based (changes only if Google Fonts updates Oswald).
-      */}
       <head>
-        <link
-          rel="preload"
-          as="font"
-          type="font/woff2"
-          href="/_next/static/media/037b6aa687f94b32-s.0evsli58wo2lo.woff2"
-          crossOrigin="anonymous"
-        />
         {/* Preconnect to external origins hit early in page load */}
         <link rel="preconnect" href="https://kimtv-oss.99kimtvs.top" />
         <link rel="dns-prefetch" href="https://kimtv-oss.99kimtvs.top" />
@@ -64,7 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             alt=""
             fill
             priority
-            quality={55}
+            quality={20}
             className="object-cover object-top"
             sizes="100vw"
           />

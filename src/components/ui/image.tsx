@@ -50,13 +50,11 @@ export const Img = memo(function Img({
 
   const roundedClass = rounded ? `rounded-${rounded}` : undefined
 
-  // Khi truyền width/height (không dùng fill), tự enforce CSS size để không cần
-  // thêm className="w-[Xpx] h-[Ypx]" redundant bên ngoài.
-  // Consumer style vẫn có thể override (ví dụ: height: "auto" cho logo).
+  // Set only CSS width — Tailwind's preflight applies `height: auto` which keeps aspect ratio.
+  // Setting inline height: N px here would override `height: auto` while the preflight's
+  // `max-width: 100%` still constrains width, breaking the ratio on responsive containers.
   const sizeStyle: React.CSSProperties =
-    !fill && props.width && props.height
-      ? { width: Number(props.width), height: Number(props.height) }
-      : {}
+    !fill && props.width ? { width: Number(props.width) } : {}
 
   const mergedStyle: React.CSSProperties = { objectFit, ...sizeStyle, ...style }
 

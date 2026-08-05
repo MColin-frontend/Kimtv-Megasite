@@ -64,6 +64,7 @@ function LeagueRow({
           alt={item.name}
           width={40}
           height={40}
+          quality={60}
           objectFit="contain"
           className="shrink-0"
         />
@@ -124,6 +125,7 @@ function TeamRow({
         alt={item.name}
         width={40}
         height={40}
+        quality={60}
         objectFit="contain"
         className="shrink-0"
       />
