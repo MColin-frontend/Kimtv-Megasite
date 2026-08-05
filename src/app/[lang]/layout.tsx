@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { notFound } from "next/navigation"
 
 import { createMetadata } from "@/lib/metadata"
@@ -48,7 +49,9 @@ export default async function LangLayout({
         <Footer />
       </div>
       <MobileBottomNav />
-      <PollFloatButton />
+      <Suspense>
+        <PollFloatButton />
+      </Suspense>
       <BackToTop />
       <ToasterWrapper />
     </>
