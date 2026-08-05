@@ -134,6 +134,7 @@ export function HeroVideoClient({ matches, defaultMatchId, className }: HeroVide
         />
         {activeMatch && (
           <MatchLiveInfoBar
+            priority
             match={{
               ...(activeMatch as unknown as MatchInterface),
               matchId: Number(activeMatch.id),

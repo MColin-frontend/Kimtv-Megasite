@@ -14,6 +14,7 @@ interface CardBackgroundProps {
   stadiumClassName?: string
   thumbnailExtras?: ReactNode
   stadiumExtras?: ReactNode
+  priority?: boolean
 }
 
 export function CardBackground({
@@ -25,29 +26,41 @@ export function CardBackground({
   stadiumClassName,
   thumbnailExtras,
   stadiumExtras,
+  priority,
 }: CardBackgroundProps) {
   const resolvedStadiumSrc =
     stadiumSrc ?? (isUpcoming ? imgStadiumUpcoming.src : imgStadiumBg.src)
+
+  const fetchPri = priority ? "high" : "auto"
+  const loading = priority ? "eager" : "lazy"
 
   return (
     <>
       {thumbnail ? (
         <>
-          <div
-            className="pointer-events-none absolute inset-0 z-0 bg-cover bg-[center_top]"
-            style={{ backgroundImage: `url(${thumbnail})` }}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={thumbnail}
+            alt=""
+            fetchPriority={fetchPri}
+            loading={loading}
+            className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-top"
           />
           <div className="card-thumbnail-overlay pointer-events-none absolute inset-0 z-[1]" />
           {thumbnailExtras}
         </>
       ) : (
         <>
-          <div
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={resolvedStadiumSrc}
+            alt=""
+            fetchPriority={fetchPri}
+            loading={loading}
             className={cn(
-              "pointer-events-none absolute inset-0 z-0 bg-cover bg-center",
+              "pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-center",
               stadiumClassName,
             )}
-            style={{ backgroundImage: `url(${resolvedStadiumSrc})` }}
           />
           {homeLogo && (
             <div

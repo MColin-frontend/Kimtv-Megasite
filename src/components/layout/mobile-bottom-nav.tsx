@@ -78,10 +78,13 @@ export function MobileBottomNav() {
       setReady()
     }
 
-    measure()
+    const rafId = requestAnimationFrame(measure)
     const ro = new ResizeObserver(measure)
     ro.observe(nav)
-    return () => ro.disconnect()
+    return () => {
+      cancelAnimationFrame(rafId)
+      ro.disconnect()
+    }
   }, [pathname, setReady])
 
   const path = ready && cx !== null ? buildPath(W, cx) : null

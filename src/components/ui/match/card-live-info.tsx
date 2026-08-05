@@ -50,6 +50,7 @@ import { MatchStatBar } from "./parts/stat-bar"
 export interface MatchLiveInfoBarProps {
   match: MatchInterface
   className?: string
+  priority?: boolean
 }
 
 /* ── Share button ────────────────────────────────────────── */
@@ -128,7 +129,7 @@ function ShareButton() {
 
 /* ── Main component ──────────────────────────────────────── */
 
-export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
+export function MatchLiveInfoBar({ match, className, priority }: MatchLiveInfoBarProps) {
   const { t } = useTranslation()
   const navigateToLive = useLiveNavigate()
   const { user } = useAuth()
@@ -243,6 +244,7 @@ export function MatchLiveInfoBar({ match, className }: MatchLiveInfoBarProps) {
         stadiumSrc={imgStadiumBg.src}
         stadiumClassName="opacity-50"
         stadiumExtras={<div className="pointer-events-none absolute inset-0 z-[1] bg-black/20" />}
+        priority={priority}
       />
 
       {/* Content above bg */}
