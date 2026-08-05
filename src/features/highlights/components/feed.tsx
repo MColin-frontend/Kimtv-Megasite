@@ -410,11 +410,15 @@ export function HighlightsFeed({
   const [playerWidth, setPlayerWidth] = useState(360)
   const [layoutReady, setLayoutReady] = useState(false)
 
+  // Cached header height — updated by ResizeObserver (post-paint) so updateLayout
+  // never reads offsetHeight synchronously and avoids forced reflow in useLayoutEffect.
+  const headerHRef = useRef(78)
+
   const updateLayout = useCallback(() => {
     if (typeof window === "undefined") return
     const vw = window.innerWidth
     const vh = window.innerHeight
-    const headerH = document.getElementById("site-header")?.offsetHeight ?? 78
+    const headerH = headerHRef.current
     const isMobile = vw < 1024
     const bottomNavH = isMobile ? 72 : 0 // 64px bar + 8px buffer
     const sideMenuW = isMobile ? 0 : 96
@@ -456,6 +460,23 @@ export function HighlightsFeed({
       window.removeEventListener("resize", onResize)
       if (rafId != null) cancelAnimationFrame(rafId)
     }
+  }, [updateLayout])
+
+  // Track header height after paint so updateLayout never reads offsetHeight synchronously.
+  // useEffect runs post-paint — safe to read geometry here without causing a forced reflow.
+  useEffect(() => {
+    const el = document.getElementById("site-header")
+    if (!el) return
+    headerHRef.current = el.offsetHeight
+    const ro = new ResizeObserver(([entry]) => {
+      const newH = Math.round(entry.contentRect.height)
+      if (newH !== headerHRef.current) {
+        headerHRef.current = newH
+        updateLayout()
+      }
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
   }, [updateLayout])
 
   // ── Derived ──────────────────────────────────────────────────────────────────
