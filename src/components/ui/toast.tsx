@@ -1,6 +1,7 @@
 "use client"
 
-import { toast as reactToast } from "react-toastify"
+// react-toastify is loaded lazily — only downloaded when a toast is first shown.
+// This removes ~60 KB from the critical JS bundle.
 import Image from "next/image"
 import { AlertTriangle, CheckCircle, Info, X, XCircle } from "lucide-react"
 
@@ -94,7 +95,7 @@ function ToastContent({
       </div>
 
       <button
-        onClick={() => reactToast.dismiss(id)}
+        onClick={() => import("react-toastify").then(({ toast }) => toast.dismiss(id))}
         className="mt-0.5 shrink-0 text-white/30 transition-colors hover:text-white/70"
       >
         <X size={14} />
@@ -103,7 +104,8 @@ function ToastContent({
   )
 }
 
-function show(variant: Variant, title: string, description?: string, image?: string) {
+async function show(variant: Variant, title: string, description?: string, image?: string) {
+  const { toast: reactToast } = await import("react-toastify")
   const id = crypto.randomUUID()
   reactToast(
     <ToastContent

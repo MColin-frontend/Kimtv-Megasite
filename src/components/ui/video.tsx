@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef } from "react"
 import dynamic from "next/dynamic"
+import NextImage from "next/image"
 import type { SimplePlayer } from "xgplayer"
 
 import { cn } from "@/lib/utils"
@@ -214,14 +215,13 @@ export function VideoPlayer({
       )}
     >
       {!hasSource && (
-        <div>
-          <div
-            className="absolute inset-0 z-0 opacity-30"
-            style={{
-              backgroundImage: `url(${imgNoSource.src})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
+        <>
+          <NextImage
+            src={imgNoSource}
+            alt=""
+            fill
+            priority
+            className="z-0 object-cover object-center opacity-30"
           />
 
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 text-center">
@@ -235,7 +235,7 @@ export function VideoPlayer({
               </Typography>
             </div>
           </div>
-        </div>
+        </>
       )}
       <div
         id={mountId}

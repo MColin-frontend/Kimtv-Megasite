@@ -3,8 +3,10 @@
 import dynamic from "next/dynamic"
 
 import { cn } from "@/lib/utils"
+
 import { siteConfig } from "@/config/site"
 import { CHAT_SOCIAL_NAMES } from "@/constants/ui/ui-chat.constants"
+
 import { Img } from "@/components/ui/image"
 import { Typography } from "@/components/ui/typography"
 
@@ -13,7 +15,7 @@ import imgFacebook from "@assets/images/layout/img-facebook.png"
 import imgTele from "@assets/images/layout/img-tele.png"
 import imgZalo from "@assets/images/layout/img-zalo.png"
 
-import type { ChatProps, ChatMessage, ChatSocials, ConnectionStatus, UserRole } from "./types"
+import type { ChatMessage, ChatProps, ChatSocials, ConnectionStatus, UserRole } from "./types"
 
 export type { ChatMessage, ChatSocials, ChatProps, UserRole, ConnectionStatus }
 export type { ChatMessageType } from "./types"
@@ -53,7 +55,7 @@ export function Chat({ socials, className, ...bodyProps }: ChatProps) {
               as="span"
               variant="caption"
               weight="600"
-              className="max-sm:text-10 leading-none text-gray-900"
+              className="max-sm:text-10 leading-none text-white"
             >
               {CHAT_SOCIAL_NAMES.TELEGRAM}
             </Typography>

@@ -1,53 +1,77 @@
 "use client"
 
-import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip"
+import type { ReactNode } from "react"
 
 import { cn } from "@/lib/utils"
 
-function TooltipProvider({ delay = 0, ...props }: TooltipPrimitive.Provider.Props) {
-  return <TooltipPrimitive.Provider data-slot="tooltip-provider" delay={delay} {...props} />
+// CSS-only tooltip — replaces @base-ui/react/tooltip + floating-ui (~184 KB) with zero JS.
+// Hover state is driven by Tailwind group-hover; no event listeners, no positioning library.
+
+function TooltipProvider({ children }: { children?: ReactNode; delay?: number }) {
+  return <>{children}</>
 }
 
-function Tooltip({ ...props }: TooltipPrimitive.Root.Props) {
-  return <TooltipPrimitive.Root data-slot="tooltip" {...props} />
+function Tooltip({ children }: { children?: ReactNode }) {
+  return <span className="group/tip relative inline-flex">{children}</span>
 }
 
-function TooltipTrigger({ ...props }: TooltipPrimitive.Trigger.Props) {
-  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />
+function TooltipTrigger({
+  children,
+  className,
+  ...props
+}: {
+  children?: ReactNode
+  className?: string
+  [key: string]: unknown
+}) {
+  return (
+    <span data-slot="tooltip-trigger" className={className} {...props}>
+      {children}
+    </span>
+  )
+}
+
+const SIDE_CLASSES: Record<string, string> = {
+  top: "bottom-full left-1/2 -translate-x-1/2 mb-1.5",
+  bottom: "top-full left-1/2 -translate-x-1/2 mt-1.5",
+  left: "right-full top-1/2 -translate-y-1/2 mr-1.5",
+  right: "left-full top-1/2 -translate-y-1/2 ml-1.5",
 }
 
 function TooltipContent({
+  children,
   className,
   side = "top",
-  sideOffset = 4,
-  align = "center",
-  alignOffset = 0,
-  children,
+  // accept but ignore the old positioner props to keep call-sites unchanged
+  sideOffset: _so,
+  align: _a,
+  alignOffset: _ao,
   ...props
-}: TooltipPrimitive.Popup.Props &
-  Pick<TooltipPrimitive.Positioner.Props, "align" | "alignOffset" | "side" | "sideOffset">) {
+}: {
+  children?: ReactNode
+  className?: string
+  side?: "top" | "bottom" | "left" | "right"
+  sideOffset?: number
+  align?: string
+  alignOffset?: number
+  [key: string]: unknown
+}) {
   return (
-    <TooltipPrimitive.Portal>
-      <TooltipPrimitive.Positioner
-        align={align}
-        alignOffset={alignOffset}
-        side={side}
-        sideOffset={sideOffset}
-        className="isolate z-[999]"
-      >
-        <TooltipPrimitive.Popup
-          data-slot="tooltip-content"
-          className={cn(
-            "bg-foreground text-background data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=delayed-open]:animate-in data-[state=delayed-open]:fade-in-0 data-[state=delayed-open]:zoom-in-95 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 z-[999] inline-flex w-fit max-w-xs origin-(--transform-origin) items-center gap-1.5 rounded-md px-3 py-1.5 text-xs has-data-[slot=kbd]:pr-1.5 **:data-[slot=kbd]:relative **:data-[slot=kbd]:isolate **:data-[slot=kbd]:z-[999] **:data-[slot=kbd]:rounded-sm",
-            className
-          )}
-          {...props}
-        >
-          {children}
-          <TooltipPrimitive.Arrow className="bg-foreground fill-foreground z-[999] size-2.5 translate-y-[calc(-50%-2px)] rotate-45 rounded-[2px] data-[side=bottom]:top-1 data-[side=inline-end]:top-1/2! data-[side=inline-end]:-left-1 data-[side=inline-end]:-translate-y-1/2 data-[side=inline-start]:top-1/2! data-[side=inline-start]:-right-1 data-[side=inline-start]:-translate-y-1/2 data-[side=left]:top-1/2! data-[side=left]:-right-1 data-[side=left]:-translate-y-1/2 data-[side=right]:top-1/2! data-[side=right]:-left-1 data-[side=right]:-translate-y-1/2 data-[side=top]:-bottom-2.5" />
-        </TooltipPrimitive.Popup>
-      </TooltipPrimitive.Positioner>
-    </TooltipPrimitive.Portal>
+    <span
+      role="tooltip"
+      data-slot="tooltip-content"
+      className={cn(
+        // hidden by default, visible on group hover
+        "pointer-events-none absolute z-[999] hidden group-hover/tip:inline-flex",
+        // appearance
+        "bg-foreground text-background w-max max-w-xs items-center rounded-md px-3 py-1.5 text-xs",
+        SIDE_CLASSES[side] ?? SIDE_CLASSES.top,
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </span>
   )
 }
 

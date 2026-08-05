@@ -1,7 +1,6 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { isEmpty } from "lodash"
 
 import { formatKickOff, formatMatchDate } from "@/lib/date"
 import { cn } from "@/lib/utils"
@@ -424,7 +423,7 @@ export function Fixtures({
 
   return (
     <div className={cn("flex h-full flex-col gap-3", className)}>
-      {isEmpty(groups) ? (
+      {!groups.length ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16">
           <Img
             src={imgEmpty.src}

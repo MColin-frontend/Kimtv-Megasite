@@ -1,7 +1,6 @@
 "use client"
 
 import { useCallback, useState } from "react"
-import { isEmpty } from "lodash"
 
 import { cn } from "@/lib/utils"
 
@@ -48,7 +47,7 @@ export function NewsSectionCard({
     api?.on("select", () => setActiveIndex(api.selectedScrollSnap()))
   }, [])
 
-  if (isEmpty(items)) return null
+  if (!items.length) return null
 
   const [featuredItem, ...rowItems] = items
 

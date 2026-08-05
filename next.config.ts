@@ -1,6 +1,12 @@
 import path from "path"
 import type { NextConfig } from "next"
 
+const withBundleAnalyzer =
+  process.env.ANALYZE === "true"
+    ? // eslint-disable-next-line @typescript-eslint/no-require-imports
+      require("@next/bundle-analyzer")({ enabled: true })
+    : (c: NextConfig) => c
+
 const POLYFILL_STUB = path.resolve("./src/lib/empty-polyfill.js")
 
 const nextConfig: NextConfig = {
@@ -31,6 +37,12 @@ const nextConfig: NextConfig = {
     return config
   },
   reactStrictMode: false,
+  experimental: {
+    // Inline CSS chunks as <style> tags instead of render-blocking <link rel="stylesheet">.
+    // Eliminates the extra HTTP round-trip for the font CSS chunk and the compiled
+    // Tailwind CSS chunk — both currently block first paint by ~540 ms (Lighthouse).
+    inlineCss: true,
+  },
   // Bundle server tối giản cho Docker — chỉ copy `.next/standalone` vào image runner.
   output: "standalone",
   images: {
@@ -38,6 +50,8 @@ const nextConfig: NextConfig = {
     // The OSS origin serves no Cache-Control header; this ensures at least
     // the Next.js-optimized copies are cached long-term.
     minimumCacheTTL: 2592000,
+    // All quality values used in the codebase — Next.js 16 requires explicit enumeration.
+    qualities: [20, 60, 65, 75],
     remotePatterns: [
       {
         protocol: "https",
@@ -90,4 +104,4 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default nextConfig
+export default withBundleAnalyzer(nextConfig)
