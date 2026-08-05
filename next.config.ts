@@ -2,6 +2,7 @@ import path from "path"
 import type { NextConfig } from "next"
 
 const POLYFILL_STUB = path.resolve("./src/lib/empty-polyfill.js")
+const EMPTY_MODULE_LOADER = path.resolve("./src/lib/empty-module-loader.js")
 
 const nextConfig: NextConfig = {
   turbopack: {
@@ -9,18 +10,20 @@ const nextConfig: NextConfig = {
       "*.mp4": { type: "asset" },
       "*.mov": { type: "asset" },
       "*.webm": { type: "asset" },
-    },
-    resolveAlias: {
-      // Replace Next.js built-in polyfills with a no-op.
-      // All listed features are Baseline and supported by our .browserslistrc targets.
-      "next/dist/build/polyfills/polyfill-module": POLYFILL_STUB,
+      // Strip Next.js built-in polyfills from Turbopack builds.
+      // resolveAlias can't catch this because app-globals.js imports via a relative
+      // path ("../build/polyfills/polyfill-module") — aliases match raw specifiers,
+      // not resolved paths. A loader rule matches the resolved file path, so it works.
+      "**/build/polyfills/polyfill-module.js": {
+        loaders: [{ loader: EMPTY_MODULE_LOADER }],
+        as: "*.js",
+      },
     },
   },
   webpack(config, { webpack: wp, isServer }) {
     if (!isServer) {
-      // NormalModuleReplacementPlugin intercepts the raw import request before
-      // webpack resolves it, so it catches both the bare name and the relative
-      // path ("../build/polyfills/polyfill-module") used inside Next.js internals.
+      // Webpack fallback: NormalModuleReplacementPlugin matches the resolved path,
+      // catching the relative import inside Next.js internals.
       config.plugins!.push(
         new wp.NormalModuleReplacementPlugin(
           /polyfills[\\/]polyfill-module(\.js)?$/,
@@ -29,6 +32,12 @@ const nextConfig: NextConfig = {
       )
     }
     return config
+  },
+  experimental: {
+    // Inline CSS into <style> tags instead of render-blocking <link> tags.
+    // Recommended for Tailwind (atomic CSS) — styles are compact so the extra
+    // per-response bytes are fine, and new visitors skip the CSS waterfall entirely.
+    inlineCss: true,
   },
   reactStrictMode: false,
   // Bundle server tối giản cho Docker — chỉ copy `.next/standalone` vào image runner.
