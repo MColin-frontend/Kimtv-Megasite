@@ -13,7 +13,7 @@ import { useTranslation } from "@/i18n"
 import { Typography } from "@/components/ui/typography"
 
 import imgLiveSmall from "@assets/images/common/img-live-small.gif"
-import imgNoSource from "@assets/images/common/img-no-source.webp"
+import imgNoSource from "@assets/images/common/img-no-source.png"
 import videoBanner from "@assets/videos/common/video-banner.mp4"
 
 const AdBanner = dynamic(() => import("@/components/ui/ad-banner").then((m) => m.AdBanner), {
@@ -221,11 +221,13 @@ export function VideoPlayer({
             alt=""
             fill
             priority
-            className="z-0 object-cover object-center opacity-30"
+            sizes="(max-width: 1024px) 100vw, 60vw"
+            className="z-0 object-cover object-center opacity-70"
           />
+          <div className="absolute inset-0 z-[1] bg-black/40" />
 
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 text-center">
-            <div className="card-gold rounded-8 relative overflow-hidden px-8 py-5 max-sm:scale-50">
+          <div className="absolute inset-0 z-[2] flex flex-col items-center justify-center gap-3 px-6 text-center">
+            <div className="card-gold rounded-8 relative overflow-hidden px-4 py-3.5 sm:px-8 sm:py-5">
               <div className="via-gold/50 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent" />
               <Typography variant="body" weight="700" className="text-gold drop-shadow-gold">
                 {t("video.no-source.title")}
