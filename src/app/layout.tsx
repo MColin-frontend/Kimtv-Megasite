@@ -15,9 +15,6 @@ const oswald = Oswald({
   variable: "--font-oswald",
   subsets: ["latin", "vietnamese"],
   weight: ["400", "500", "600", "700"],
-  // "optional": zero block period — browser paints immediately with system font,
-  // swaps to Oswald only if already cached. Removes all non-preloaded woff2
-  // variants from the critical request chain (8 of 12 files were not preloaded).
   display: "optional",
 })
 
@@ -55,7 +52,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             alt=""
             fill
             priority
-            quality={20}
             className="object-cover object-top"
             sizes="100vw"
           />
