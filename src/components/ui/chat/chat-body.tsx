@@ -382,12 +382,12 @@ export function ChatBody({
   }, [chatroomId, gameId, initWs])
 
   const scrollToBottom = useCallback(() => {
-    // Defer until after the browser has finished layout for the newly-committed
-    // message nodes — reading scrollHeight before that forces a synchronous reflow.
-    requestAnimationFrame(() => {
-      const el = listRef.current
-      if (el) el.scrollTop = el.scrollHeight
-    })
+    // useEffect (caller) fires post-paint — messages are in the DOM, no rAF needed.
+    // Setting scrollTop to a large value lets the browser clamp it to the actual
+    // maximum internally, eliminating the scrollHeight JS read that would otherwise
+    // force a synchronous layout recalculation.
+    const el = listRef.current
+    if (el) el.scrollTop = 999999
   }, [])
 
   useEffect(() => {

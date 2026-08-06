@@ -1,6 +1,18 @@
+import { preload } from "react-dom"
+
 import { fetchLiveScheduleMatches } from "@/features/live-schedule/live-schedule.api"
 import { buildStreamSources, fetchAnchorLiveData } from "@/features/live/api/live.api"
 import type { VideoSource } from "@/components/ui/video"
+
+import imgNoSource from "@assets/images/common/img-no-source.webp"
+
+import {
+  buildNextImgSrcset,
+  MATCH_CARD_IMG_QUALITY,
+  MATCH_CARD_IMG_SIZES,
+  MATCH_CARD_IMG_WIDTHS,
+  nextImgUrl,
+} from "@/lib/next-image.utils"
 
 import { HeroVideoClient } from "./hero-video-client"
 
@@ -111,6 +123,18 @@ export async function HeroVideo({ className }: { className?: string }) {
       } satisfies LiveMatch
     })
   )
+
+  // Preload the LCP image with the exact /_next/image srcset the browser will request.
+  // priority={true} on <Image> inside a Client Component doesn't inject <link rel="preload">
+  // into the document head — only the img fetchpriority attribute is set. This preload()
+  // call runs in the Server Component and guarantees the hint lands in the initial HTML.
+  const lcpSrc = matches[0]?.poster ?? imgNoSource.src
+  preload(nextImgUrl(lcpSrc, 828, MATCH_CARD_IMG_QUALITY), {
+    as: "image",
+    fetchPriority: "high",
+    imageSrcSet: buildNextImgSrcset(lcpSrc, MATCH_CARD_IMG_WIDTHS, MATCH_CARD_IMG_QUALITY),
+    imageSizes: MATCH_CARD_IMG_SIZES,
+  })
 
   return <HeroVideoClient matches={matches} className={className} />
 }

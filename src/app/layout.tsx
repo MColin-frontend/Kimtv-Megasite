@@ -15,14 +15,17 @@ const oswald = Oswald({
   variable: "--font-oswald",
   subsets: ["latin", "vietnamese"],
   weight: ["400", "500", "600", "700"],
-  display: "fallback",
+  // "optional": zero block period — browser paints immediately with system font,
+  // swaps to Oswald only if already cached. Removes all non-preloaded woff2
+  // variants from the critical request chain (8 of 12 files were not preloaded).
+  display: "optional",
 })
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin", "vietnamese"],
   weight: ["400", "500", "600", "700", "800"],
-  display: "fallback",
+  display: "optional",
 })
 
 export const metadata = createMetadata({

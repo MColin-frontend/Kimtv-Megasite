@@ -78,13 +78,15 @@ export function MobileBottomNav() {
       setReady()
     }
 
-    const rafId = requestAnimationFrame(measure)
+    // useEffect fires post-paint — layout is already computed, reading geometry here
+    // is safe and does not trigger a forced reflow. The previous requestAnimationFrame
+    // wrapper deferred the read to the NEXT frame, where pending React state updates
+    // (WebSocket messages, data fetches) could have invalidated styles, making the
+    // geometry read force a synchronous layout instead.
+    measure()
     const ro = new ResizeObserver(measure)
     ro.observe(nav)
-    return () => {
-      cancelAnimationFrame(rafId)
-      ro.disconnect()
-    }
+    return () => ro.disconnect()
   }, [pathname, setReady])
 
   const path = ready && cx !== null ? buildPath(W, cx) : null

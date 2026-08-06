@@ -270,7 +270,7 @@ export const VideoFeedPlayer = forwardRef<VideoFeedPlayerHandle, VideoFeedPlayer
         <div
           id={mountId}
           className="h-full w-full overflow-hidden [&_.xgplayer]:pointer-events-none [&_.xgplayer-controls]:!hidden [&_.xgplayer-poster]:!hidden [&_.xgplayer-replay]:!hidden [&_.xgplayer-start]:!hidden [&_video]:h-full [&_video]:w-full [&_video]:object-contain"
-          style={{ contain: "layout" }}
+          style={{ contain: "strict" }}
         />
       </div>
     )
