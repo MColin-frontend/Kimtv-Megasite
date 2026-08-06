@@ -30,6 +30,9 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 2592000,
     // All quality values used in the codebase — Next.js 16 requires explicit enumeration.
     qualities: [20, 60, 65, 75],
+    // 168 matches the fixed thumbnail size used in NewsItemRow so /_next/image serves
+    // exactly 168px instead of falling back to the next slot (256px) — saves ~55% bytes.
+    imageSizes: [16, 32, 48, 64, 96, 128, 168, 256, 384],
     remotePatterns: [
       {
         protocol: "https",

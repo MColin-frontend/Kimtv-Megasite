@@ -14,14 +14,15 @@ import "./globals.css"
 const oswald = Oswald({
   variable: "--font-oswald",
   subsets: ["latin", "vietnamese"],
-  weight: ["300", "400", "500", "600", "700"],
-  display: "swap",
+  weight: ["400", "500", "600", "700"],
+  display: "fallback",
 })
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin", "vietnamese"],
-  display: "swap",
+  weight: ["400", "500", "600", "700", "800"],
+  display: "fallback",
 })
 
 export const metadata = createMetadata({
