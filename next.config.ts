@@ -1,4 +1,3 @@
-import path from "path"
 import type { NextConfig } from "next"
 
 const withBundleAnalyzer =
@@ -7,8 +6,6 @@ const withBundleAnalyzer =
       require("@next/bundle-analyzer")({ enabled: true })
     : (c: NextConfig) => c
 
-const POLYFILL_STUB = path.resolve("./src/lib/empty-polyfill.js")
-
 const nextConfig: NextConfig = {
   turbopack: {
     rules: {
@@ -16,25 +13,6 @@ const nextConfig: NextConfig = {
       "*.mov": { type: "asset" },
       "*.webm": { type: "asset" },
     },
-    resolveAlias: {
-      // Replace Next.js built-in polyfills with a no-op.
-      // All listed features are Baseline and supported by our .browserslistrc targets.
-      "next/dist/build/polyfills/polyfill-module": POLYFILL_STUB,
-    },
-  },
-  webpack(config, { webpack: wp, isServer }) {
-    if (!isServer) {
-      // NormalModuleReplacementPlugin intercepts the raw import request before
-      // webpack resolves it, so it catches both the bare name and the relative
-      // path ("../build/polyfills/polyfill-module") used inside Next.js internals.
-      config.plugins!.push(
-        new wp.NormalModuleReplacementPlugin(
-          /polyfills[\\/]polyfill-module(\.js)?$/,
-          POLYFILL_STUB
-        )
-      )
-    }
-    return config
   },
   reactStrictMode: false,
   experimental: {

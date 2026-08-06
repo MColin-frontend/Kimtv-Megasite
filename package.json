@@ -12,7 +12,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "next typegen && tsc --noEmit",
-    "prepare": "husky && mkdir -p public src/styles && touch src/styles/xgplayer-overrides.css && cat node_modules/xgplayer/dist/index.min.css src/styles/xgplayer-overrides.css > public/xgplayer.min.css && cp node_modules/react-toastify/dist/ReactToastify.css public/react-toastify.css"
+    "prepare": "husky && mkdir -p public src/styles && touch src/styles/xgplayer-overrides.css && cat node_modules/xgplayer/dist/index.min.css src/styles/xgplayer-overrides.css > public/xgplayer.min.css && cp node_modules/react-toastify/dist/ReactToastify.css public/react-toastify.css && cp src/lib/empty-polyfill.js node_modules/next/dist/build/polyfills/polyfill-module.js"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

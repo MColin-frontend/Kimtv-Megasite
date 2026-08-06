@@ -150,6 +150,8 @@ function FeedStackSlide({
           volume={isActive ? 0.8 : 0}
           autoplay={false}
           active={isActive}
+          pixelWidth={width}
+          pixelHeight={height}
           onReady={isActive ? onReady : undefined}
           onPlay={isActive ? onPlay : undefined}
           onPause={isActive ? onPause : undefined}
