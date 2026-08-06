@@ -382,8 +382,12 @@ export function ChatBody({
   }, [chatroomId, gameId, initWs])
 
   const scrollToBottom = useCallback(() => {
-    const el = listRef.current
-    if (el) el.scrollTop = el.scrollHeight
+    // Defer until after the browser has finished layout for the newly-committed
+    // message nodes — reading scrollHeight before that forces a synchronous reflow.
+    requestAnimationFrame(() => {
+      const el = listRef.current
+      if (el) el.scrollTop = el.scrollHeight
+    })
   }, [])
 
   useEffect(() => {

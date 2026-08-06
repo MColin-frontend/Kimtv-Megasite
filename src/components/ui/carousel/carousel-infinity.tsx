@@ -191,6 +191,7 @@ export default function CarouselInfinity<T>({
       <div
         className={`overflow-hidden${viewportClassName ? ` ${viewportClassName}` : ""}`}
         ref={emblaRef}
+        style={{ contain: "layout" }}
       >
         <div
           className={`flex items-stretch will-change-transform${gapClassName ? ` ${gapClassName}` : ""}`}

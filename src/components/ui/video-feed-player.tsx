@@ -24,6 +24,10 @@ export interface VideoFeedPlayerProps {
   autoplay?: boolean
   /** Khi false, player pause và preload — dùng cho slide prev/next trong feed stack. */
   active?: boolean
+  /** Explicit pixel dimensions forwarded to xgplayer config — skips the DOM read
+   *  xgplayer does internally when width/height are "100%". */
+  pixelWidth?: number
+  pixelHeight?: number
   onReady?: () => void
   onPlay?: () => void
   onPause?: () => void
@@ -51,6 +55,8 @@ export const VideoFeedPlayer = forwardRef<VideoFeedPlayerHandle, VideoFeedPlayer
       volume = 0.8,
       autoplay = true,
       active,
+      pixelWidth,
+      pixelHeight,
       onReady,
       onPlay,
       onPause,
@@ -186,8 +192,8 @@ export const VideoFeedPlayer = forwardRef<VideoFeedPlayerHandle, VideoFeedPlayer
           controls: false,
           pip: false,
           playsinline: true,
-          width: "100%",
-          height: "100%",
+          width: pixelWidth ?? "100%",
+          height: pixelHeight ?? "100%",
           fluid: false,
           cssFullscreen: false,
           ignores: ["start"],
@@ -264,6 +270,7 @@ export const VideoFeedPlayer = forwardRef<VideoFeedPlayerHandle, VideoFeedPlayer
         <div
           id={mountId}
           className="h-full w-full overflow-hidden [&_.xgplayer]:pointer-events-none [&_.xgplayer-controls]:!hidden [&_.xgplayer-poster]:!hidden [&_.xgplayer-replay]:!hidden [&_.xgplayer-start]:!hidden [&_video]:h-full [&_video]:w-full [&_video]:object-contain"
+          style={{ contain: "layout" }}
         />
       </div>
     )
