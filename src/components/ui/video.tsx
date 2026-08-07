@@ -88,13 +88,6 @@ export function VideoPlayer({
       link.href = "/xgplayer.min.css"
       document.head.appendChild(link)
     }
-    if (!document.getElementById("xgplayer-overrides-css")) {
-      const link = document.createElement("link")
-      link.id = "xgplayer-overrides-css"
-      link.rel = "stylesheet"
-      link.href = "/xgplayer-overrides.css"
-      document.head.appendChild(link)
-    }
   }, [])
 
   useEffect(() => {

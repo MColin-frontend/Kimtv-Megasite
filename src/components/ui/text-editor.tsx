@@ -1,5 +1,6 @@
 "use client"
 
+import "./tiptap.css"
 import { useEditor, EditorContent } from "@tiptap/react"
 import { useEffect } from "react"
 import StarterKit from "@tiptap/starter-kit"
@@ -101,16 +102,6 @@ export function TextEditor({
       onChange?.(editor.getHTML())
     },
   })
-
-  useEffect(() => {
-    if (!document.getElementById("tiptap-css")) {
-      const link = document.createElement("link")
-      link.id = "tiptap-css"
-      link.rel = "stylesheet"
-      link.href = "/tiptap.css"
-      document.head.appendChild(link)
-    }
-  }, [])
 
   useEffect(() => {
     if (!editor || value === undefined) return
