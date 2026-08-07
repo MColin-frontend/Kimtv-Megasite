@@ -1,4 +1,5 @@
 import { localePath, type LocaleType } from "@/i18n"
+import { SEARCH_QUERY_KEY } from "@/features/search/search.schema"
 
 export const getRoutes = (locale: LocaleType) => ({
   home: `/${locale}`,
@@ -24,7 +25,11 @@ export const getRoutes = (locale: LocaleType) => ({
     register: localePath(locale, "dang-ky"),
   },
   inviteFriend: localePath(locale, "moi-ban"),
+  search: localePath(locale, "tim-kiem"),
+  searchWithQuery: (q: string) =>
+    `${localePath(locale, "tim-kiem")}?${new URLSearchParams({ [SEARCH_QUERY_KEY]: q })}`,
   userInfo: (userId: string | number) => localePath(locale, "nguoi-dung", String(userId)),
+  liveBase: (matchId: string | number) => localePath(locale, "truc-tiep", String(matchId)),
   live: (matchId: string | number, gameId: number) =>
     `${localePath(locale, "truc-tiep", String(matchId))}?game_id=${gameId}`,
 })

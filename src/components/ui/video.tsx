@@ -1,5 +1,6 @@
 "use client"
 
+import { preload } from "react-dom"
 import { useEffect, useId, useRef } from "react"
 import dynamic from "next/dynamic"
 import NextImage from "next/image"
@@ -207,6 +208,20 @@ export function VideoPlayer({
 
   const hasSource = !!(url ?? sources?.[0]?.url)
 
+  // Khi không có nguồn phát, img-no-source là LCP trên mobile. Inject preload vào
+  // <head> trước khi browser parse <img> để đảm bảo fetchpriority=high được ghi nhận
+  // đúng (priority prop không phải lúc nào cũng đủ với fill + client component).
+  if (!hasSource) {
+    preload(imgNoSource.src, {
+      as: "image",
+      fetchPriority: "high",
+      imageSrcSet: [640, 750, 828, 1080].map(
+        (w) => `/_next/image?url=${encodeURIComponent(imgNoSource.src)}&w=${w}&q=60 ${w}w`
+      ).join(", "),
+      imageSizes: "(max-width: 1024px) 100vw, 60vw",
+    })
+  }
+
   return (
     <div
       className={cn(
@@ -221,6 +236,8 @@ export function VideoPlayer({
             alt=""
             fill
             priority
+            fetchPriority="high"
+            quality={60}
             sizes="(max-width: 1024px) 100vw, 60vw"
             className="z-0 object-cover object-center opacity-70"
           />

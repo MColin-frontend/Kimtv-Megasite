@@ -1,11 +1,10 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 import { cn } from "@/lib/utils"
-import { useBoolean } from "@/hooks/use-boolean"
 
 import { SLUG_MAP, useTranslation } from "@/i18n"
 import { getRoutes } from "@/config/routes"
@@ -13,16 +12,15 @@ import { MAIN_NAV_ITEMS } from "@/constants/component/layout.constants"
 
 import { Img } from "@/components/ui/image"
 
-const BAR_COLOR = "#111d35" // noticeably lighter than page (#091320) so notch is visible
+const BAR_COLOR = "#111d35"
 const BAR_H = 64
 const CIRCLE_R = 35
-const NOTCH_R = 39 // tight around circle: gap = 39-35 = 4px
+const NOTCH_R = 39
 
-/** SVG path: bar with true circular notch using 2-segment bezier approximation */
 function buildPath(W: number, cx: number): string {
   const H = BAR_H
   const R = NOTCH_R
-  const k = 0.5523 // magic number for quarter-circle bezier
+  const k = 0.5523
 
   const lx = cx - R
   const rx = cx + R
@@ -31,11 +29,7 @@ function buildPath(W: number, cx: number): string {
     `M 0,${H}`,
     `L 0,0`,
     `L ${lx},0`,
-    // Left quarter-circle: (lx,0) → (cx,R)
-    // CP1: go down from lx (vertical tangent)
-    // CP2: approach from left at depth R (horizontal tangent)
     `C ${lx},${R * k} ${cx - R * k},${R} ${cx},${R}`,
-    // Right quarter-circle: (cx,R) → (rx,0)
     `C ${cx + R * k},${R} ${rx},${R * k} ${rx},0`,
     `L ${W},0`,
     `L ${W},${H}`,
@@ -43,14 +37,26 @@ function buildPath(W: number, cx: number): string {
   ].join(" ")
 }
 
+// Only items that render (have an icon)
+const NAV_ITEMS = MAIN_NAV_ITEMS.filter((item) => item.icon)
+
 export function MobileBottomNav() {
   const { locale, t } = useTranslation()
   const pathname = usePathname()
   const routes = getRoutes(locale)
-  const navRef = useRef<HTMLDivElement>(null)
-  const [cx, setCx] = useState<number | null>(null)
-  const [W, setW] = useState(375)
-  const { value: ready, on: setReady } = useBoolean()
+
+  // window.innerWidth does NOT force layout — it's a global value always available.
+  // Replaces el.offsetWidth + active.offsetLeft + active.offsetWidth (3 layout reads)
+  // with pure arithmetic from item index and viewport width.
+  const [W, setW] = useState<number>(() => typeof window !== "undefined" ? window.innerWidth : 0)
+
+  useEffect(() => {
+    function onResize() {
+      setW(window.innerWidth)
+    }
+    window.addEventListener("resize", onResize, { passive: true })
+    return () => window.removeEventListener("resize", onResize)
+  }, [])
 
   function isActive(href: string, relatedSlugs?: string[]): boolean {
     if (href === `/${locale}`) return pathname === `/${locale}`
@@ -61,40 +67,17 @@ export function MobileBottomNav() {
     return !!relatedSlugs?.some((s) => pathname.includes(`/${s}`))
   }
 
-  useEffect(() => {
-    const nav = navRef.current
-    if (!nav) return
-
-    function measure() {
-      const el = navRef.current
-      if (!el) return
-      // Batch all reads before any writes to avoid layout thrashing
-      const width = el.offsetWidth
-      const active = el.querySelector<HTMLElement>("[data-active='true']")
-      const activeCx = active != null ? active.offsetLeft + active.offsetWidth / 2 : null
-      // Commit all writes together
-      setW(width)
-      setCx(activeCx)
-      setReady()
-    }
-
-    // useEffect fires post-paint — layout is already computed, reading geometry here
-    // is safe and does not trigger a forced reflow. The previous requestAnimationFrame
-    // wrapper deferred the read to the NEXT frame, where pending React state updates
-    // (WebSocket messages, data fetches) could have invalidated styles, making the
-    // geometry read force a synchronous layout instead.
-    measure()
-    const ro = new ResizeObserver(measure)
-    ro.observe(nav)
-    return () => ro.disconnect()
-  }, [pathname, setReady])
-
-  const path = ready && cx !== null ? buildPath(W, cx) : null
+  // Compute active item center from index — nav is fixed inset-x-0 with equal flex-1 items,
+  // so center of item k = (k + 0.5) * W / itemCount. No DOM geometry read needed.
+  const activeIndex = NAV_ITEMS.findIndex((item) =>
+    isActive(item.getHref(routes), item.relatedSlugs)
+  )
+  const cx = activeIndex >= 0 ? ((activeIndex + 0.5) * W) / NAV_ITEMS.length : null
+  const path = cx !== null ? buildPath(W, cx) : null
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-50 lg:hidden">
-      <div ref={navRef} className="relative" style={{ height: BAR_H }}>
-        {/* Bar SVG */}
+      <div className="relative" style={{ height: BAR_H }}>
         {path ? (
           <svg
             aria-hidden
@@ -110,13 +93,11 @@ export function MobileBottomNav() {
           <div className="absolute inset-0" style={{ background: BAR_COLOR }} />
         )}
 
-        {/* Items */}
         <div className="relative flex h-full items-center justify-around">
-          {MAIN_NAV_ITEMS.map((item) => {
+          {NAV_ITEMS.map((item) => {
             const href = item.getHref(routes)
             const active = isActive(href, item.relatedSlugs)
             const Icon = item.icon
-            if (!Icon) return null
 
             return (
               <Link
@@ -131,7 +112,6 @@ export function MobileBottomNav() {
                     active ? "-translate-y-9" : "translate-y-0"
                   )}
                 >
-                  {/* Circle wrapper — only for active */}
                   {active && (
                     <div
                       className="absolute rounded-full"
@@ -140,7 +120,7 @@ export function MobileBottomNav() {
                         boxShadow: [
                           "0 20px 48px -4px rgba(0,0,0,0.95)",
                           "0 10px 20px -2px rgba(0,0,0,0.85)",
-                          "inset 0 1px 0 rgba(255,255,255,0.08)", // top highlight
+                          "inset 0 1px 0 rgba(255,255,255,0.08)",
                         ].join(", "),
                         width: CIRCLE_R * 2,
                         height: CIRCLE_R * 2,
@@ -151,7 +131,6 @@ export function MobileBottomNav() {
                     />
                   )}
 
-                  {/* Icon */}
                   <div className="relative z-10">
                     {item.iconSrc ? (
                       <Img
@@ -217,7 +196,6 @@ export function MobileBottomNav() {
         </div>
       </div>
 
-      {/* iPhone safe area */}
       <div style={{ height: "env(safe-area-inset-bottom,0px)", background: BAR_COLOR }} />
     </nav>
   )

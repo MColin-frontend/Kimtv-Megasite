@@ -1,9 +1,12 @@
-import { createMetadata } from "@/lib/metadata"
 import { getRequest } from "@/server/services/request"
+import { createMetadata } from "@/lib/metadata"
 
-import type { UserInfoModel } from "@/features/user-info/user-info.models"
-import { USER_INFO_API } from "@/features/user-info/user-info.constants"
+import type { LocaleType } from "@/i18n"
+import { getRoutes } from "@/config/routes"
+
 import { UserInfoPage } from "@/features/user-info/components"
+import { USER_INFO_API } from "@/features/user-info/user-info.constants"
+import type { UserInfoModel } from "@/features/user-info/user-info.models"
 
 export const dynamic = "force-dynamic"
 
@@ -13,7 +16,7 @@ export async function generateMetadata({
   params: Promise<{ lang: string; id: string }>
 }) {
   const { lang, id } = await params
-  const path = `/${lang}/nguoi-dung/${id}`
+  const path = getRoutes(lang as LocaleType).userInfo(id)
 
   const user = await getRequest<UserInfoModel>(USER_INFO_API.PROFILE, {
     params: { userId: id },

@@ -911,6 +911,12 @@
 
 /* ─── Base ───────────────────────────────────────────────────── */
 @layer base {
+  input[type="search"]::-webkit-search-cancel-button,
+  input[type="search"]::-webkit-search-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
   html {
     font-family: var(--font-oswald), var(--font-inter), Arial, Helvetica, sans-serif !important;
   }

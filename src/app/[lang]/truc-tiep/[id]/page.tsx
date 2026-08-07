@@ -1,6 +1,8 @@
 import { Suspense } from "react"
 
 import { createMetadata } from "@/lib/metadata"
+import { getRoutes } from "@/config/routes"
+import type { LocaleType } from "@/i18n"
 
 import { fetchAnchorLiveData, fetchMatchLiveData } from "@/features/live/api/live.api"
 import { LivePage } from "@/features/live/components"
@@ -31,7 +33,7 @@ export async function generateMetadata({ params, searchParams }: Props) {
       ? `Xem trực tiếp ${home} vs ${away}${league ? ` (${league})` : ""} trên KimTV — tỉ số live, bình luận và phòng chat.`
       : "Xem bóng đá trực tiếp trên KimTV — tỉ số live, bình luận viên và phòng chat."
 
-  const path = `/${lang}/truc-tiep/${id}`
+  const path = getRoutes(lang as LocaleType).liveBase(id)
   const ogImage = match?.homeLogo ?? match?.awayLogo ?? null
 
   return createMetadata({

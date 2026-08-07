@@ -1,4 +1,6 @@
 import { createMetadata } from "@/lib/metadata"
+import { getRoutes } from "@/config/routes"
+import type { LocaleType } from "@/i18n"
 
 import { fetchHotNewsByGameAction } from "@/features/news/news.server"
 
@@ -8,7 +10,7 @@ export const dynamic = "force-dynamic"
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params
-  const path = `/${lang}/tin-tuc`
+  const path = getRoutes(lang as LocaleType).news.index
 
   const hotNews = await fetchHotNewsByGameAction().catch(() => ({ news: [], videos: [] }))
   const firstItem = hotNews.news[0] ?? null

@@ -1,18 +1,16 @@
 import { Suspense } from "react"
 import dynamic from "next/dynamic"
 
-import { FootballHub, FootballHubSkeleton } from "./football-hub"
 import { ScrollReveal } from "@/components/ui/scroll-reveal"
 
+import { FootballHub, FootballHubSkeleton } from "./football-hub"
 import { HeroBanner } from "./hero-banner"
 import { HeroVideo } from "./hero-video"
 import { HeroVideoClientSkeleton } from "./hero-video-client"
 import MatchFixtures from "./match-fixtures/index"
 
 // Deferred — pulls in Embla Carousel + react-query hooks; not needed for initial paint
-const MatchSchedule = dynamic(() =>
-  import("./match-schedule").then((m) => m.MatchSchedule)
-)
+const MatchSchedule = dynamic(() => import("./match-schedule").then((m) => m.MatchSchedule))
 
 export function HomePage() {
   return (

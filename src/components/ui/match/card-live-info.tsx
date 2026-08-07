@@ -1,31 +1,22 @@
 "use client"
 
-import dynamic from "next/dynamic"
 import { useEffect, useState } from "react"
+import dynamic from "next/dynamic"
+
 import { deriveMatchStatusFlags } from "@/lib/match.utils"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/use-auth"
 import { useBoolean } from "@/hooks/use-boolean"
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard"
-import { useLiveNavigate } from "@/hooks/use-live-navigate"
 import { useDisclosure } from "@/hooks/use-disclosure"
 import { useFakeGameMinute } from "@/hooks/use-fake-game-minute"
+import { useLiveNavigate } from "@/hooks/use-live-navigate"
 
 import { useTranslation } from "@/i18n"
 import { buildMatchStats } from "@/constants/component/match-card.constants"
 import type { MatchInterface } from "@/models/match.models"
 
 import { closePollApi, createPollApi, getActivePollApi } from "@/features/live/api/poll.api"
-// Deferred — each modal pulls in react-hook-form, zod, and @base-ui/react/dialog.
-// Only load when the user opens the poll UI.
-const PollHistoryModal = dynamic(() =>
-  import("@/features/live/components/poll-history-modal").then((m) => m.PollHistoryModal),
-  { ssr: false }
-)
-const PollModal = dynamic(() =>
-  import("@/features/live/components/poll-modal").then((m) => m.PollModal),
-  { ssr: false }
-)
 import { POLL_TYPE_MAP, PollTypeEnum } from "@/features/live/poll.constants"
 import type { CreatePollPayloadInterface, PollInterface } from "@/features/live/poll.models"
 import type { PollFormType } from "@/features/live/poll.schema"
@@ -36,7 +27,7 @@ import { Typography } from "@/components/ui/typography"
 
 import icPoll from "@assets/icons/common/ic-poll.svg"
 import icShare from "@assets/icons/common/ic-share.svg"
-import imgStadiumBg from "@assets/images/common/img-no-source.webp"
+import imgStadiumBg from "@assets/images/common/img-no-source.png"
 import imgVs from "@assets/images/common/img-vs.png"
 
 import { BadgeLive } from "./parts/badge-live"
@@ -44,6 +35,17 @@ import { CardBackground } from "./parts/card-background"
 import { GameMinuteBadge } from "./parts/game-minute-badge"
 import { LeagueTimeRow } from "./parts/league-time-row"
 import { MatchStatBar } from "./parts/stat-bar"
+
+// Deferred — each modal pulls in react-hook-form, zod, and @base-ui/react/dialog.
+// Only load when the user opens the poll UI.
+const PollHistoryModal = dynamic(
+  () => import("@/features/live/components/poll-history-modal").then((m) => m.PollHistoryModal),
+  { ssr: false }
+)
+const PollModal = dynamic(
+  () => import("@/features/live/components/poll-modal").then((m) => m.PollModal),
+  { ssr: false }
+)
 
 /* ── Types ───────────────────────────────────────────────── */
 
@@ -242,7 +244,7 @@ export function MatchLiveInfoBar({ match, className, priority }: MatchLiveInfoBa
         homeLogo={match.homeLogo}
         awayLogo={match.awayLogo}
         stadiumSrc={imgStadiumBg.src}
-        stadiumClassName="opacity-50"
+        stadiumClassName="opacity-90"
         stadiumExtras={<div className="pointer-events-none absolute inset-0 z-[1] bg-black/20" />}
         priority={priority}
       />

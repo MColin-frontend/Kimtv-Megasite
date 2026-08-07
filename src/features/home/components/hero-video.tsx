@@ -1,11 +1,5 @@
 import { preload } from "react-dom"
 
-import { fetchLiveScheduleMatches } from "@/features/live-schedule/live-schedule.api"
-import { buildStreamSources, fetchAnchorLiveData } from "@/features/live/api/live.api"
-import type { VideoSource } from "@/components/ui/video"
-
-import imgNoSource from "@assets/images/common/img-no-source.webp"
-
 import {
   buildNextImgSrcset,
   MATCH_CARD_IMG_QUALITY,
@@ -13,6 +7,12 @@ import {
   MATCH_CARD_IMG_WIDTHS,
   nextImgUrl,
 } from "@/lib/next-image.utils"
+
+import { fetchLiveScheduleMatches } from "@/features/live-schedule/live-schedule.api"
+import { buildStreamSources, fetchAnchorLiveData } from "@/features/live/api/live.api"
+import type { VideoSource } from "@/components/ui/video"
+
+import imgNoSource from "@assets/images/common/img-no-source.webp"
 
 import { HeroVideoClient } from "./hero-video-client"
 

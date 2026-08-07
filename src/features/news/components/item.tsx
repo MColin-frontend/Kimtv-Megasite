@@ -33,7 +33,7 @@ export function NewsItemFeatured({ item, href, categoryLabel, className }: NewsI
         quality={65}
         rounded="8"
         objectFit="cover"
-        sizes="(max-width: 1023px) calc(100vw - 32px), 400px"
+        sizes="(max-width: 1023px) calc(100vw - 32px), 370px"
         wrapperClassName="relative overflow-hidden rounded-8 w-full aspect-video mb-2"
         className="transition-transform duration-300 group-hover:scale-105"
       />

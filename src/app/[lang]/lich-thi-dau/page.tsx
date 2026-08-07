@@ -1,4 +1,6 @@
 import { createMetadata } from "@/lib/metadata"
+import { getRoutes } from "@/config/routes"
+import type { LocaleType } from "@/i18n"
 
 export { SchedulePage as default } from "@/features/schedule/components"
 
@@ -6,7 +8,7 @@ export const dynamic = "force-dynamic"
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params
-  const path = `/${lang}/lich-thi-dau`
+  const path = getRoutes(lang as LocaleType).schedule
   return createMetadata({
     title: "Lịch thi đấu",
     description:

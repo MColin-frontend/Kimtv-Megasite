@@ -11,8 +11,8 @@ function TooltipProvider({ children }: { children?: ReactNode; delay?: number })
   return <>{children}</>
 }
 
-function Tooltip({ children }: { children?: ReactNode }) {
-  return <span className="group/tip relative inline-flex">{children}</span>
+function Tooltip({ children, className }: { children?: ReactNode; className?: string }) {
+  return <span className={cn("group/tip relative inline-flex", className)}>{children}</span>
 }
 
 function TooltipTrigger({

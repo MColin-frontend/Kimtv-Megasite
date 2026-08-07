@@ -1,21 +1,24 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { Suspense, useCallback, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LogOut, Menu, UserRound, X } from "lucide-react"
+import { LogOut, Menu, Search, UserRound, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/use-auth"
 import { useDisclosure } from "@/hooks/use-disclosure"
+import { useRouter } from "@/hooks/use-router"
 
 import { SLUG_MAP, useTranslation } from "@/i18n"
 import { getRoutes } from "@/config/routes"
 import { HEADER_DROPDOWN_ITEMS, MAIN_NAV_ITEMS } from "@/constants/component/layout.constants"
 
+import { SEARCH_QUERY_KEY } from "@/features/search/search.schema"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Img } from "@/components/ui/image"
+import { Input } from "@/components/ui/input"
 import { ConfirmModal } from "@/components/ui/modal/confirm"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Typography } from "@/components/ui/typography"
@@ -235,6 +238,112 @@ function AvatarDropdown({ user, userId, onLogout }: AvatarDropdownProps) {
   )
 }
 
+/* ── Search ──────────────────────────────────────────────── */
+
+function SearchInput() {
+  const { t, locale } = useTranslation()
+  const routes = getRoutes(locale)
+  const { push, removeParams, getParam, pathname } = useRouter()
+  const isSearchPage = pathname === routes.search
+  const { state, open, close } = useDisclosure("search")
+  const formRef = useRef<HTMLFormElement>(null)
+  const wrapRef = useRef<HTMLDivElement>(null)
+  const urlQuery = getParam(SEARCH_QUERY_KEY) ?? ""
+
+  const focusInput = () => wrapRef.current?.querySelector<HTMLInputElement>("input")?.focus()
+
+  const handleClear = () => {
+    formRef.current?.reset()
+    removeParams(SEARCH_QUERY_KEY, { replace: true, scroll: false })
+    setTimeout(focusInput, 0)
+  }
+
+  const expand = () => {
+    open("search")
+    setTimeout(focusInput, 50)
+  }
+
+  const collapse = () => {
+    close("search")
+    if (!isSearchPage) removeParams(SEARCH_QUERY_KEY, { replace: true, scroll: false })
+  }
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const q = ((new FormData(e.currentTarget).get(SEARCH_QUERY_KEY) as string) ?? "").trim()
+    if (!q) {
+      push(routes.search)
+    } else {
+      push(routes.searchWithQuery(q))
+    }
+
+    close("search")
+  }
+
+  const handleBlur = () => {
+    setTimeout(() => {
+      if (!wrapRef.current?.contains(document.activeElement)) collapse()
+    }, 100)
+  }
+
+  return (
+    <div ref={wrapRef} className="relative hidden md:block" onBlur={handleBlur}>
+      <button
+        onClick={expand}
+        aria-label={t("header.search.aria-label")}
+        className={cn(
+          "flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200",
+          "border shadow-[0_1px_2px_rgba(0,0,0,0.3)]",
+          state.search || isSearchPage
+            ? "border-gold/50 bg-gold/10 text-gold shadow-[0_0_12px_rgba(246,195,67,0.2)]"
+            : "text-muted border-white/10 bg-white/[0.05] hover:border-white/20 hover:bg-white/10 hover:text-white"
+        )}
+      >
+        <Search className="h-[15px] w-[15px]" />
+      </button>
+
+      <form
+        ref={formRef}
+        key={urlQuery}
+        onSubmit={handleSubmit}
+        className={cn(
+          "absolute top-1/2 right-0 z-50 -translate-y-1/2",
+          "h-9 rounded-full border border-white/15 bg-[#0d1829]",
+          "shadow-[0_4px_24px_rgba(0,0,0,0.4)]",
+          "origin-right transition-all duration-200 ease-out",
+          state.search
+            ? "pointer-events-auto w-56 scale-x-100 opacity-100"
+            : "pointer-events-none w-8 scale-x-0 opacity-0"
+        )}
+      >
+        <Input
+          type="text"
+          name={SEARCH_QUERY_KEY}
+          defaultValue={urlQuery}
+          onKeyDown={(e) => e.key === "Escape" && collapse()}
+          placeholder={t("header.search.placeholder")}
+          variant="ghost"
+          inputSize="sm"
+          wrapperClassName="h-full rounded-full px-3"
+          leftIcon={<Search className="h-3.5 w-3.5" />}
+          rightIcon={
+            urlQuery && (
+              <Button
+                size="icon-sm"
+                variant="ghost"
+                onClick={handleClear}
+                className="flex size-6 items-center justify-center rounded-full bg-white/10 text-white/50 hover:bg-white/20 hover:text-white"
+              >
+                <X className="size-3" />
+              </Button>
+            )
+          }
+        />
+      </form>
+    </div>
+  )
+}
+
 /* ── Desktop Nav ─────────────────────────────────────────── */
 
 function DesktopNav({
@@ -403,6 +512,9 @@ export function Header() {
           <DesktopNav items={MAIN_NAV_ITEMS} isActive={isActive} t={t} />
 
           <div className="ml-auto flex shrink-0 items-center gap-3 max-sm:gap-2">
+            <Suspense>
+              <SearchInput />
+            </Suspense>
             {isLoggedIn && user ? (
               <AvatarDropdown user={user} userId={user.userId ?? user.uid} onLogout={logout} />
             ) : (

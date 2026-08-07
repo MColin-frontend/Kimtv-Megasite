@@ -1,4 +1,6 @@
 import { createMetadata } from "@/lib/metadata"
+import { getRoutes } from "@/config/routes"
+import type { LocaleType } from "@/i18n"
 import { fetchLiveScheduleMatches } from "@/features/live-schedule/live-schedule.api"
 
 import { LiveSchedulePage } from "@/features/live-schedule/components"
@@ -7,7 +9,7 @@ export const dynamic = "force-dynamic"
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params
-  const path = `/${lang}/lich-truc-tiep`
+  const path = getRoutes(lang as LocaleType).liveSchedule
 
   const matches = await fetchLiveScheduleMatches().catch(() => [])
   const first = matches[0] ?? null

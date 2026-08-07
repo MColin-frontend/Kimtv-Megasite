@@ -1,4 +1,6 @@
 import { createMetadata } from "@/lib/metadata"
+import { getRoutes } from "@/config/routes"
+import type { LocaleType } from "@/i18n"
 import { fetchInitialHighlights } from "@/features/highlights/api/highlights.server"
 import { FeedMenu } from "@/enums/highlights.enum"
 
@@ -8,7 +10,7 @@ export const dynamic = "force-dynamic"
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params
-  const path = `/${lang}/video`
+  const path = getRoutes(lang as LocaleType).video.index
 
   const data = await fetchInitialHighlights(FeedMenu.Featured).catch(() => ({ videos: [], hasMore: false }))
   const firstVideo = data.videos[0] ?? null

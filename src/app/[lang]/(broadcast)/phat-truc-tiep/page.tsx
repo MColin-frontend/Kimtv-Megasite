@@ -1,4 +1,6 @@
 import { createMetadata } from "@/lib/metadata"
+import { getRoutes } from "@/config/routes"
+import type { LocaleType } from "@/i18n"
 
 import { BroadcastPage } from "@/features/broadcast/components"
 
@@ -6,7 +8,7 @@ export const dynamic = "force-dynamic"
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params
-  const path = `/${lang}/phat-truc-tiep`
+  const path = getRoutes(lang as LocaleType).broadcast
   return createMetadata({
     title: "Phát trực tiếp",
     description:

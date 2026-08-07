@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "title": "Tìm kiếm",
+    "title-with-query": "Tìm kiếm \"{query}\"",
+    "description": "Tìm kiếm tin tức, trận đấu, video bóng đá trên KimTV."
+  },
+  "form": {
+    "placeholder": "Tìm kiếm tin tức, trận đấu, video...",
+    "submit": "Tìm kiếm",
+    "clear": "Xoá"
+  },
+  "results": {
+    "for": "Kết quả tìm kiếm cho",
+    "empty": "Nhập từ khoá để tìm kiếm tin tức, video, trận đấu."
+  },
+  "error": {
+    "required": "Vui lòng nhập từ khoá tìm kiếm",
+    "max": "Từ khoá tối đa {max} ký tự"
+  }
+}

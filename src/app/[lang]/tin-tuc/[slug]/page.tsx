@@ -1,4 +1,6 @@
 import { createMetadata } from "@/lib/metadata"
+import { getRoutes } from "@/config/routes"
+import type { LocaleType } from "@/i18n"
 
 import { NewsArticlePage } from "@/features/news/components/details"
 import { fetchNewsArticleAction } from "@/features/news/news.server"
@@ -12,7 +14,7 @@ export async function generateMetadata({
 }) {
   const { lang, slug } = await params
   const detail = await fetchNewsArticleAction(slug)
-  const path = `/${lang}/tin-tuc/${slug}`
+  const path = getRoutes(lang as LocaleType).news.article(slug)
   const title = detail?.title?.trim() || "Chi tiết tin tức"
   const description =
     detail?.summary?.trim() ||
