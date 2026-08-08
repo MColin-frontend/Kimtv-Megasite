@@ -10,6 +10,7 @@ import match from "./vi/match.json"
 import news from "./vi/news.json"
 import profile from "./vi/profile.json"
 import schedule from "./vi/schedule.json"
+import search from "./vi/search.json"
 import video from "./vi/video.json"
 
 const vi = {
@@ -20,6 +21,7 @@ const vi = {
   match,
   news,
   schedule,
+  search,
   chat,
   video,
   profile,

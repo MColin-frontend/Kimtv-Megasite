@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 
-import { fetchSlideAction } from "@/server/actions/slide.action"
+import { fetchAllAction, fetchSlideAction } from "@/server/actions/slide.action"
 
 import CarouselInfinity from "./carousel-infinity"
 
@@ -15,6 +15,8 @@ interface CarouselInfinityApiProps<T> {
   params?: Record<string, unknown>
   pageSize?: number
   skeletonCount?: number
+  /** Fetch toàn bộ mà không gửi params phân trang (vd: LIVE_SEARCH). */
+  fetchAll?: boolean
   renderItem: (item: T, index: number, isLoading: boolean) => React.ReactNode
   renderEmpty?: () => React.ReactNode
   slideClassName?: string
@@ -32,6 +34,7 @@ export default function CarouselInfinityApi<T>({
   params,
   pageSize = DEFAULT_PAGE_SIZE,
   skeletonCount = DEFAULT_SKELETON_COUNT,
+  fetchAll = false,
   renderItem,
   renderEmpty,
   slideClassName,
@@ -54,18 +57,26 @@ export default function CarouselInfinityApi<T>({
       }
       if (loadingRef.current || !hasMoreRef.current) return
       loadingRef.current = true
+
       try {
-        const data = await fetchSlideAction<T>(endpoint, method, params ?? {}, p, pageSize)
-        setItems((prev) => (p === 1 ? data : [...prev, ...data]))
-        hasMoreRef.current = data.length === pageSize
-        pageRef.current = p
+        if (fetchAll) {
+          const data = await fetchAllAction<T>(endpoint, method, params ?? {})
+          setItems(data)
+          hasMoreRef.current = false
+          pageRef.current = 1
+        } else {
+          const data = await fetchSlideAction<T>(endpoint, method, params ?? {}, p, pageSize)
+          setItems((prev) => (p === 1 ? data : [...prev, ...data]))
+          hasMoreRef.current = data.length === pageSize
+          pageRef.current = p
+        }
       } finally {
         loadingRef.current = false
         setIsInitialLoading(false)
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [endpoint, method, pageSize]
+    [endpoint, method, pageSize, fetchAll]
   )
 
   useEffect(() => {
@@ -73,8 +84,9 @@ export default function CarouselInfinityApi<T>({
   }, [loadPage])
 
   const handleReachEnd = useCallback(() => {
+    if (fetchAll) return
     loadPage(pageRef.current + 1)
-  }, [loadPage])
+  }, [loadPage, fetchAll])
 
   const skeletonItems = Array.from(
     { length: skeletonCount },
@@ -93,7 +105,7 @@ export default function CarouselInfinityApi<T>({
       gapClassName={gapClassName}
       autoPlayDelay={autoPlayDelay}
       keyExtractor={isInitialLoading ? (_, i) => `skeleton-${i}` : keyExtractor}
-      onReachEnd={handleReachEnd}
+      onReachEnd={fetchAll ? undefined : handleReachEnd}
       className={className}
     />
   )

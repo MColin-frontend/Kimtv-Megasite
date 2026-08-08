@@ -8,6 +8,7 @@ import { getTranslation } from "@/i18n/get-locale"
 import { getRoutes } from "@/config/routes"
 import { FOOTBALL_GAME_ID } from "@/constants/component/home.constants"
 
+import { HotTeamsList } from "@/features/home/components/football-hub"
 import { fetchHotNewsByGameAction, fetchNewsArticleAction } from "@/features/news/news.server"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Breadcrumb } from "@/components/ui/breadcrumb"
@@ -16,6 +17,7 @@ import { Typography } from "@/components/ui/typography"
 
 import { CommentSection } from "./comment-section"
 import { FollowButton } from "./follow-button"
+import { LikeButton } from "./like-button"
 
 export async function NewsArticlePage({ slug }: { slug: string }) {
   const [detail, hotData] = await Promise.all([
@@ -77,12 +79,11 @@ export async function NewsArticlePage({ slug }: { slug: string }) {
                   {detail.commentCount ?? 0}
                 </Typography>
               </span>
-              <span className="flex items-center gap-2">
-                <Heart className="size-5 text-white/50" />
-                <Typography variant="body-sm" color="foreground/50">
-                  {detail.likeCount ?? 0}
-                </Typography>
-              </span>
+              <LikeButton
+                newsId={detail.newsId}
+                initialLikeCount={detail.likeCount ?? 0}
+                initialIsLike={detail.isLike}
+              />
             </div>
           </div>
 
@@ -140,7 +141,7 @@ export async function NewsArticlePage({ slug }: { slug: string }) {
         </article>
 
         {/* ── Sidebar ── */}
-        <aside className="w-full shrink-0 xl:sticky xl:top-[80px] xl:max-h-[calc(100vh-88px)] xl:w-[380px] xl:self-start xl:overflow-y-auto">
+        <aside className="sticky top-23 max-h-[calc(100vh-92px)] w-[380px] shrink-0 self-start overflow-y-auto max-xl:static max-xl:max-h-none max-xl:w-full max-xl:overflow-visible">
           <div className="flex flex-col gap-4">
             {/* Tin nổi bật */}
             {hotData.news.length > 0 && (
@@ -251,6 +252,8 @@ export async function NewsArticlePage({ slug }: { slug: string }) {
                 </div>
               </div>
             )}
+
+            <HotTeamsList />
           </div>
         </aside>
       </div>

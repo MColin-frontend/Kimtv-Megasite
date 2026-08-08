@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 
 import { DEFAULT_PAGE_SIZE } from "@/constants/common.constants"
 
+import { Skeleton } from "@/components/ui/skeleton"
 import { Typography } from "@/components/ui/typography"
 
 /* ── Types ─────────────────────────────────────────────────── */
@@ -16,6 +17,7 @@ export interface PaginationProps {
   onPageChange: (page: number) => void
   onPageSizeChange?: (size: number) => void
   showSizeChanger?: boolean
+  loading?: boolean
   className?: string
 }
 
@@ -70,14 +72,40 @@ function PageBtn({
   )
 }
 
+/* ── Skeleton ───────────────────────────────────────────────── */
+function PaginationSkeleton({ className }: { className?: string }) {
+  return (
+    <div className={cn("flex items-center justify-center", className)}>
+      <div className="flex items-center gap-2 max-sm:gap-1">
+        <div className="flex items-center gap-0.5">
+          <Skeleton className="rounded-8 size-8 max-sm:size-7" />
+          <Skeleton className="rounded-8 size-8 max-sm:size-7" />
+        </div>
+        <div className="rounded-8 bg-foreground/5 flex items-center gap-0.5 px-1 py-1">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="rounded-8 size-8 max-sm:size-7" />
+          ))}
+        </div>
+        <div className="flex items-center gap-0.5">
+          <Skeleton className="rounded-8 size-8 max-sm:size-7" />
+          <Skeleton className="rounded-8 size-8 max-sm:size-7" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /* ── Pagination ─────────────────────────────────────────────── */
 export function Pagination({
   page,
   pageSize = DEFAULT_PAGE_SIZE,
   total,
   onPageChange,
+  loading,
   className,
 }: PaginationProps) {
+  if (loading) return <PaginationSkeleton className={className} />
+
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
   const pages = buildPageList(page, totalPages)
 

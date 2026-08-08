@@ -4,12 +4,11 @@ import "react"
 
 import { Users, Video } from "lucide-react"
 
-import { LIVE_MATCH_TYPE } from "@/lib/match.utils"
-import { deriveMatchStatusFlags } from "@/lib/match.utils"
+import { deriveMatchStatusFlags, LIVE_MATCH_TYPE } from "@/lib/match.utils"
 import { cn, formatViewers } from "@/lib/utils"
 import { useCountdown } from "@/hooks/use-countdown"
-import { useLiveNavigate } from "@/hooks/use-live-navigate"
 import { useFakeGameMinute } from "@/hooks/use-fake-game-minute"
+import { useLiveNavigate } from "@/hooks/use-live-navigate"
 
 import { useTranslation } from "@/i18n"
 import {
@@ -83,7 +82,7 @@ export function Card({ match, isLoading, className }: CardProps) {
     <div
       onClick={handleClick}
       className={cn(
-        "card-match-bg rounded-12 relative h-full w-full overflow-hidden shadow-none transition-all",
+        "card-match-bg rounded-12 shadow-card relative h-full w-full overflow-hidden transition-all",
         (isLive || isStream) && match?.matchId && match?.gameId
           ? "hover:shadow-card-hover cursor-pointer"
           : "cursor-default",

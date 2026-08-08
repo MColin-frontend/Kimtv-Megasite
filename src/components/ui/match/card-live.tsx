@@ -1,7 +1,7 @@
 "use client"
 
-import { cn } from "@/lib/utils"
 import { deriveMatchStatusFlags } from "@/lib/match.utils"
+import { cn } from "@/lib/utils"
 import { useLiveNavigate } from "@/hooks/use-live-navigate"
 
 import { useTranslation } from "@/i18n"
@@ -54,7 +54,7 @@ export function MatchCardLive({
       className={cn(
         "card-match-bg rounded-12 relative w-full overflow-hidden transition-all",
         match.matchId && match.gameId ? "hover:shadow-card-hover cursor-pointer" : "cursor-default",
-        "shadow-none",
+        "shadow-card",
         className
       )}
     >

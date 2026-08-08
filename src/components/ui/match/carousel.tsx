@@ -1,6 +1,6 @@
 "use client"
 
-import { HTTP_METHOD, LIVE_MATCH_TYPE, MATCH_QUERY_PARAMS } from "@/lib/match.utils"
+import { HTTP_METHOD, LIVE_MATCH_TYPE, MATCH_API, MATCH_QUERY_PARAMS } from "@/lib/match.utils"
 
 import { useTranslation } from "@/i18n"
 import type { MatchInterface } from "@/models/match.models"
@@ -8,8 +8,8 @@ import type { MatchInterface } from "@/models/match.models"
 import CarouselInfinityApi from "@/components/ui/carousel/carousel-infinity-api"
 import { Empty } from "@/components/ui/empty"
 
-import { Card } from "./card-basic"
 import { BadgeStatus, type MatchStatusType } from "./badge-status"
+import { Card } from "./card-basic"
 
 interface CarouselProps {
   title?: string
@@ -19,6 +19,7 @@ interface CarouselProps {
   params?: Record<string, unknown>
   matchType?: (typeof LIVE_MATCH_TYPE)[keyof typeof LIVE_MATCH_TYPE]
   hideFilter?: boolean
+  slideClassName?: string
 }
 
 export function Carousel({
@@ -27,6 +28,7 @@ export function Carousel({
   method = HTTP_METHOD.POST,
   params = MATCH_QUERY_PARAMS.ALL_GAMES,
   matchType = LIVE_MATCH_TYPE.LIVE,
+  slideClassName,
 }: CarouselProps) {
   const { t } = useTranslation()
   const isLive =
@@ -40,14 +42,16 @@ export function Carousel({
         endpoint={endpoint}
         method={method}
         params={params}
+        fetchAll={endpoint === MATCH_API.LIVE_SEARCH}
         renderItem={(match, _, isLoading) => (
           <Card match={match} isLoading={isLoading} matchType={matchType} />
         )}
         renderEmpty={() => <Empty tip={t("common.empty")} />}
         slideClassName={
-          isLive
-            ? "basis-1/5 max-lg:basis-1/3 max-sm:basis-full"
-            : "basis-[350px] max-sm:basis-full"
+          slideClassName ??
+          (isLive
+            ? "basis-1/4 max-lg:basis-1/3 max-sm:basis-full"
+            : "basis-[350px] max-sm:basis-full")
         }
         gapClassName="gap-3"
       />

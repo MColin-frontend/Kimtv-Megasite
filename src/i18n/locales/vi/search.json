@@ -1,0 +1,71 @@
+{
+  "meta": {
+    "title": "Tìm kiếm",
+    "title-with-query": "Tìm kiếm \"{query}\"",
+    "description": "Tìm kiếm tin tức, trận đấu, video bóng đá trên KimTV."
+  },
+  "form": {
+    "placeholder": "Tìm kiếm tin tức, trận đấu, video...",
+    "submit": "Tìm kiếm",
+    "clear": "Xoá"
+  },
+  "results": {
+    "for": "Kết quả tìm kiếm cho",
+    "empty": "Nhập từ khoá để tìm kiếm tin tức, video, trận đấu."
+  },
+  "error": {
+    "required": "Vui lòng nhập từ khoá tìm kiếm",
+    "max": "Từ khoá tối đa {max} ký tự"
+  },
+  "hero": {
+    "title": "TÌM KIẾM",
+    "subtitle": "ĐÚNG THỨ BẠN CẦN",
+    "description": "Tìm kiếm trận đấu, đội bóng, cầu thủ, giải đấu, tin tức và nhiều hơn nữa."
+  },
+  "sidebar": {
+    "explore": "Khám Phá",
+    "history": "Lịch Sử Tìm Kiếm",
+    "history-empty": "Chưa có lịch sử tìm kiếm",
+    "history-filter-placeholder": "Lọc lịch sử...",
+    "history-clear": "Xoá tất cả lịch sử"
+  },
+  "filter": {
+    "all": "Tất cả kết quả",
+    "match": "Trận đấu",
+    "news": "Tin tức",
+    "user": "Người dùng",
+    "stream": "Streamer theo dõi"
+  },
+  "news": {
+    "title": "Tin Tức Bóng Đá",
+    "subtitle": "Cập nhật & tổng hợp",
+    "empty": "Không tìm thấy tin tức nào",
+    "category": "Bóng đá"
+  },
+  "users": {
+    "title": "Người Dùng",
+    "subtitle": "Tìm kiếm tài khoản",
+    "empty": "Không tìm thấy người dùng nào"
+  },
+  "anchors": {
+    "title": "Streamer Theo Dõi",
+    "subtitle": "Danh sách streamer bạn đang theo dõi",
+    "empty": "Bạn chưa theo dõi streamer nào"
+  },
+  "user-card": {
+    "badge-stream": "Stream",
+    "badge-admin": "Admin",
+    "get-in-touch": "Liên hệ",
+    "follow": "Theo dõi",
+    "following": "Đang theo dõi",
+    "registration-days": "Ngày tham gia",
+    "join-date": "Ngày đăng ký",
+    "na": "N/A",
+    "stats": {
+      "follower": "Người theo dõi",
+      "following": "Đang theo dõi",
+      "likes": "Lượt thích",
+      "experience": "Kinh nghiệm"
+    }
+  }
+}

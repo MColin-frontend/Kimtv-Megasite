@@ -4,6 +4,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Autoplay from "embla-carousel-autoplay"
 import useEmblaCarousel, { type UseEmblaCarouselType } from "embla-carousel-react"
 
+import { useRouter } from "@/hooks/use-router"
+
 import { SlideNavNext, SlideNavPrev } from "@/components/ui/slide-nav"
 
 export type CarouselInfinityApi = UseEmblaCarouselType[1]
@@ -23,6 +25,8 @@ interface CarouselInfinityProps<T> {
   /** Callback khi đang đi tới gần cuối danh sách — dùng cho infinite scroll */
   onReachEnd?: () => void
   reachEndThreshold?: number
+  /** URL query param key để sync scroll index — mỗi nơi dùng truyền key khác nhau */
+  pageKey?: string
   className?: string
   viewportClassName?: string
 }
@@ -50,9 +54,13 @@ export default function CarouselInfinity<T>({
   onApiReady,
   onReachEnd,
   reachEndThreshold = 2,
+  pageKey,
   className,
   viewportClassName,
 }: CarouselInfinityProps<T>) {
+  const { getParam, setParams } = useRouter()
+  const initialIndex = pageKey ? Number(getParam(pageKey) ?? 0) : 0
+
   const latestOnReachEndRef = useRef(onReachEnd)
   const lastReachedIndexRef = useRef<number | null>(null)
   const prevSelectedIndexRef = useRef<number | null>(null)
@@ -68,7 +76,9 @@ export default function CarouselInfinity<T>({
       dragFree: false,
       slidesToScroll: 1 as const,
       duration: 20,
+      startIndex: initialIndex,
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
 
@@ -121,6 +131,18 @@ export default function CarouselInfinity<T>({
   useEffect(() => {
     if (emblaApi) onApiReady?.(emblaApi)
   }, [emblaApi, onApiReady])
+
+  useEffect(() => {
+    if (!emblaApi || !pageKey) return
+    const onSelect = () => {
+      const index = emblaApi.selectedScrollSnap()
+      setParams({ [pageKey]: index }, { replace: true, scroll: false })
+    }
+    emblaApi.on("select", onSelect)
+    return () => {
+      emblaApi.off("select", onSelect)
+    }
+  }, [emblaApi, pageKey, setParams])
 
   const maybeTriggerReachEnd = useCallback(() => {
     if (!emblaApi) return
