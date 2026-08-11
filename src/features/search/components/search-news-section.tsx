@@ -49,6 +49,7 @@ export function SearchNewsSection() {
   const { data, isLoading } = useQuery({
     ...searchNewsQueryOptions(query, page),
     enabled: activeFilter === SearchFilterEnum.NEWS,
+    staleTime: 0,
     refetchOnMount: "always",
   })
 
@@ -60,6 +61,7 @@ export function SearchNewsSection() {
   } = useInfiniteQuery({
     ...searchNewsInfiniteQueryOptions(query),
     enabled: isAll,
+    staleTime: 0,
     refetchOnMount: "always",
   })
 
