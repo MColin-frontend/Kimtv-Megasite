@@ -249,30 +249,12 @@ const searchBtnClass = (active: boolean) =>
       : "text-muted border-white/10 bg-white/[0.05] hover:border-white/20 hover:bg-white/10 hover:text-white"
   )
 
-/** Mobile: link thẳng tới trang search — luôn hiện, không phụ thuộc Suspense. */
-function MobileSearchButton() {
-  const { t, locale } = useTranslation()
-  const routes = getRoutes(locale)
-  const pathname = usePathname()
-  const isSearchPage = pathname === routes.search || pathname.startsWith(`${routes.search}/`)
-
-  return (
-    <Link
-      href={routes.search}
-      aria-label={t("header.search.aria-label")}
-      className={cn(searchBtnClass(isSearchPage), "md:hidden")}
-    >
-      <Search className="h-3.5 w-3.5" />
-    </Link>
-  )
-}
-
-/** Desktop: nút expand form inline. */
+/** Nút expand form inline — dùng chung mobile & desktop. */
 function SearchInput() {
   const { t, locale } = useTranslation()
   const routes = getRoutes(locale)
   const { push, removeParams, getParam, pathname } = useRouter()
-  const isSearchPage = pathname === routes.search
+  const isSearchPage = pathname === routes.search || pathname.startsWith(`${routes.search}/`)
   const { state, open, close } = useDisclosure("search")
   const formRef = useRef<HTMLFormElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
@@ -314,13 +296,14 @@ function SearchInput() {
   }
 
   return (
-    <div ref={wrapRef} className="relative hidden md:block" onBlur={handleBlur}>
+    <div ref={wrapRef} className="relative" onBlur={handleBlur}>
       <button
+        type="button"
         onClick={expand}
         aria-label={t("header.search.aria-label")}
         className={searchBtnClass(state.search || isSearchPage)}
       >
-        <Search className="h-[15px] w-[15px]" />
+        <Search className="h-[15px] w-[15px] max-sm:h-3.5 max-sm:w-3.5" />
       </button>
 
       <form
@@ -329,11 +312,11 @@ function SearchInput() {
         onSubmit={handleSubmit}
         className={cn(
           "absolute top-1/2 right-0 z-50 -translate-y-1/2",
-          "h-9 rounded-full border border-white/15 bg-[#0d1829]",
+          "h-9 rounded-full border border-white/15 bg-[#0d1829] max-sm:h-8",
           "shadow-[0_4px_24px_rgba(0,0,0,0.4)]",
           "origin-right transition-all duration-200 ease-out",
           state.search
-            ? "pointer-events-auto w-56 scale-x-100 opacity-100"
+            ? "pointer-events-auto w-56 scale-x-100 opacity-100 max-sm:w-[min(14rem,calc(100vw-6.5rem))]"
             : "pointer-events-none w-8 scale-x-0 opacity-0"
         )}
       >
@@ -530,8 +513,7 @@ export function Header() {
         <DesktopNav items={MAIN_NAV_ITEMS} isActive={isActive} t={t} />
 
         <div className="ml-auto flex shrink-0 items-center gap-2 max-sm:gap-1.5 sm:gap-3">
-          <MobileSearchButton />
-          <Suspense fallback={null}>
+          <Suspense fallback={<div className={searchBtnClass(false)} aria-hidden />}>
             <SearchInput />
           </Suspense>
           {isLoggedIn && user ? (
