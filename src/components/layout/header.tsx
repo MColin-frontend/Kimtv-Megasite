@@ -3,7 +3,7 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LogOut, Menu, Search, UserRound, X } from "lucide-react"
+import { LogOut, Search, UserRound, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/use-auth"
@@ -240,6 +240,34 @@ function AvatarDropdown({ user, userId, onLogout }: AvatarDropdownProps) {
 
 /* ── Search ──────────────────────────────────────────────── */
 
+const searchBtnClass = (active: boolean) =>
+  cn(
+    "flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200 max-sm:h-8 max-sm:w-8",
+    "border shadow-[0_1px_2px_rgba(0,0,0,0.3)]",
+    active
+      ? "border-gold/50 bg-gold/10 text-gold shadow-[0_0_12px_rgba(246,195,67,0.2)]"
+      : "text-muted border-white/10 bg-white/[0.05] hover:border-white/20 hover:bg-white/10 hover:text-white"
+  )
+
+/** Mobile: link thẳng tới trang search — luôn hiện, không phụ thuộc Suspense. */
+function MobileSearchButton() {
+  const { t, locale } = useTranslation()
+  const routes = getRoutes(locale)
+  const pathname = usePathname()
+  const isSearchPage = pathname === routes.search || pathname.startsWith(`${routes.search}/`)
+
+  return (
+    <Link
+      href={routes.search}
+      aria-label={t("header.search.aria-label")}
+      className={cn(searchBtnClass(isSearchPage), "md:hidden")}
+    >
+      <Search className="h-3.5 w-3.5" />
+    </Link>
+  )
+}
+
+/** Desktop: nút expand form inline. */
 function SearchInput() {
   const { t, locale } = useTranslation()
   const routes = getRoutes(locale)
@@ -290,13 +318,7 @@ function SearchInput() {
       <button
         onClick={expand}
         aria-label={t("header.search.aria-label")}
-        className={cn(
-          "flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200",
-          "border shadow-[0_1px_2px_rgba(0,0,0,0.3)]",
-          state.search || isSearchPage
-            ? "border-gold/50 bg-gold/10 text-gold shadow-[0_0_12px_rgba(246,195,67,0.2)]"
-            : "text-muted border-white/10 bg-white/[0.05] hover:border-white/20 hover:bg-white/10 hover:text-white"
-        )}
+        className={searchBtnClass(state.search || isSearchPage)}
       >
         <Search className="h-[15px] w-[15px]" />
       </button>
@@ -479,7 +501,6 @@ export function Header() {
   const { t, locale } = useTranslation()
   const pathname = usePathname()
   const routes = getRoutes(locale)
-  const { state, toggle, close } = useDisclosure("mobileMenu")
   const { user, isLoggedIn, login, logout } = useAuth()
 
   function isActive(href: string, relatedSlugs?: string[]): boolean {
@@ -492,140 +513,41 @@ export function Header() {
   }
 
   return (
-    <>
-      <header id="site-header" className="bg-header sticky top-0 z-50 w-full">
-        <div className="container flex h-fit items-center gap-3 py-3 max-sm:gap-2 max-sm:py-2!">
-          <Link href={routes.home} className="shrink-0" onClick={() => close("mobileMenu")}>
-            <Img
-              src={kimtvLogo}
-              alt="KimTV"
-              width={130}
-              height={48}
-              priority
-              objectFit="contain"
-              className="max-sm:!h-[30px] max-sm:!w-[82px]"
-            />
-          </Link>
+    <header id="site-header" className="bg-header sticky top-0 z-50 w-full">
+      <div className="container flex h-fit items-center gap-3 py-3 max-sm:gap-2 max-sm:py-2!">
+        <Link href={routes.home} className="shrink-0">
+          <Img
+            src={kimtvLogo}
+            alt="KimTV"
+            width={130}
+            height={48}
+            priority
+            objectFit="contain"
+            className="max-sm:!h-[30px] max-sm:!w-[82px]"
+          />
+        </Link>
 
-          <DesktopNav items={MAIN_NAV_ITEMS} isActive={isActive} t={t} />
+        <DesktopNav items={MAIN_NAV_ITEMS} isActive={isActive} t={t} />
 
-          <div className="ml-auto flex shrink-0 items-center gap-3 max-sm:gap-2">
-            <Suspense>
-              <SearchInput />
-            </Suspense>
-            {isLoggedIn && user ? (
-              <AvatarDropdown user={user} userId={user.userId ?? user.uid} onLogout={logout} />
-            ) : (
-              <Button
-                variant="gradient"
-                onClick={login}
-                className="max-lg:size-6 max-lg:rounded-full max-lg:px-0"
-              >
-                <UserRound className="h-3.5 w-3.5" />
-                <span className="max-lg:hidden">{t("header.auth.login")}</span>
-              </Button>
-            )}
-
-            <button
-              aria-label={
-                state.mobileMenu ? t("header.mobile-menu.close") : t("header.mobile-menu.open")
-              }
-              onClick={() => toggle("mobileMenu")}
-              className="text-muted relative hidden h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] shadow-[0_1px_2px_rgba(0,0,0,0.3)] transition-all duration-200 hover:border-white/20 hover:bg-white/10 hover:text-white"
-            >
-              <Menu
-                className={cn(
-                  "absolute h-[18px] w-[18px] transition-all duration-200",
-                  state.mobileMenu
-                    ? "scale-50 rotate-90 opacity-0"
-                    : "scale-100 rotate-0 opacity-100"
-                )}
-              />
-              <X
-                className={cn(
-                  "absolute h-[18px] w-[18px] transition-all duration-200",
-                  state.mobileMenu
-                    ? "scale-100 rotate-0 opacity-100"
-                    : "scale-50 -rotate-90 opacity-0"
-                )}
-              />
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <div
-        onClick={() => close("mobileMenu")}
-        className={cn(
-          "fixed inset-0 top-[60px] z-40 bg-black/60 backdrop-blur-sm lg:hidden",
-          "transition-opacity duration-300",
-          state.mobileMenu ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
-        )}
-      />
-
-      <div
-        className={cn(
-          "bg-navy fixed inset-x-0 top-[60px] z-50 lg:hidden",
-          "border-b border-white/8",
-          "transition-all duration-300 ease-out",
-          state.mobileMenu
-            ? "pointer-events-auto translate-y-0 opacity-100"
-            : "pointer-events-none -translate-y-3 opacity-0"
-        )}
-      >
-        <nav className="container divide-y divide-white/6 py-2">
-          {MAIN_NAV_ITEMS.map((item) => {
-            const href = item.getHref(routes)
-            const active = isActive(href, item.relatedSlugs)
-            const Icon = item.icon
-            return (
-              <Link
-                key={href}
-                href={href}
-                onClick={() => close("mobileMenu")}
-                className={cn(
-                  "flex h-[52px] items-center gap-3 transition-colors",
-                  active ? "text-gold" : "text-muted hover:text-white"
-                )}
-              >
-                <span
-                  className={cn(
-                    "h-4 w-[3px] rounded-full transition-all duration-200",
-                    active ? "bg-gold" : "bg-transparent"
-                  )}
-                />
-                {Icon && (
-                  <div className="relative">
-                    <Icon className="size-4 shrink-0" />
-                    {item.badge && (
-                      <span className="absolute -top-0.5 -right-0.5 size-1.5 rounded-full bg-red-500" />
-                    )}
-                  </div>
-                )}
-                <Typography variant="label" className="text-inherit">
-                  {t(item.labelKey)}
-                </Typography>
-              </Link>
-            )
-          })}
-        </nav>
-
-        {!isLoggedIn && (
-          <div className="container pt-3 pb-5 lg:hidden">
+        <div className="ml-auto flex shrink-0 items-center gap-2 max-sm:gap-1.5 sm:gap-3">
+          <MobileSearchButton />
+          <Suspense fallback={null}>
+            <SearchInput />
+          </Suspense>
+          {isLoggedIn && user ? (
+            <AvatarDropdown user={user} userId={user.userId ?? user.uid} onLogout={logout} />
+          ) : (
             <Button
               variant="gradient"
-              className="w-full"
-              onClick={() => {
-                login()
-                close("mobileMenu")
-              }}
+              onClick={login}
+              className="max-lg:h-9 max-lg:w-9 max-lg:rounded-full max-lg:px-0 max-sm:h-8 max-sm:w-8"
             >
-              <UserRound className="h-4 w-4" />
-              {t("header.auth.login")}
+              <UserRound className="h-3.5 w-3.5" />
+              <span className="max-lg:hidden">{t("header.auth.login")}</span>
             </Button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </>
+    </header>
   )
 }
