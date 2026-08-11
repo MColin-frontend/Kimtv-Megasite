@@ -48,6 +48,35 @@ function patchFollowInRecords<T extends { userId?: unknown; uid?: unknown; ancho
   })
 }
 
+function removeAnchorFromRecords<T extends { anchorId?: unknown }>(
+  records: T[] | undefined,
+  targetId: string
+): T[] | undefined {
+  if (!records) return records
+  return records.filter((item) => String(item.anchorId ?? "") !== targetId)
+}
+
+function patchAnchorPage(
+  page: { records?: Array<{ anchorId?: unknown; isAttention?: boolean }>; total?: number },
+  targetId: string,
+  isFollow: boolean
+) {
+  if (!isFollow) {
+    const before = page.records?.length ?? 0
+    const records = removeAnchorFromRecords(page.records, targetId)
+    const removed = before - (records?.length ?? 0)
+    return {
+      ...page,
+      records,
+      total: Math.max(0, (page.total ?? before) - removed),
+    }
+  }
+  return {
+    ...page,
+    records: patchFollowInRecords(page.records, targetId, isFollow, "isAttention"),
+  }
+}
+
 /** Keep search list cache in sync so remounting tabs does not reset follow UI. */
 function syncSearchFollowCache(
   queryClient: ReturnType<typeof useQueryClient>,
@@ -73,27 +102,28 @@ function syncSearchFollowCache(
     }
   })
 
+  // Stream tab is "followed streamers" — unfollow removes the card immediately.
   queryClient.setQueriesData({ queryKey: ["search-anchors"] }, (old: unknown) => {
     if (!old || typeof old !== "object") return old
-    const page = old as { records?: Array<{ anchorId?: unknown; isAttention?: boolean }> }
-    if (!("records" in page)) return old
-    return {
-      ...page,
-      records: patchFollowInRecords(page.records, targetId, isFollow, "isAttention"),
+    const page = old as {
+      records?: Array<{ anchorId?: unknown; isAttention?: boolean }>
+      total?: number
     }
+    if (!("records" in page)) return old
+    return patchAnchorPage(page, targetId, isFollow)
   })
 
   queryClient.setQueriesData({ queryKey: ["search-anchors-infinite"] }, (old: unknown) => {
     if (!old || typeof old !== "object" || !("pages" in old)) return old
     const infinite = old as {
-      pages: Array<{ records?: Array<{ anchorId?: unknown; isAttention?: boolean }> }>
+      pages: Array<{
+        records?: Array<{ anchorId?: unknown; isAttention?: boolean }>
+        total?: number
+      }>
     }
     return {
       ...infinite,
-      pages: infinite.pages.map((page) => ({
-        ...page,
-        records: patchFollowInRecords(page.records, targetId, isFollow, "isAttention"),
-      })),
+      pages: infinite.pages.map((page) => patchAnchorPage(page, targetId, isFollow)),
     }
   })
 }

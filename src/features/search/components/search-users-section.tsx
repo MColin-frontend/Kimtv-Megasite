@@ -82,12 +82,14 @@ export function SearchPersonSection<T>({
   } = useInfiniteQuery({
     ...infiniteQueryFn(keyword),
     enabled: isAll,
+    staleTime: 0,
     refetchOnMount: "always",
   })
 
   const { data: pageData, isLoading } = useQuery({
     ...pageQueryFn(keyword, page),
     enabled: activeFilter === filter,
+    staleTime: 0,
     refetchOnMount: "always",
   })
 
