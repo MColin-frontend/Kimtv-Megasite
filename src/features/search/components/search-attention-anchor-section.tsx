@@ -1,5 +1,8 @@
 "use client"
 
+import { UserRoleEnum } from "@/features/user-info/user-info.constants"
+import type { UserInfoModel } from "@/features/user-info/user-info.models"
+
 import imgStreamer from "@assets/images/common/img-search-anchors.png"
 
 import { searchAnchorsInfiniteQueryOptions, searchAnchorsQueryOptions } from "../search.api"
@@ -8,7 +11,7 @@ import type { AnchorModel } from "../search.models"
 import { SearchPersonSection } from "./search-users-section"
 import { UserCard } from "./user-card"
 
-function mapAnchorToUser(anchor: AnchorModel) {
+function mapAnchorToUser(anchor: AnchorModel): UserInfoModel {
   return {
     uid: anchor.anchorId,
     name: anchor.userName,
@@ -16,6 +19,8 @@ function mapAnchorToUser(anchor: AnchorModel) {
     hasFollow: anchor.isAttention ?? false,
     followerCount: anchor.followerCount ?? 0,
     registerDate: anchor.registerDate ?? null,
+    // Attention-anchor results are always streamers
+    role: UserRoleEnum.BLV,
   }
 }
 

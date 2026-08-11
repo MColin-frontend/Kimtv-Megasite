@@ -74,7 +74,7 @@ export function NewsLatestPanel({
                 item={item}
                 href={getHref(String(item.newsId))}
                 categoryLabel={categoryLabel}
-                className="card-elevated rounded-12 min-h-0 flex-1 px-2"
+                className="rounded-12 min-h-0 flex-1 bg-white/[0.04] px-2 hover:bg-white/[0.06]"
               />
             ))}
           </StaggerReveal>
