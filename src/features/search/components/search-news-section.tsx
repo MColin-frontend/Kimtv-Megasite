@@ -49,6 +49,7 @@ export function SearchNewsSection() {
   const { data, isLoading } = useQuery({
     ...searchNewsQueryOptions(query, page),
     enabled: activeFilter === SearchFilterEnum.NEWS,
+    refetchOnMount: "always",
   })
 
   const {
@@ -58,6 +59,8 @@ export function SearchNewsSection() {
     hasNextPage,
   } = useInfiniteQuery({
     ...searchNewsInfiniteQueryOptions(query),
+    enabled: isAll,
+    refetchOnMount: "always",
   })
 
   const infiniteItems = infiniteData?.pages.flatMap((p) => p?.records ?? []) ?? []

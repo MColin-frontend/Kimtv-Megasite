@@ -38,7 +38,10 @@ export function NewsItemFeatured({
   return (
     <Link
       href={href}
-      className={cn("group rounded-8 flex h-[320px] flex-col pb-2.5 transition-all", className)}
+      className={cn(
+        "group rounded-8 flex h-[320px] flex-col pb-2.5 transition-colors outline-none focus-visible:outline-none",
+        className
+      )}
     >
       <Img
         src={item.coverUrl}
@@ -74,7 +77,7 @@ export function NewsItemFeatured({
                   <Typography
                     size="16"
                     weight="600"
-                    className="group-hover:text-gold mt-1 line-clamp-2 text-left leading-150 text-white transition-colors"
+                    className="group-hover:text-gold mt-1 line-clamp-2 text-left leading-150 text-white transition-colors outline-none focus-visible:outline-none"
                   >
                     {item.title}
                   </Typography>
@@ -113,7 +116,13 @@ export function NewsItemRow({
   headerTextSize = "12",
 }: NewsItemRowProps) {
   return (
-    <Link href={href} className={cn("group rounded-8 flex gap-3 py-2.5 transition-all", className)}>
+    <Link
+      href={href}
+      className={cn(
+        "group rounded-8 flex gap-3 py-2.5 transition-colors outline-none focus-visible:outline-none",
+        className
+      )}
+    >
       {fillImage ? (
         <Img
           src={item.coverUrl}
@@ -167,7 +176,7 @@ export function NewsItemRow({
                 <Typography
                   size="14"
                   weight="600"
-                  className="group-hover:text-gold max-sm:!text-12 mt-1 line-clamp-2 text-left leading-150 text-white transition-colors"
+                  className="group-hover:text-gold max-sm:!text-12 mt-1 line-clamp-2 text-left leading-150 text-white transition-colors outline-none focus-visible:outline-none"
                 >
                   {item.title}
                 </Typography>

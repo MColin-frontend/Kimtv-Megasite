@@ -58,9 +58,11 @@ export function LiveMatchFilterSection({
   const keyword = searchParams.get("search-key") ?? undefined
   const page = pageKey ? Number(getParam(pageKey) ?? 1) : 1
 
-  const { data, isLoading } = useQuery(
-    liveMatchesGridQueryOptions(typeScreen, keyword, pageKey ? page : undefined)
-  )
+  const { data, isLoading } = useQuery({
+    ...liveMatchesGridQueryOptions(typeScreen, keyword, pageKey ? page : undefined),
+    // Search page: đổi filter type cần fetch lại ngay
+    ...(pageKey ? { refetchOnMount: "always" as const } : {}),
+  })
 
   const matches = data?.records ?? []
   const total = data?.total ?? 0

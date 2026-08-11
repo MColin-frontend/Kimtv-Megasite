@@ -153,7 +153,10 @@ function SearchResults() {
 
         <div className="flex w-full min-w-0 flex-1 flex-col gap-6 overflow-x-clip max-md:gap-4 max-sm:gap-3">
           {sections.map(({ key, visible, node }) =>
-            visible ? <Fragment key={key}>{node}</Fragment> : null
+            visible ? (
+              // Remount khi đổi filter để query gọi API lại ngay (không dùng cache stale)
+              <Fragment key={`${String(key)}-${activeFilter}`}>{node}</Fragment>
+            ) : null
           )}
         </div>
       </div>

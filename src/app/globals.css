@@ -1406,20 +1406,27 @@ main .xgplayer .flex-controls .xg-inner-controls {
 }
 
 @utility card-elevated {
+  border: none;
+  outline: none;
   background-color: rgba(255, 255, 255, 0.04);
-  outline: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow:
     0 4px 0 rgba(0, 0, 0, 0.25),
     0 12px 28px rgba(0, 0, 0, 0.35);
-  transition: box-shadow 0.25s ease;
+  transition:
+    background-color 0.25s ease,
+    box-shadow 0.25s ease;
   &:is(.dark *) {
     box-shadow: var(--shadow-card);
   }
   &:hover {
-    background-color: transparent;
-    outline: none;
+    background-color: rgba(255, 255, 255, 0.06);
     box-shadow:
-      0 10px 0 rgba(0, 0, 0, 0.35),
-      0 24px 48px rgba(0, 0, 0, 0.55);
+      0 4px 0 rgba(0, 0, 0, 0.25),
+      0 16px 32px rgba(0, 0, 0, 0.4);
+  }
+  &:focus,
+  &:focus-visible {
+    border: none;
+    outline: none;
   }
 }
