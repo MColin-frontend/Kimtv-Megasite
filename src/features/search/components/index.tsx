@@ -1,7 +1,5 @@
 "use client"
 
-import { Fragment } from "react"
-
 import { cn } from "@/lib/utils"
 import { useRouter } from "@/hooks/use-router"
 
@@ -152,12 +150,17 @@ function SearchResults() {
         <SearchSidebar />
 
         <div className="flex w-full min-w-0 flex-1 flex-col gap-6 overflow-x-clip max-md:gap-4 max-sm:gap-3">
-          {sections.map(({ key, visible, node }) =>
-            visible ? (
-              // Remount khi đổi filter để query gọi API lại ngay (không dùng cache stale)
-              <Fragment key={`${String(key)}-${activeFilter}`}>{node}</Fragment>
-            ) : null
-          )}
+          {sections.map(({ key, visible, node }) => (
+            // Keep mounted when switching tabs so follow local state is not wiped;
+            // queries already use refetchOnMount: "always" when they become enabled again.
+            <div
+              key={String(key)}
+              className={visible ? undefined : "hidden"}
+              aria-hidden={!visible}
+            >
+              {node}
+            </div>
+          ))}
         </div>
       </div>
     </div>

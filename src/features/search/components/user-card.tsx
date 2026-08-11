@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useQueryClient } from "@tanstack/react-query"
 import { Bookmark, Calendar, CalendarDays, Mail, Phone, Send, ShieldCheck } from "lucide-react"
 
 import { formatCount } from "@/lib/utils"
@@ -29,19 +30,92 @@ interface UserCardProps {
   user: UserInfoModel
 }
 
+function isFollowed(v: UserInfoModel["hasFollow"]): boolean {
+  return v === true || v === 1 || v === "1" || v === "true"
+}
+
+function patchFollowInRecords<T extends { userId?: unknown; uid?: unknown; anchorId?: unknown }>(
+  records: T[] | undefined,
+  targetId: string,
+  isFollow: boolean,
+  field: "hasFollow" | "isAttention"
+): T[] | undefined {
+  if (!records) return records
+  return records.map((item) => {
+    const id = String(item.userId ?? item.uid ?? item.anchorId ?? "")
+    if (id !== targetId) return item
+    return { ...item, [field]: isFollow }
+  })
+}
+
+/** Keep search list cache in sync so remounting tabs does not reset follow UI. */
+function syncSearchFollowCache(
+  queryClient: ReturnType<typeof useQueryClient>,
+  targetId: string,
+  isFollow: boolean
+) {
+  queryClient.setQueriesData({ queryKey: ["search-users"] }, (old: unknown) => {
+    if (!old || typeof old !== "object") return old
+    const page = old as { records?: UserInfoModel[] }
+    if (!("records" in page)) return old
+    return { ...page, records: patchFollowInRecords(page.records, targetId, isFollow, "hasFollow") }
+  })
+
+  queryClient.setQueriesData({ queryKey: ["search-users-infinite"] }, (old: unknown) => {
+    if (!old || typeof old !== "object" || !("pages" in old)) return old
+    const infinite = old as { pages: Array<{ records?: UserInfoModel[] }> }
+    return {
+      ...infinite,
+      pages: infinite.pages.map((page) => ({
+        ...page,
+        records: patchFollowInRecords(page.records, targetId, isFollow, "hasFollow"),
+      })),
+    }
+  })
+
+  queryClient.setQueriesData({ queryKey: ["search-anchors"] }, (old: unknown) => {
+    if (!old || typeof old !== "object") return old
+    const page = old as { records?: Array<{ anchorId?: unknown; isAttention?: boolean }> }
+    if (!("records" in page)) return old
+    return {
+      ...page,
+      records: patchFollowInRecords(page.records, targetId, isFollow, "isAttention"),
+    }
+  })
+
+  queryClient.setQueriesData({ queryKey: ["search-anchors-infinite"] }, (old: unknown) => {
+    if (!old || typeof old !== "object" || !("pages" in old)) return old
+    const infinite = old as {
+      pages: Array<{ records?: Array<{ anchorId?: unknown; isAttention?: boolean }> }>
+    }
+    return {
+      ...infinite,
+      pages: infinite.pages.map((page) => ({
+        ...page,
+        records: patchFollowInRecords(page.records, targetId, isFollow, "isAttention"),
+      })),
+    }
+  })
+}
+
 export function UserCard({ user }: UserCardProps) {
   const { t, locale } = useTranslation()
   const { isLoggedIn, login } = useAuth()
+  const queryClient = useQueryClient()
   const routes = getRoutes(locale)
   const userId = user.userId ?? user.uid
+  const userKey = userId != null ? String(userId) : null
 
-  const [following, setFollowing] = useState(
-    () =>
-      user.hasFollow === true ||
-      user.hasFollow === 1 ||
-      user.hasFollow === "1" ||
-      user.hasFollow === "true"
-  )
+  const serverFollowing = isFollowed(user.hasFollow)
+  // Optimistic override keyed by user id so remount/refetch can fall back to props/cache.
+  const [optimisticFollow, setOptimisticFollow] = useState<{
+    id: string
+    value: boolean
+  } | null>(null)
+  const following =
+    optimisticFollow && userKey && optimisticFollow.id === userKey
+      ? optimisticFollow.value
+      : serverFollowing
   const [followLoading, setFollowLoading] = useState(false)
 
   function toggleFollow() {
@@ -49,11 +123,15 @@ export function UserCard({ user }: UserCardProps) {
       login()
       return
     }
-    if (followLoading) return
+    if (followLoading || userKey == null) return
+    const next = !following
     handleFollowUser({
-      userId: Number(userId),
-      isFollow: !following,
-      setFollowing,
+      userId: Number(userKey),
+      isFollow: next,
+      setFollowing: (value) => {
+        setOptimisticFollow({ id: userKey, value })
+        if (value === next) syncSearchFollowCache(queryClient, userKey, next)
+      },
       setLoading: setFollowLoading,
     })
   }
