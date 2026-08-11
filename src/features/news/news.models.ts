@@ -13,6 +13,13 @@ export interface NewsItem {
   commentCount?: number
   gameId?: number
   publishTime?: string | number
+  source?: string | null
+  topTime?: number | null
+  isTop?: boolean
+  grade?: string | number | null
+  remarkPrefixUrl?: string | null
+  prefixUrl?: string | null
+  userDescription?: string | null
 }
 
 interface FeaturedNewsResult {
@@ -27,6 +34,14 @@ interface PopularNewsResult {
 interface LatestNewsResult {
   records: NewsItem[]
   total: number
+}
+
+interface NewsPaginatedInterface {
+  records: NewsItem[]
+  total: number
+  current: number
+  pages: number
+  size: number
 }
 
 interface HotNewsResultInterface {
@@ -117,6 +132,7 @@ export type {
   FeaturedNewsResult,
   PopularNewsResult,
   LatestNewsResult,
+  NewsPaginatedInterface,
   HotNewsResultInterface,
   NewsComment,
   NewsArticleDetail,

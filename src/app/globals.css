@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "react-toastify/dist/ReactToastify.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -1402,4 +1403,23 @@ main .xgplayer .flex-controls .xg-inner-controls {
   backdrop-filter: blur(32px);
   border: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+@utility card-elevated {
+  background-color: rgba(255, 255, 255, 0.04);
+  outline: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 4px 0 rgba(0, 0, 0, 0.25),
+    0 12px 28px rgba(0, 0, 0, 0.35);
+  transition: box-shadow 0.25s ease;
+  &:is(.dark *) {
+    box-shadow: var(--shadow-card);
+  }
+  &:hover {
+    background-color: transparent;
+    outline: none;
+    box-shadow:
+      0 10px 0 rgba(0, 0, 0, 0.35),
+      0 24px 48px rgba(0, 0, 0, 0.55);
+  }
 }

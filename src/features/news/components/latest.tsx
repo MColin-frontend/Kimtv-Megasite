@@ -66,7 +66,7 @@ export function NewsLatestPanel({
             variant="fade-up"
             stagger={60}
             duration={400}
-            className="flex h-full flex-col gap-1"
+            className="-mx-2 -my-2 flex h-full flex-col gap-2 px-2 py-2"
           >
             {sideItems.map((item) => (
               <NewsItemRow
@@ -74,7 +74,7 @@ export function NewsLatestPanel({
                 item={item}
                 href={getHref(String(item.newsId))}
                 categoryLabel={categoryLabel}
-                className="min-h-0 flex-1"
+                className="card-elevated rounded-12 min-h-0 flex-1 px-2"
               />
             ))}
           </StaggerReveal>

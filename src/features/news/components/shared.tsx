@@ -44,20 +44,28 @@ export function NewsPanelHeader({ title, viewAllHref, viewAllLabel }: NewsPanelH
 interface NewsMetaRowProps {
   item: Pick<NewsItem, "userName" | "userAvatar" | "likeCount" | "commentCount">
   className?: string
+  avatarSize?: number
+  textSize?: "12" | "14"
 }
 
 /** Meta row dùng chung: avatar + tên tác giả + lượt thích + bình luận. */
-export function NewsMetaRow({ item, className }: NewsMetaRowProps) {
+export function NewsMetaRow({
+  item,
+  className,
+  avatarSize = 24,
+  textSize = "12",
+}: NewsMetaRowProps) {
+  const iconClass = textSize === "14" ? "size-4" : "size-3.5"
   return (
     <div className={`flex flex-wrap items-center gap-3 ${className ?? ""}`}>
       {item.userName && (
         <div className="flex min-w-0 items-center gap-1.5">
           {item.userAvatar && (
-            <Avatar size={24}>
+            <Avatar size={avatarSize}>
               <AvatarImage src={item.userAvatar} alt={item.userName} />
             </Avatar>
           )}
-          <Typography variant="caption" weight="500" className="truncate">
+          <Typography size={textSize} weight="500" className="truncate">
             {item.userName}
           </Typography>
         </div>
@@ -65,14 +73,14 @@ export function NewsMetaRow({ item, className }: NewsMetaRowProps) {
       <div className="ml-auto flex shrink-0 items-center gap-2">
         {item.likeCount != null && (
           <span className="flex items-center gap-1">
-            <Heart className="size-3.5" aria-hidden="true" />
-            <Typography variant="caption">{item.likeCount}</Typography>
+            <Heart className={iconClass} aria-hidden="true" />
+            <Typography size={textSize}>{item.likeCount}</Typography>
           </span>
         )}
         {item.commentCount != null && (
           <span className="flex items-center gap-1">
-            <MessageCircle className="size-3.5" aria-hidden="true" />
-            <Typography variant="caption">{item.commentCount}</Typography>
+            <MessageCircle className={iconClass} aria-hidden="true" />
+            <Typography size={textSize}>{item.commentCount}</Typography>
           </span>
         )}
       </div>

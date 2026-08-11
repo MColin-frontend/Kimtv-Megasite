@@ -10,8 +10,13 @@ import { cn } from "@/lib/utils"
 import { useRouter } from "@/hooks/use-router"
 
 import { useTranslation } from "@/i18n"
+import { PAGE_SIZE_OPTION } from "@/constants/common.constants"
+import type { LiveSearchMatchInterface } from "@/models/match.models"
 
-import { liveMatchesGridQueryOptions } from "@/features/live-schedule/live-schedule.api"
+import {
+  LIVE_MATCHES_PAGE_SIZE,
+  liveMatchesGridQueryOptions,
+} from "@/features/live-schedule/live-schedule.api"
 import {
   LIVE_SCHEDULE_DEFAULT_TAB,
   LIVE_SCHEDULE_FILTER_OPTIONS,
@@ -21,41 +26,62 @@ import {
 } from "@/features/live-schedule/live-schedule.constants"
 import CarouselInfinity from "@/components/ui/carousel/carousel-infinity"
 import { Empty } from "@/components/ui/empty"
-import type { LiveSearchMatchInterface } from "@/models/match.models"
-import { MatchCardLive } from "@/components/ui/match/card-live"
 import { BadgeStatus } from "@/components/ui/match/badge-status"
-import { CardLiveSkeleton, CardBasicSkeleton } from "@/components/ui/match/skeleton"
+import { MatchCardLive } from "@/components/ui/match/card-live"
+import { CardBasicSkeleton, CardLiveSkeleton } from "@/components/ui/match/skeleton"
+import { Pagination } from "@/components/ui/pagination"
 
 function getTypeScreen(tab: LiveScheduleTab): number {
   return LIVE_SCHEDULE_FILTER_OPTIONS.find((o) => o.value === tab)?.typeScreen ?? 0
 }
 
-/* ── Main component ───────────────────────────────────────── */
-
 interface LiveMatchFilterSectionProps {
   renderCard?: (match: LiveSearchMatchInterface) => React.ReactNode
   hideFilter?: boolean
+  cols?: 3 | 4
+  pageKey?: string
 }
 
 export function LiveMatchFilterSection({
   renderCard,
   hideFilter,
+  cols = 4,
+  pageKey,
 }: LiveMatchFilterSectionProps = {}) {
   const { t } = useTranslation()
-  const { setParams } = useRouter()
+  const { setParams, getParam } = useRouter()
   const searchParams = useSearchParams()
   const tab = (searchParams.get(LIVE_SCHEDULE_TAB_PARAM) ??
     LIVE_SCHEDULE_DEFAULT_TAB) as LiveScheduleTab
 
   const typeScreen = getTypeScreen(tab)
+  const keyword = searchParams.get("search-key") ?? undefined
+  const page = pageKey ? Number(getParam(pageKey) ?? 1) : 1
 
-  const { data: matches = [], isLoading } = useQuery(liveMatchesGridQueryOptions(typeScreen))
+  const { data, isLoading } = useQuery(
+    liveMatchesGridQueryOptions(typeScreen, keyword, pageKey ? page : undefined)
+  )
 
-  const skeletonCount = 10
+  const matches = data?.records ?? []
+  const total = data?.total ?? 0
+
+  function handleTabChange(value: LiveScheduleTab) {
+    setParams(
+      {
+        [LIVE_SCHEDULE_TAB_PARAM]: value,
+        ...(pageKey ? { [pageKey]: null } : {}),
+      },
+      { scroll: false }
+    )
+  }
+
+  const gridClassName = cn(
+    "grid gap-4 max-lg:grid-cols-2 max-sm:hidden",
+    cols === 3 ? "grid-cols-3" : "grid-cols-4 max-xl:grid-cols-3"
+  )
 
   return (
-    <section className="card-glow rounded-12 flex flex-col gap-4 p-5 max-sm:gap-3 max-sm:p-3">
-      {/* Header */}
+    <section className="card-glow rounded-12 flex min-w-0 flex-col gap-4 overflow-x-clip p-5 max-sm:gap-3 max-sm:p-3">
       <div className="flex items-center justify-between gap-3 max-sm:flex-col max-sm:items-start">
         <BadgeStatus type="live" />
 
@@ -67,9 +93,7 @@ export function LiveMatchFilterSection({
               return (
                 <button
                   key={o.value}
-                  onClick={() =>
-                    setParams({ [LIVE_SCHEDULE_TAB_PARAM]: o.value }, { scroll: false })
-                  }
+                  onClick={() => handleTabChange(o.value)}
                   className={cn(
                     "rounded-8 font-500 flex shrink-0 items-center gap-1 px-2.5 py-1.5 transition-all duration-150 max-sm:flex-1 max-sm:flex-col max-sm:gap-0.5 max-sm:px-2 max-sm:py-1",
                     "text-13 max-sm:text-10",
@@ -113,14 +137,14 @@ export function LiveMatchFilterSection({
             </div>
           </div>
           {/* Desktop skeleton grid */}
-          <div className="grid grid-cols-4 gap-4 max-xl:grid-cols-3 max-lg:grid-cols-2 max-sm:hidden">
-            {Array.from({ length: skeletonCount }).map((_, i) =>
+          <div className={gridClassName}>
+            {Array.from({ length: PAGE_SIZE_OPTION?.[0] }).map((_, i) =>
               renderCard ? <CardBasicSkeleton key={i} /> : <CardLiveSkeleton key={i} />
             )}
           </div>
         </>
       ) : matches.length > 0 ? (
-        <>
+        <div className="flex flex-col gap-8">
           {/* Mobile carousel */}
           <div className="hidden max-sm:block">
             <CarouselInfinity
@@ -132,13 +156,13 @@ export function LiveMatchFilterSection({
                   <MatchCardLive key={`${match.matchId}-${i}`} match={match} />
                 )
               }
-              slideClassName="basis-full"
+              slideClassName="basis-full min-w-0"
               gapClassName="gap-3"
               keyExtractor={(m, i) => `${m.matchId}-${i}`}
             />
           </div>
           {/* Desktop grid */}
-          <div className="grid grid-cols-4 gap-4 max-xl:grid-cols-3 max-lg:grid-cols-2 max-sm:hidden">
+          <div className={gridClassName}>
             {matches.map((match, i) =>
               renderCard ? (
                 <Fragment key={`${match.matchId}-${i}`}>{renderCard(match)}</Fragment>
@@ -147,7 +171,17 @@ export function LiveMatchFilterSection({
               )
             )}
           </div>
-        </>
+          {pageKey && total > LIVE_MATCHES_PAGE_SIZE && (
+            <Pagination
+              className="max-sm:hidden"
+              page={page}
+              pageSize={LIVE_MATCHES_PAGE_SIZE}
+              total={total}
+              loading={isLoading}
+              onPageChange={(p) => setParams({ [pageKey]: p })}
+            />
+          )}
+        </div>
       ) : (
         <Empty tip={t("common.empty")} />
       )}

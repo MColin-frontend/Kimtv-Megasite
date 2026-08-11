@@ -49,11 +49,12 @@ export function NewsSectionCard({
       <NewsSectionHeader title={title} href={viewAllHref} viewAllLabel={viewAllLabel} />
 
       {/* Desktop: 1 featured lớn + rows nhỏ */}
-      <div className="hidden flex-col gap-2 divide-y divide-white/[0.06] lg:flex">
+      <div className="-mx-1 -my-1 hidden flex-col gap-2 px-1 py-1 lg:flex">
         <NewsItemFeatured
           item={featuredItem}
           categoryLabel={categoryLabel}
           href={routes.news.article(String(featuredItem.newsId))}
+          className="card-elevated rounded-12 p-2"
         />
         {rowItems.map((item) => (
           <NewsItemRow
@@ -61,6 +62,7 @@ export function NewsSectionCard({
             item={item}
             categoryLabel={categoryLabel}
             href={routes.news.article(String(item.newsId))}
+            className="card-elevated rounded-12 px-2"
           />
         ))}
       </div>

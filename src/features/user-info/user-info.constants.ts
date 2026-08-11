@@ -2,6 +2,12 @@ import { CalendarDays, FileText, Heart, Video } from "lucide-react"
 
 import type { TranslationKey } from "@/i18n/use-translation"
 
+export enum UserRoleEnum {
+  USER = "user",
+  ADMIN = "admin",
+  BLV = "blv",
+}
+
 export enum UserInfoTabEnum {
   ALL = "all",
   NEWS = "news",

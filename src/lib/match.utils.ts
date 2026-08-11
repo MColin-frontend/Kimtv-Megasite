@@ -58,8 +58,7 @@ export function deriveMatchStatusFlags(params: {
     status === MatchStatusEnum.UPCOMING ||
     status === MatchStatusEnum.UNKNOWN ||
     state === MatchFootballStateEnum.NOT_STARTED
-  const isFinished =
-    status === MatchStatusEnum.FINISHED || state === MatchFootballStateEnum.END
+  const isFinished = status === MatchStatusEnum.FINISHED || state === MatchFootballStateEnum.END
   return { isMatchLive, isStream, isLive, isUpcoming, isFinished }
 }
 

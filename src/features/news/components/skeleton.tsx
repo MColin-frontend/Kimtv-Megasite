@@ -110,3 +110,35 @@ export function NewsPanelsSkeleton() {
     </div>
   )
 }
+
+export function NewsItemFeaturedSkeleton({ className }: { className?: string }) {
+  return (
+    <div className={cn("flex flex-col gap-2", className)}>
+      <Skeleton className={cn("rounded-8 aspect-video w-full", SKELETON_BG)} />
+      <Skeleton className={cn("h-3 w-20 rounded", SKELETON_BG)} />
+      <Skeleton className={cn("h-4 w-full rounded", SKELETON_BG)} />
+      <Skeleton className={cn("h-4 w-3/4 rounded", SKELETON_BG)} />
+      <div className="mt-1 flex items-center gap-2">
+        <Skeleton className={cn("size-5 rounded-full", SKELETON_BG)} />
+        <Skeleton className={cn("h-3 w-24 rounded", SKELETON_BG)} />
+      </div>
+    </div>
+  )
+}
+
+export function NewsItemRowSkeleton({ className }: { className?: string }) {
+  return (
+    <div className={cn("flex gap-3 py-2.5", className)}>
+      <Skeleton className={cn("rounded-8 h-[88px] w-[132px] shrink-0", SKELETON_BG)} />
+      <div className="flex flex-1 flex-col gap-2">
+        <Skeleton className={cn("h-3 w-16 rounded", SKELETON_BG)} />
+        <Skeleton className={cn("h-4 w-full rounded", SKELETON_BG)} />
+        <Skeleton className={cn("h-4 w-2/3 rounded", SKELETON_BG)} />
+        <div className="mt-auto flex items-center gap-2">
+          <Skeleton className={cn("size-4 rounded-full", SKELETON_BG)} />
+          <Skeleton className={cn("h-3 w-20 rounded", SKELETON_BG)} />
+        </div>
+      </div>
+    </div>
+  )
+}

@@ -36,6 +36,7 @@ export async function fetchSlideAction<T>(
     method === "GET"
       ? await getRequest<unknown>(endpoint, { params: payload })
       : await postRequest<unknown>(endpoint, payload)
+
   return extractRecords<T>(data).data
 }
 
@@ -52,6 +53,7 @@ export async function fetchAllAction<T>(
     method === "GET"
       ? await getRequest<unknown>(endpoint, { params })
       : await postRequest<unknown>(endpoint, params)
+
   return extractRecords<T>(data).data
 }
 

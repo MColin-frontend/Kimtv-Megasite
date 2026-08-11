@@ -6,8 +6,6 @@ import { AlertTriangle, CheckCircle, Info, X, XCircle } from "lucide-react"
 
 import { Typography } from "@/components/ui/typography"
 
-import "react-toastify/dist/ReactToastify.css"
-
 export function Toaster() {
   return (
     <ToastContainer
