@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import { Bookmark, Calendar, CalendarDays, Mail, Phone, Send, ShieldCheck } from "lucide-react"
 
@@ -104,8 +104,18 @@ export function UserCard({ user }: UserCardProps) {
   const queryClient = useQueryClient()
   const routes = getRoutes(locale)
   const userId = user.userId ?? user.uid
+  const userKey = userId != null ? String(userId) : null
 
-  const [following, setFollowing] = useState(() => isFollowed(user.hasFollow))
+  const serverFollowing = isFollowed(user.hasFollow)
+  // Optimistic override keyed by user id so remount/refetch can fall back to props/cache.
+  const [optimisticFollow, setOptimisticFollow] = useState<{
+    id: string
+    value: boolean
+  } | null>(null)
+  const following =
+    optimisticFollow && userKey && optimisticFollow.id === userKey
+      ? optimisticFollow.value
+      : serverFollowing
   const [followLoading, setFollowLoading] = useState(false)
 
   function toggleFollow() {
@@ -113,14 +123,14 @@ export function UserCard({ user }: UserCardProps) {
       login()
       return
     }
-    if (followLoading || userId == null) return
+    if (followLoading || userKey == null) return
     const next = !following
     handleFollowUser({
-      userId: Number(userId),
+      userId: Number(userKey),
       isFollow: next,
       setFollowing: (value) => {
-        setFollowing(value)
-        if (value === next) syncSearchFollowCache(queryClient, String(userId), next)
+        setOptimisticFollow({ id: userKey, value })
+        if (value === next) syncSearchFollowCache(queryClient, userKey, next)
       },
       setLoading: setFollowLoading,
     })
