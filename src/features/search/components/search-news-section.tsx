@@ -69,6 +69,10 @@ export function SearchNewsSection() {
 
   const items = data?.records ?? []
   const total = data?.total ?? 0
+
+  function handlePageChange(p: number) {
+    setParams({ [SEARCH_NEWS_PAGE_KEY]: p }, { scroll: false })
+  }
   const isEmpty = !isLoading && !items.length
 
   const featured = items[0]
@@ -95,7 +99,7 @@ export function SearchNewsSection() {
         pageSize={SEARCH_NEWS_PAGE_SIZE}
         total={total}
         loading={isLoading}
-        onPageChange={(p) => setParams({ [SEARCH_NEWS_PAGE_KEY]: p })}
+        onPageChange={handlePageChange}
       />
     ) : null
 

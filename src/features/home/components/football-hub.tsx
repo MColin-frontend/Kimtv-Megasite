@@ -80,6 +80,16 @@ function LeagueRow({
         </div>
 
         <div className="flex shrink-0 items-center gap-3">
+          {item.matchCount > 0 && (
+            <Typography
+              as="span"
+              variant="caption"
+              weight="600"
+              className="text-white/45 tabular-nums"
+            >
+              <span className="text-gold font-700">{item.matchCount}</span> {matchUnit}
+            </Typography>
+          )}
           {item.liveCount > 0 ? (
             <span className="rounded-4 flex items-center gap-1 bg-red-600/90 px-1.5 py-0.5">
               <span className="size-1.5 shrink-0 animate-pulse rounded-full bg-white" />
@@ -91,16 +101,6 @@ function LeagueRow({
             <span className="rounded-4 bg-gold/15 text-10 font-600 text-gold ring-gold/30 inline-flex items-center px-1.5 py-0.5 ring-1">
               {upcomingLabel}
             </span>
-          )}
-          {item.matchCount > 0 && (
-            <Typography
-              as="span"
-              variant="caption"
-              weight="600"
-              className="text-white/45 tabular-nums"
-            >
-              <span className="text-gold font-700">{item.matchCount}</span> {matchUnit}
-            </Typography>
           )}
         </div>
       </div>

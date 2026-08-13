@@ -17,9 +17,11 @@ import {
   SEARCH_ANCHOR_PAGE_KEY,
   SEARCH_FILTER_KEY,
   SEARCH_FILTER_TYPES,
+  SEARCH_FINISHED_PAGE_KEY,
   SEARCH_MATCH_PAGE_KEY,
   SEARCH_NEWS_PAGE_KEY,
   SEARCH_QUERY_KEY,
+  SEARCH_UPCOMING_PAGE_KEY,
   SEARCH_USERS_PAGE_KEY,
   SearchFilterEnum,
 } from "../search.constants"
@@ -87,6 +89,8 @@ export function SearchSidebar() {
       {
         [SEARCH_FILTER_KEY]: key === SearchFilterEnum.ALL ? null : key,
         [SEARCH_MATCH_PAGE_KEY]: null,
+        [SEARCH_UPCOMING_PAGE_KEY]: null,
+        [SEARCH_FINISHED_PAGE_KEY]: null,
         [SEARCH_NEWS_PAGE_KEY]: null,
         [SEARCH_USERS_PAGE_KEY]: null,
         [SEARCH_ANCHOR_PAGE_KEY]: null,

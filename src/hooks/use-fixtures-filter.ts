@@ -19,12 +19,13 @@ export interface FixtureFilterStateInterface {
 }
 
 export function useFixturesFilter(): FixtureFilterStateInterface & {
+  isPending: boolean
   setPickedDate: (date: Date | null) => void
   setStatus: (val: MatchStatusTabValue) => void
   setLeagueIds: (ids: number[]) => void
   setPage: (p: number) => void
 } {
-  const { getParam, setParams } = useRouter()
+  const { getParam, setParams, isPending } = useRouter()
 
   const pickedDate = parseDateParam(getParam(MATCH_FIXTURES_PARAMS.PICKED_DATE)) ?? new Date()
   const status = (getParam(MATCH_FIXTURES_PARAMS.STATUS) ??
@@ -78,6 +79,7 @@ export function useFixturesFilter(): FixtureFilterStateInterface & {
     leagueIds,
     page,
     pageSize,
+    isPending,
     setPickedDate,
     setStatus,
     setLeagueIds,

@@ -63,7 +63,7 @@ export function ScheduleFilter({
 
   return (
     <section
-      className="flex items-center justify-end gap-2 max-sm:w-full max-sm:flex-wrap [&>*]:max-sm:basis-[calc(50%-4px)] [&>*]:max-sm:grow [&>*]:max-sm:shrink-0"
+      className="flex items-center justify-end gap-2 max-sm:w-full max-sm:flex-wrap [&>*]:max-sm:shrink-0 [&>*]:max-sm:grow [&>*]:max-sm:basis-[calc(50%-4px)]"
       style={disabled ? { pointerEvents: "none", opacity: 0.5 } : undefined}
     >
       <Select
@@ -79,7 +79,7 @@ export function ScheduleFilter({
       />
       <LeagueSelect
         groups={groups}
-        favorites={hotLeagues}
+        hotLeagues={hotLeagues}
         value={selectedLeagues}
         onValueChange={onLeagueChange}
         className="max-sm:w-full"

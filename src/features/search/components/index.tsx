@@ -2,6 +2,7 @@
 
 import { Fragment } from "react"
 
+import { LIVE_MATCH_TYPE } from "@/lib/match.utils"
 import { cn } from "@/lib/utils"
 import { useRouter } from "@/hooks/use-router"
 
@@ -9,6 +10,10 @@ import { useTranslation } from "@/i18n"
 
 import { MatchSchedule } from "@/features/home/components/match-schedule"
 import { LiveMatchFilterSection } from "@/features/live-schedule/components/live-match-filter-section"
+import {
+  FinishedMatchFilterSection,
+  UpcomingMatchFilterSection,
+} from "@/features/live-schedule/components/status-match-filter-section"
 import { Typography } from "@/components/ui/typography"
 
 import { useSearchHistory } from "../hooks/use-search-history"
@@ -16,8 +21,10 @@ import {
   SEARCH_ANCHOR_PAGE_KEY,
   SEARCH_FILTER_KEY,
   SEARCH_FILTER_TYPES,
+  SEARCH_FINISHED_PAGE_KEY,
   SEARCH_MATCH_PAGE_KEY,
   SEARCH_NEWS_PAGE_KEY,
+  SEARCH_UPCOMING_PAGE_KEY,
   SEARCH_USERS_PAGE_KEY,
   SearchAllResultKeyEnum,
   SearchFilterEnum,
@@ -38,6 +45,8 @@ function SearchMobileFilters() {
       {
         [SEARCH_FILTER_KEY]: key === SearchFilterEnum.ALL ? null : key,
         [SEARCH_MATCH_PAGE_KEY]: null,
+        [SEARCH_UPCOMING_PAGE_KEY]: null,
+        [SEARCH_FINISHED_PAGE_KEY]: null,
         [SEARCH_NEWS_PAGE_KEY]: null,
         [SEARCH_USERS_PAGE_KEY]: null,
         [SEARCH_ANCHOR_PAGE_KEY]: null,
@@ -87,19 +96,34 @@ function SearchResults() {
   const sections = [
     { key: SearchAllResultKeyEnum.MATCHES, visible: isAll, node: <MatchSchedule cols={4} /> },
     {
+      key: SearchAllResultKeyEnum.UPCOMING,
+      visible: isAll,
+      node: <MatchSchedule status={LIVE_MATCH_TYPE.UPCOMING} cols={4} />,
+    },
+    {
+      key: SearchAllResultKeyEnum.FINISHED,
+      visible: isAll,
+      node: <MatchSchedule status={LIVE_MATCH_TYPE.FINISHED} cols={4} />,
+    },
+    {
       key: SearchFilterEnum.MATCH,
       visible: activeFilter === SearchFilterEnum.MATCH,
-      node: <LiveMatchFilterSection hideFilter cols={3} pageKey={SEARCH_MATCH_PAGE_KEY} />,
+      node: <LiveMatchFilterSection hideFilter cols={3} paginate />,
+    },
+    {
+      key: "match-upcoming",
+      visible: activeFilter === SearchFilterEnum.MATCH,
+      node: <UpcomingMatchFilterSection cols={3} />,
+    },
+    {
+      key: "match-finished",
+      visible: activeFilter === SearchFilterEnum.MATCH,
+      node: <FinishedMatchFilterSection cols={3} />,
     },
     {
       key: SearchFilterEnum.NEWS,
       visible: show(SearchFilterEnum.NEWS),
       node: <SearchNewsSection />,
-    },
-    {
-      key: SearchFilterEnum.USER,
-      visible: show(SearchFilterEnum.USER),
-      node: <SearchUsersSection />,
     },
     {
       key: SearchFilterEnum.STREAM,

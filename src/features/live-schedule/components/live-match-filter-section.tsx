@@ -35,18 +35,20 @@ function getTypeScreen(tab: LiveScheduleTab): number {
   return LIVE_SCHEDULE_FILTER_OPTIONS.find((o) => o.value === tab)?.typeScreen ?? 0
 }
 
+const LIVE_PAGE_PARAM = "match-page"
+
 interface LiveMatchFilterSectionProps {
   renderCard?: (match: LiveSearchMatchInterface) => React.ReactNode
   hideFilter?: boolean
   cols?: 3 | 4
-  pageKey?: string
+  paginate?: boolean
 }
 
 export function LiveMatchFilterSection({
   renderCard,
   hideFilter,
   cols = 4,
-  pageKey,
+  paginate = false,
 }: LiveMatchFilterSectionProps = {}) {
   const { t } = useTranslation()
   const { setParams, getParam } = useRouter()
@@ -56,12 +58,11 @@ export function LiveMatchFilterSection({
 
   const typeScreen = getTypeScreen(tab)
   const keyword = searchParams.get("search-key") ?? undefined
-  const page = pageKey ? Number(getParam(pageKey) ?? 1) : 1
+  const page = paginate ? Number(getParam(LIVE_PAGE_PARAM) ?? 1) : 1
 
   const { data, isLoading } = useQuery({
-    ...liveMatchesGridQueryOptions(typeScreen, keyword, pageKey ? page : undefined),
-    // Search page: đổi filter type cần fetch lại ngay
-    ...(pageKey ? { refetchOnMount: "always" as const } : {}),
+    ...liveMatchesGridQueryOptions(typeScreen, keyword, paginate ? page : undefined),
+    ...(paginate ? { refetchOnMount: "always" as const } : {}),
   })
 
   const matches = data?.records ?? []
@@ -71,10 +72,15 @@ export function LiveMatchFilterSection({
     setParams(
       {
         [LIVE_SCHEDULE_TAB_PARAM]: value,
-        ...(pageKey ? { [pageKey]: null } : {}),
+        ...(paginate ? { [LIVE_PAGE_PARAM]: null } : {}),
       },
       { scroll: false }
     )
+  }
+
+  function handlePageChange(p: number) {
+    if (!paginate) return
+    setParams({ [LIVE_PAGE_PARAM]: p }, { scroll: false })
   }
 
   const gridClassName = cn(
@@ -140,10 +146,19 @@ export function LiveMatchFilterSection({
           </div>
           {/* Desktop skeleton grid */}
           <div className={gridClassName}>
-            {Array.from({ length: PAGE_SIZE_OPTION?.[0] }).map((_, i) =>
-              renderCard ? <CardBasicSkeleton key={i} /> : <CardLiveSkeleton key={i} />
-            )}
+            {Array.from({ length: 6 }).map((_, i) => (
+              <CardLiveSkeleton key={i} />
+            ))}
           </div>
+
+          <Pagination
+            className="max-sm:hidden"
+            page={page}
+            pageSize={LIVE_MATCHES_PAGE_SIZE}
+            total={total}
+            loading={isLoading}
+            onPageChange={handlePageChange}
+          />
         </>
       ) : matches.length > 0 ? (
         <div className="flex flex-col gap-8">
@@ -173,14 +188,14 @@ export function LiveMatchFilterSection({
               )
             )}
           </div>
-          {pageKey && total > LIVE_MATCHES_PAGE_SIZE && (
+          {paginate && total > LIVE_MATCHES_PAGE_SIZE && (
             <Pagination
               className="max-sm:hidden"
               page={page}
               pageSize={LIVE_MATCHES_PAGE_SIZE}
               total={total}
               loading={isLoading}
-              onPageChange={(p) => setParams({ [pageKey]: p })}
+              onPageChange={handlePageChange}
             />
           )}
         </div>

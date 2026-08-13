@@ -21,6 +21,7 @@ interface HeroFixturesProps {
   pickedDate: Date
   statusFilter: MatchStatusTabValue
   selectedLeagues: number[]
+  disabled?: boolean
   onPickedDateChange: (d: Date | null) => void
   onStatusChange: (val: string) => void
   onLeagueChange: (value: number[]) => void
@@ -32,6 +33,7 @@ function HeroFixtures({
   pickedDate,
   statusFilter,
   selectedLeagues,
+  disabled,
   onPickedDateChange,
   onStatusChange,
   onLeagueChange,
@@ -64,19 +66,21 @@ function HeroFixtures({
         onValueChange={(val) => onStatusChange(val ?? MATCH_STATUS_TAB.ALL)}
         variant="glass"
         size="sm"
+        disabled={disabled}
         isActive={statusFilter !== MATCH_STATUS_TAB.ALL}
       />
       <LeagueSelect
         groups={groups}
-        favorites={hotLeagues}
+        hotLeagues={hotLeagues}
         value={selectedLeagues}
         onValueChange={onLeagueChange}
+        disabled={disabled}
       />
       <DatePicker
         value={pickedDate}
         onChange={onPickedDateChange}
         size="sm"
-        disabled={statusFilter === MATCH_STATUS_TAB.LIVE}
+        disabled={disabled || statusFilter === MATCH_STATUS_TAB.LIVE}
         maxDate={statusFilter === MATCH_STATUS_TAB.FINISHED ? new Date() : null}
       />
     </section>

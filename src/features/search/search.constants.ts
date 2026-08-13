@@ -1,18 +1,10 @@
-import {
-  Flame,
-  Heart,
-  LayoutGrid,
-  Newspaper,
-  Radio,
-  Trophy,
-  User,
-  UserPlus,
-  Users,
-} from "lucide-react"
+import { Flame, Heart, LayoutGrid, Newspaper, Radio, Trophy, UserPlus, Users } from "lucide-react"
 
 const SEARCH_QUERY_KEY = "search-key" as const
 const SEARCH_FILTER_KEY = "filter" as const
 const SEARCH_MATCH_PAGE_KEY = "match-page" as const
+const SEARCH_UPCOMING_PAGE_KEY = "upcoming-page" as const
+const SEARCH_FINISHED_PAGE_KEY = "finished-page" as const
 const SEARCH_NEWS_PAGE_KEY = "news-page" as const
 const SEARCH_USERS_PAGE_KEY = "users-page" as const
 const SEARCH_ANCHOR_PAGE_KEY = "anchor-page" as const
@@ -28,6 +20,8 @@ enum SearchFilterEnum {
 
 enum SearchAllResultKeyEnum {
   MATCHES = "matches",
+  UPCOMING = "upcoming",
+  FINISHED = "finished",
   NEWS = "news",
   USERS = "users",
   ANCHORS = "anchors",
@@ -67,7 +61,6 @@ const SEARCH_FILTER_TYPES = [
   { key: SearchFilterEnum.ALL, labelKey: "search.filter.all", icon: LayoutGrid },
   { key: SearchFilterEnum.MATCH, labelKey: "search.filter.match", icon: Trophy },
   { key: SearchFilterEnum.NEWS, labelKey: "search.filter.news", icon: Newspaper },
-  { key: SearchFilterEnum.USER, labelKey: "search.filter.user", icon: User },
   { key: SearchFilterEnum.STREAM, labelKey: "search.filter.stream", icon: Radio },
 ]
 
@@ -75,6 +68,8 @@ export {
   SEARCH_QUERY_KEY,
   SEARCH_FILTER_KEY,
   SEARCH_MATCH_PAGE_KEY,
+  SEARCH_UPCOMING_PAGE_KEY,
+  SEARCH_FINISHED_PAGE_KEY,
   SEARCH_NEWS_PAGE_KEY,
   SEARCH_USERS_PAGE_KEY,
   SEARCH_ANCHOR_PAGE_KEY,

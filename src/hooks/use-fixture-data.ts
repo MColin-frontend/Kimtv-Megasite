@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState, useTransition } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 import { fetchAllAction, fetchPageAction } from "@/server/actions/slide.action"
 import { buildMatchApiConfig } from "@/lib/match.utils"
@@ -16,12 +16,15 @@ export function useFixtureData({
   leagueIds,
   page,
   pageSize,
-}: FixtureFilterStateInterface) {
+  isPending: isNavigating = false,
+}: FixtureFilterStateInterface & { isPending?: boolean }) {
+  const filterKey = `${status}|${pickedDate.toDateString()}|${page}|${pageSize}|${leagueIds.join(",")}`
+  const [resolvedKey, setResolvedKey] = useState("")
   const [allMatches, setAllMatches] = useState<MatchInterface[]>([])
   const [total, setTotal] = useState(0)
-  const [isPending, startTransition] = useTransition()
 
   useEffect(() => {
+    let cancelled = false
     const pickedDateTs = Math.floor(
       new Date(pickedDate.getFullYear(), pickedDate.getMonth(), pickedDate.getDate()).getTime() /
         1000
@@ -32,14 +35,13 @@ export function useFixtureData({
       leagueIds
     )
 
-    if (paginate === false) {
-      startTransition(async () => {
+    ;(async () => {
+      if (paginate === false) {
         const data = await fetchAllAction<MatchInterface>(endpoint, method, params)
+        if (cancelled) return
         setAllMatches(data)
         setTotal(data.length)
-      })
-    } else {
-      startTransition(async () => {
+      } else {
         const { data, total: t } = await fetchPageAction<MatchInterface>(
           endpoint,
           method,
@@ -47,12 +49,18 @@ export function useFixtureData({
           page,
           pageSize
         )
+        if (cancelled) return
         setAllMatches(data || [])
         setTotal(t)
-      })
+      }
+      setResolvedKey(filterKey)
+    })()
+
+    return () => {
+      cancelled = true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, pickedDate.toDateString(), page, pageSize, leagueIds.join(",")])
+  }, [filterKey])
 
   const filteredMatches = useMemo(() => {
     let result = [...allMatches]
@@ -69,5 +77,5 @@ export function useFixtureData({
     return result
   }, [allMatches, status])
 
-  return { filteredMatches, total, loading: isPending }
+  return { filteredMatches, total, loading: isNavigating || resolvedKey !== filterKey }
 }
