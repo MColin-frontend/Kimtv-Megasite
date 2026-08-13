@@ -34,10 +34,21 @@
     "all": "Tất cả giải",
     "unit": "giải",
     "title": "Lọc theo giải đấu",
+    "subtitle": "Tìm và chọn giải đấu bạn muốn theo dõi",
     "selected": "đã chọn",
+    "clear": "Xoá chọn",
     "clear-all": "Bỏ chọn tất cả",
+    "cancel": "Huỷ",
+    "apply": "Áp dụng",
     "search-placeholder": "Tìm kiếm giải đấu...",
     "empty": "Không tìm thấy giải đấu",
-    "favorites": "Yêu thích"
+    "favorites": "Yêu thích",
+    "col-league": "Giải đấu",
+    "col-level": "Cấp độ",
+    "col-region": "Khu vực",
+    "col-status": "Trạng thái",
+    "col-matches": "Trận đấu",
+    "level": "Cấp {{n}}",
+    "hot": "HOT"
   }
 }

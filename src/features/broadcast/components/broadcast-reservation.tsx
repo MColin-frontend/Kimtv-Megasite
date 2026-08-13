@@ -16,9 +16,12 @@ import {
   fetchReservationList,
 } from "@/features/broadcast/broadcast.api"
 import { ScheduleFilter } from "@/components/ui/filters/schedule-filter"
-import { groupMatches, Fixtures } from "@/components/ui/match/fixtures"
+import { Fixtures, groupMatches } from "@/components/ui/match/fixtures"
 import { ScheduleHeader } from "@/components/ui/match/parts/schedule-header"
-import { buildLeagueGroupsFromApi } from "@/components/ui/select/league-select"
+import {
+  buildHotLeaguesFromApi,
+  buildLeagueGroupsFromApi,
+} from "@/components/ui/select/league-select"
 import { Typography } from "@/components/ui/typography"
 
 import { BroadcastReservationSkeleton } from "./skeleton"
@@ -50,11 +53,7 @@ export function BroadcastReservation() {
     return new Set<number>(arr.filter((r) => r?.isReservation).map((r) => Number(r.matchId)))
   }, [rawReservations])
 
-  const hotLeagues = (leaguesData?.hotLeagus ?? []).map((l) => ({
-    id: l.leagueId,
-    name: l.name,
-    count: l.gameCount,
-  }))
+  const hotLeagues = buildHotLeaguesFromApi(leaguesData?.hotLeagus ?? [])
   const leagueGroups = buildLeagueGroupsFromApi(leaguesData?.moreLeagus ?? [])
 
   async function handleToggle(match: MatchInterface) {

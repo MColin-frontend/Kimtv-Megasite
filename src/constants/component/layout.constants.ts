@@ -38,7 +38,6 @@ export const MAIN_NAV_ITEMS: NavI18nItemInterface[] = [
     labelKey: "header.nav.live-schedule",
     getHref: (r) => r.liveSchedule,
     icon: Broadcast,
-    badge: true,
     relatedSlugs: ["truc-tiep"],
   },
   { labelKey: "header.nav.news", getHref: (r) => r.news.index, icon: NewspaperClipping },

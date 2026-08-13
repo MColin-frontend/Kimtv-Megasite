@@ -67,88 +67,258 @@ export function FixturesSkeleton() {
   )
 }
 
-/* ── CardBasicSkeleton ──────────────────────────────────────────── */
+/* ── Shared: bottom row (league + date) ─────────────────────────── */
 
-export function CardBasicSkeleton({ className }: { className?: string }) {
+function SkeletonBottomRow() {
   return (
-    <div className={cn("card-glow rounded-12 relative w-full overflow-hidden min-h-[300px] max-sm:min-h-[250px]", className)}>
-      <div className="flex flex-col gap-3 p-3.5 max-md:gap-2 max-md:p-2.5 max-sm:gap-1.5 max-sm:p-2">
-        {/* Row 1: LIVE + time */}
-        <div className="flex items-center justify-between">
-          <Skeleton className="rounded-6 h-6 w-14 max-sm:h-5 max-sm:w-12" />
-          <Skeleton className="rounded-4 h-5 w-12 max-sm:h-4 max-sm:w-10" />
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-1.5">
+        <Skeleton className={cn("size-4 shrink-0 rounded-full max-sm:size-3.5", SKELETON_BG)} />
+        <Skeleton className={cn("h-3 w-24 max-sm:w-16", SKELETON_BG)} />
+      </div>
+      <Skeleton className={cn("h-3 w-20 max-sm:w-14", SKELETON_BG)} />
+    </div>
+  )
+}
+
+/* ── Shared: stat bar (yellow / red / corner) ───────────────────── */
+
+function SkeletonStatBar() {
+  return (
+    <div className="rounded-8 flex items-center justify-between bg-white/[0.04] px-2 py-1.5 max-sm:px-1 max-sm:py-0.5">
+      {Array.from({ length: 3 }).map((_, i) => (
+        <div key={i} className="flex flex-1 flex-col items-center gap-0.5 px-2 max-sm:px-1">
+          <div className="flex items-center gap-1">
+            <Skeleton className={cn("size-4 shrink-0 max-sm:size-3", SKELETON_BG)} />
+            <Skeleton className={cn("h-3 w-8 max-sm:w-6", SKELETON_BG)} />
+          </div>
+          <Skeleton className={cn("h-2.5 w-10 max-sm:w-8", SKELETON_BG)} />
         </div>
-        {/* Row 2: BLV */}
-        <div className="flex min-h-[52px] items-center gap-2 max-sm:min-h-[40px] max-sm:gap-1.5">
-          <Skeleton className="size-10 shrink-0 rounded-full max-sm:size-8" />
-          <div className="flex flex-col gap-1.5">
-            <Skeleton className="h-4 w-20 rounded-full max-sm:h-3 max-sm:w-16" />
-            <Skeleton className="h-4 w-24 max-sm:h-3 max-sm:w-20" />
+      ))}
+    </div>
+  )
+}
+
+/* ── Shared: team column ──────────────────────────────────────── */
+
+function SkeletonTeam() {
+  return (
+    <div className="flex basis-2/5 flex-col items-center gap-1.5">
+      <Skeleton
+        className={cn(
+          "size-[80px] shrink-0 rounded-full max-md:size-[60px] max-sm:size-[44px]",
+          SKELETON_BG
+        )}
+      />
+      <Skeleton className={cn("h-3 w-16 max-sm:w-12", SKELETON_BG)} />
+    </div>
+  )
+}
+
+/* ── CardUpcomingSkeleton ───────────────────────────────────────── */
+/* Layout: empty row | teams+VS | countdown | league+date           */
+
+export function CardUpcomingSkeleton({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn(
+        "card-match-bg rounded-12 relative min-h-[300px] w-full overflow-hidden max-sm:min-h-[250px]",
+        className
+      )}
+    >
+      {/* stadium bg shimmer */}
+      <Skeleton className="absolute inset-0 rounded-none" />
+
+      <div className="relative z-10 flex h-full min-h-[300px] flex-col justify-between gap-2 p-3.5 max-md:gap-1.5 max-md:p-2.5 max-sm:min-h-[250px] max-sm:gap-1.5 max-sm:p-2">
+        {/* Row 1: empty top */}
+        <div className="flex h-5 items-center max-sm:h-4" />
+
+        {/* Row 2: teams + VS */}
+        <div className="flex flex-1 items-center justify-between gap-2">
+          <SkeletonTeam />
+          {/* VS placeholder */}
+          <div className="flex basis-1/5 flex-col items-center">
+            <Skeleton
+              className={cn("size-14 rounded-full max-md:size-12 max-sm:size-10", SKELETON_BG)}
+            />
           </div>
+          <SkeletonTeam />
         </div>
-        {/* Row 3: Teams + Score */}
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex basis-2/5 flex-col items-center gap-2 max-sm:gap-1.5">
-            <Skeleton className="size-[60px] rounded-full max-md:size-[60px] max-sm:size-[44px]" />
-            <Skeleton className="h-3 w-16 max-sm:w-12" />
-          </div>
-          <div className="flex basis-1/5 flex-col items-center gap-1">
-            <Skeleton className="h-10 w-20 max-sm:h-8 max-sm:w-14" />
-            <Skeleton className="rounded-4 h-4 w-14 max-sm:h-3 max-sm:w-10" />
-          </div>
-          <div className="flex basis-2/5 flex-col items-center gap-2 max-sm:gap-1.5">
-            <Skeleton className="size-[60px] rounded-full max-sm:size-[44px]" />
-            <Skeleton className="h-3 w-16 max-sm:w-12" />
-          </div>
+
+        {/* Row 3: countdown (Giờ : Phút : Giây) */}
+        <div className="flex items-center justify-center gap-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="flex items-start gap-2">
+              <div className="flex flex-col items-center gap-1">
+                <Skeleton className={cn("h-7 w-10 max-sm:h-5 max-sm:w-8", SKELETON_BG)} />
+                <Skeleton className={cn("h-2.5 w-6 max-sm:w-4", SKELETON_BG)} />
+              </div>
+              {i < 2 && (
+                <Skeleton className={cn("mt-0.5 h-5 w-3 max-sm:h-4 max-sm:w-2", SKELETON_BG)} />
+              )}
+            </div>
+          ))}
         </div>
-        {/* Row 4: Stats */}
-        <Skeleton className="rounded-8 h-10 w-full max-sm:h-7" />
-        {/* Row 5: Bottom */}
-        <Skeleton className="rounded-4 h-6 w-full max-sm:h-5" />
+
+        {/* Row 4: league + date */}
+        <SkeletonBottomRow />
       </div>
     </div>
   )
 }
 
-/* ── CardLiveSkeleton ─────────────────────────────────── */
+/* ── CardFinishedSkeleton ───────────────────────────────────────── */
+/* Layout: empty row | teams+score+badge | stats bar | league+date  */
+
+export function CardFinishedSkeleton({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn(
+        "card-match-bg rounded-12 relative min-h-[300px] w-full overflow-hidden max-sm:min-h-[250px]",
+        className
+      )}
+    >
+      <Skeleton className="absolute inset-0 rounded-none" />
+
+      <div className="relative z-10 flex h-full min-h-[300px] flex-col justify-between gap-2 p-3.5 max-md:gap-1.5 max-md:p-2.5 max-sm:min-h-[250px] max-sm:gap-1.5 max-sm:p-2">
+        {/* Row 1: empty */}
+        <div className="flex h-5 items-center max-sm:h-4" />
+
+        {/* Row 2: teams + score */}
+        <div className="flex flex-1 items-center justify-between gap-2">
+          <SkeletonTeam />
+          {/* Score + badge */}
+          <div className="flex basis-1/5 flex-col items-center gap-1.5">
+            <Skeleton
+              className={cn("h-10 w-16 max-md:h-8 max-md:w-12 max-sm:h-7 max-sm:w-10", SKELETON_BG)}
+            />
+            <Skeleton className={cn("rounded-4 h-5 w-14 max-sm:h-4 max-sm:w-10", SKELETON_BG)} />
+          </div>
+          <SkeletonTeam />
+        </div>
+
+        {/* Row 3: stats bar */}
+        <SkeletonStatBar />
+
+        {/* Row 4: league + date */}
+        <SkeletonBottomRow />
+      </div>
+    </div>
+  )
+}
+
+/* ── CardBasicSkeleton ──────────────────────────────────────────── */
+/* Generic – dùng cho live/stream card basic (có BLV row)           */
+
+export function CardBasicSkeleton({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn(
+        "card-match-bg rounded-12 relative min-h-[300px] w-full overflow-hidden max-sm:min-h-[250px]",
+        className
+      )}
+    >
+      <Skeleton className="absolute inset-0 rounded-none" />
+
+      <div className="relative z-10 flex h-full min-h-[300px] flex-col justify-between gap-2 p-3.5 max-md:gap-1.5 max-md:p-2.5 max-sm:min-h-[250px] max-sm:gap-1.5 max-sm:p-2">
+        {/* Row 1: badge row */}
+        <div className="flex items-center justify-between">
+          <Skeleton className={cn("rounded-6 h-6 w-14 max-sm:h-5 max-sm:w-11", SKELETON_BG)} />
+          <div className="flex items-center gap-1.5">
+            <Skeleton className={cn("rounded-4 h-6 w-10 max-sm:h-5 max-sm:w-8", SKELETON_BG)} />
+            <Skeleton className={cn("rounded-6 h-6 w-14 max-sm:h-5 max-sm:w-10", SKELETON_BG)} />
+          </div>
+        </div>
+
+        {/* Row 2: BLV */}
+        <div className="flex items-center gap-1.5">
+          <Skeleton className={cn("size-8 shrink-0 rounded-full max-sm:size-6", SKELETON_BG)} />
+          <div className="flex flex-col gap-1">
+            <Skeleton className={cn("h-2.5 w-10 rounded-full max-sm:w-8", SKELETON_BG)} />
+            <Skeleton className={cn("h-3 w-20 max-sm:w-14", SKELETON_BG)} />
+          </div>
+        </div>
+
+        {/* Row 3: teams + score */}
+        <div className="flex flex-1 items-center justify-between gap-2">
+          <SkeletonTeam />
+          <div className="flex basis-1/5 flex-col items-center gap-1">
+            <Skeleton
+              className={cn("h-10 w-16 max-md:h-8 max-md:w-12 max-sm:h-7 max-sm:w-10", SKELETON_BG)}
+            />
+          </div>
+          <SkeletonTeam />
+        </div>
+
+        {/* Row 4: stats bar */}
+        <SkeletonStatBar />
+
+        {/* Row 5: league + date */}
+        <SkeletonBottomRow />
+      </div>
+    </div>
+  )
+}
+
+/* ── CardLiveSkeleton ─────────────────────────────────────────── */
+/* Layout: LIVE+HD+viewers | BLV | teams+score | stats | league    */
 
 export function CardLiveSkeleton({ className }: { className?: string }) {
   return (
-    <div className={cn("card-glow rounded-12 relative w-full overflow-hidden", className)}>
-      <Skeleton className="aspect-video w-full" />
-      <div className="flex flex-col gap-2 p-3 max-sm:gap-1.5 max-sm:p-2">
-        {/* BLV row */}
+    <div
+      className={cn(
+        "card-match-bg rounded-12 relative min-h-[300px] w-full overflow-hidden max-sm:min-h-[250px]",
+        className
+      )}
+    >
+      {/* Live thumbnail shimmer */}
+      <Skeleton className="absolute inset-0 rounded-none opacity-40" />
+
+      <div className="relative z-10 flex h-full min-h-[300px] flex-col justify-between gap-2 p-3.5 max-md:gap-1.5 max-md:p-2.5 max-sm:min-h-[250px] max-sm:gap-1.5 max-sm:p-2">
+        {/* Row 1: LIVE badge (left) | HD + viewer count (right) */}
+        <div className="flex items-start justify-between">
+          <Skeleton
+            className={cn("rounded-6 h-7 w-16 max-md:h-6 max-sm:h-5 max-sm:w-12", SKELETON_BG)}
+          />
+          <div className="flex items-center gap-1.5 max-sm:gap-1">
+            <Skeleton
+              className={cn("rounded-4 h-7 w-10 max-md:h-6 max-sm:h-5 max-sm:w-8", SKELETON_BG)}
+            />
+            <Skeleton
+              className={cn("rounded-6 h-7 w-16 max-md:h-6 max-sm:h-5 max-sm:w-12", SKELETON_BG)}
+            />
+          </div>
+        </div>
+
+        {/* Row 2: BLV info */}
         <div className="flex items-center gap-1.5">
-          <Skeleton className="size-7 shrink-0 rounded-full max-sm:size-6" />
+          <Skeleton className={cn("size-9 shrink-0 rounded-full max-sm:size-7", SKELETON_BG)} />
           <div className="flex flex-col gap-1">
-            <Skeleton className="h-2.5 w-12 rounded-full max-sm:w-10" />
-            <Skeleton className="h-3 w-20 max-sm:w-16" />
+            <Skeleton className={cn("h-4 w-16 rounded-full max-sm:h-3 max-sm:w-12", SKELETON_BG)} />
+            <Skeleton className={cn("h-3 w-24 max-sm:w-16", SKELETON_BG)} />
           </div>
         </div>
-        {/* Teams */}
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex basis-2/5 flex-col items-center gap-1.5">
-            <Skeleton className="size-10 rounded-full max-sm:size-8" />
-            <Skeleton className="h-3 w-14 max-sm:w-10" />
-          </div>
+
+        {/* Row 3: teams + score (larger score than basic) */}
+        <div className="flex flex-1 items-center justify-between gap-2">
+          <SkeletonTeam />
           <div className="flex basis-1/5 flex-col items-center gap-1">
-            <Skeleton className="h-8 w-16 max-sm:h-6 max-sm:w-12" />
+            {/* Score: text-72 on live */}
+            <Skeleton
+              className={cn(
+                "h-14 w-20 max-md:h-10 max-md:w-16 max-sm:h-8 max-sm:w-12",
+                SKELETON_BG
+              )}
+            />
           </div>
-          <div className="flex basis-2/5 flex-col items-center gap-1.5">
-            <Skeleton className="size-10 rounded-full max-sm:size-8" />
-            <Skeleton className="h-3 w-14 max-sm:w-10" />
-          </div>
+          <SkeletonTeam />
         </div>
-        {/* Stats */}
-        <Skeleton className="rounded-8 h-8 w-full max-sm:h-6" />
-        {/* League */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            <Skeleton className="size-4 rounded-full max-sm:size-3.5" />
-            <Skeleton className="h-3 w-20 max-sm:w-16" />
-          </div>
-          <Skeleton className="h-3 w-16 max-sm:w-12" />
-        </div>
+
+        {/* Row 4: stats bar */}
+        <SkeletonStatBar />
+
+        {/* Row 5: league + date */}
+        <SkeletonBottomRow />
       </div>
     </div>
   )

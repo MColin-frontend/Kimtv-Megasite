@@ -1,11 +1,11 @@
+import { HTTP_METHOD } from "@/lib/match.utils"
+
 export interface BannerItem {
   imageUrl: string
   url?: string
   width?: number
   height?: number
 }
-
-import { HTTP_METHOD } from "@/lib/match.utils"
 
 export interface ApiConfig {
   endpoint: string
@@ -24,12 +24,23 @@ export interface LeagueApiItem {
   nameEn: string | null
   abbr: string
   firstLetter: string
-  isHot: boolean
+  isHot: boolean | null
+  icon: string | null
+  logo: string | null
+  language: string | null
+  regionId: number
+  hotValue: number
+  hostCountry: string
+  hostCity: string
 }
 
 export interface LeagueApiResult {
+  beiDan: LeagueApiItem[]
   hotLeagus: LeagueApiItem[]
+  topLeagus: LeagueApiItem[]
   moreLeagus: LeagueApiItem[]
+  jingCai: LeagueApiItem[]
+  zuCai: LeagueApiItem[]
 }
 
 export interface HotLeagueInterface {

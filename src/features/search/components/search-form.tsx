@@ -11,7 +11,24 @@ import { useTranslation } from "@/i18n"
 
 import { Input } from "@/components/ui/input"
 
-import { SEARCH_QUERY_KEY } from "../search.constants"
+import {
+  SEARCH_ANCHOR_PAGE_KEY,
+  SEARCH_FINISHED_PAGE_KEY,
+  SEARCH_MATCH_PAGE_KEY,
+  SEARCH_NEWS_PAGE_KEY,
+  SEARCH_QUERY_KEY,
+  SEARCH_UPCOMING_PAGE_KEY,
+  SEARCH_USERS_PAGE_KEY,
+} from "../search.constants"
+
+const PAGE_KEYS = [
+  SEARCH_MATCH_PAGE_KEY,
+  SEARCH_UPCOMING_PAGE_KEY,
+  SEARCH_FINISHED_PAGE_KEY,
+  SEARCH_NEWS_PAGE_KEY,
+  SEARCH_USERS_PAGE_KEY,
+  SEARCH_ANCHOR_PAGE_KEY,
+]
 
 interface SearchFormProps {
   onSearch?: (q: string) => void
@@ -45,14 +62,16 @@ export function SearchForm({
 
   const onSubmit = ({ query }: SearchFormValues) => {
     const q = query.trim()
-    setParams({ [nameKey]: q || null }, { replace: true })
+    const pageReset = Object.fromEntries(PAGE_KEYS.map((k) => [k, null]))
+    setParams({ [nameKey]: q || null, ...pageReset }, { replace: true })
     if (q) onSearch?.(q)
     // input giữ focus vì form không re-mount
   }
 
   const handleClear = () => {
     reset({ query: "" })
-    removeParams(nameKey, { replace: true, scroll: false })
+    const pageReset = Object.fromEntries(PAGE_KEYS.map((k) => [k, null]))
+    setParams({ [nameKey]: null, ...pageReset }, { replace: true, scroll: false })
   }
 
   return (
@@ -87,7 +106,10 @@ export function SearchForm({
             value={field.value}
             onChange={(e) => {
               field.onChange(e)
-              if (!e.target.value) removeParams(nameKey, { replace: true, scroll: false })
+              if (!e.target.value) {
+                const pageReset = Object.fromEntries(PAGE_KEYS.map((k) => [k, null]))
+                setParams({ [nameKey]: null, ...pageReset }, { replace: true, scroll: false })
+              }
             }}
             autoComplete="off"
             placeholder={placeholderProp ?? t("search.form.placeholder")}

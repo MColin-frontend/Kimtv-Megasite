@@ -7,9 +7,12 @@ import { useFixtureData } from "@/hooks/use-fixture-data"
 import { useFixturesFilter } from "@/hooks/use-fixtures-filter"
 
 import { ScheduleFilter } from "@/components/ui/filters/schedule-filter"
-import { groupMatches, Fixtures } from "@/components/ui/match/fixtures"
+import { Fixtures, groupMatches } from "@/components/ui/match/fixtures"
 import { ScheduleHeader } from "@/components/ui/match/parts/schedule-header"
-import { buildLeagueGroupsFromApi } from "@/components/ui/select/league-select"
+import {
+  buildHotLeaguesFromApi,
+  buildLeagueGroupsFromApi,
+} from "@/components/ui/select/league-select"
 
 export default function ScheduleList() {
   const filter = useFixturesFilter()
@@ -17,11 +20,7 @@ export default function ScheduleList() {
   const { filteredMatches, total, loading } = useFixtureData(filter)
   const groups = useMemo(() => groupMatches(filteredMatches), [filteredMatches])
 
-  const hotLeagues = (leaguesData?.hotLeagus ?? []).map((l) => ({
-    id: l.leagueId,
-    name: l.name,
-    count: l.gameCount,
-  }))
+  const hotLeagues = buildHotLeaguesFromApi(leaguesData?.hotLeagus ?? [])
   const leagueGroups = buildLeagueGroupsFromApi(leaguesData?.moreLeagus ?? [])
 
   return (

@@ -7,7 +7,10 @@ import { useFixturesFilter } from "@/hooks/use-fixtures-filter"
 
 import { FixturesSkeleton } from "@/components/ui/match/fixtures"
 import { ScheduleHeader } from "@/components/ui/match/parts/schedule-header"
-import { buildLeagueGroupsFromApi } from "@/components/ui/select/league-select"
+import {
+  buildHotLeaguesFromApi,
+  buildLeagueGroupsFromApi,
+} from "@/components/ui/select/league-select"
 
 import HeroFixtures from "./hero-banner"
 
@@ -19,11 +22,7 @@ function Fixtures() {
   const filter = useFixturesFilter()
   const { data: leaguesData } = useLeagues()
 
-  const hotLeagues = (leaguesData?.hotLeagus ?? []).map((l) => ({
-    id: l.leagueId,
-    name: l.name,
-    count: l.gameCount,
-  }))
+  const hotLeagues = buildHotLeaguesFromApi(leaguesData?.hotLeagus ?? [])
   const groups = buildLeagueGroupsFromApi(leaguesData?.moreLeagus ?? [])
 
   return (
@@ -36,6 +35,7 @@ function Fixtures() {
         pickedDate={filter.pickedDate}
         statusFilter={filter.status}
         selectedLeagues={filter.leagueIds}
+        disabled={filter.isPending}
         onPickedDateChange={filter.setPickedDate}
         onStatusChange={(val) => filter.setStatus(val as Parameters<typeof filter.setStatus>[0])}
         onLeagueChange={filter.setLeagueIds}

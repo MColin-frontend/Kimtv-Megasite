@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback } from "react"
+import { useCallback, useEffect, useRef, useSyncExternalStore } from "react"
 import { useRouter as useNextRouter, usePathname, useSearchParams } from "next/navigation"
 
 type ParamValue = string | number | boolean | null | undefined
@@ -8,9 +8,26 @@ type ParamValue = string | number | boolean | null | undefined
 /** Params map — value rỗng ("", null, undefined) sẽ xoá param đó */
 type Params = Record<string, ParamValue>
 
+let navPending = false
+const navListeners = new Set<() => void>()
+
+function setNavPending(next: boolean) {
+  if (navPending === next) return
+  navPending = next
+  navListeners.forEach((listener) => listener())
+}
+
+function subscribeNav(listener: () => void) {
+  navListeners.add(listener)
+  return () => {
+    navListeners.delete(listener)
+  }
+}
+
 interface UseRouterReturn {
   pathname: string
   searchParams: ReturnType<typeof useSearchParams>
+  isPending: boolean
   /** Lấy giá trị của một param */
   getParam: (key: string) => string | null
   /** Điều hướng tới một URL mới (thêm vào history) */
@@ -40,6 +57,20 @@ export function useRouter(): UseRouterReturn {
   const router = useNextRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const isPending = useSyncExternalStore(
+    subscribeNav,
+    () => navPending,
+    () => false
+  )
+  const searchKey = searchParams.toString()
+  const locationKey = `${pathname}?${searchKey}`
+  const prevLocationKey = useRef(locationKey)
+
+  useEffect(() => {
+    if (prevLocationKey.current === locationKey) return
+    prevLocationKey.current = locationKey
+    setNavPending(false)
+  }, [locationKey])
 
   /* ── helpers ──────────────────────────────────────────────── */
   const buildUrl = useCallback(
@@ -51,6 +82,19 @@ export function useRouter(): UseRouterReturn {
   )
 
   const isEmpty = (v: ParamValue): boolean => v === "" || v === null || v === undefined
+
+  const currentUrl = buildUrl(new URLSearchParams(searchKey))
+
+  const navigate = useCallback(
+    (url: string, opts?: { replace?: boolean; scroll?: boolean }) => {
+      if (url === currentUrl) return
+      setNavPending(true)
+      const navOpts = { scroll: opts?.scroll ?? true }
+      if (opts?.replace) router.replace(url, navOpts)
+      else router.push(url, navOpts)
+    },
+    [currentUrl, router]
+  )
 
   /* ── setParams ────────────────────────────────────────────── */
   const setParams = useCallback(
@@ -65,12 +109,9 @@ export function useRouter(): UseRouterReturn {
         }
       })
 
-      const url = buildUrl(next)
-      const navOpts = { scroll: opts?.scroll ?? true }
-      if (opts?.replace) router.replace(url, navOpts)
-      else router.push(url, navOpts)
+      navigate(buildUrl(next), opts)
     },
-    [router, searchParams, buildUrl]
+    [searchParams, buildUrl, navigate]
   )
 
   /* ── resetParams ──────────────────────────────────────────── */
@@ -84,12 +125,9 @@ export function useRouter(): UseRouterReturn {
         })
       }
 
-      const url = buildUrl(next)
-      const navOpts = { scroll: opts?.scroll ?? true }
-      if (opts?.replace) router.replace(url, navOpts)
-      else router.push(url, navOpts)
+      navigate(buildUrl(next), opts)
     },
-    [router, buildUrl]
+    [buildUrl, navigate]
   )
 
   /* ── removeParams ─────────────────────────────────────────── */
@@ -99,18 +137,16 @@ export function useRouter(): UseRouterReturn {
       const list = Array.isArray(keys) ? keys : [keys]
       list.forEach((k) => next.delete(k))
 
-      const url = buildUrl(next)
-      const navOpts = { scroll: opts?.scroll ?? true }
-      if (opts?.replace) router.replace(url, navOpts)
-      else router.push(url, navOpts)
+      navigate(buildUrl(next), opts)
     },
-    [router, searchParams, buildUrl]
+    [searchParams, buildUrl, navigate]
   )
 
   /* ── return ───────────────────────────────────────────────── */
   return {
     pathname,
     searchParams,
+    isPending,
     getParam: (key: string) => searchParams.get(key),
     push: (href) => router.push(href),
     replace: (href) => router.replace(href),

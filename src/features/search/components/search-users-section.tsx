@@ -100,6 +100,10 @@ export function SearchPersonSection<T>({
   const total: number = pd?.total ?? 0
   const isEmpty = !isLoading && !gridItems.length
 
+  function handlePageChange(p: number) {
+    setParams({ [pageKey]: p }, { scroll: false })
+  }
+
   return (
     <section className="card-glow rounded-12 flex min-w-0 flex-col gap-5 overflow-x-clip p-5 max-md:gap-4 max-md:p-4 max-sm:gap-3 max-sm:p-3">
       <ScheduleHeader image={image} title={t(titleKey)} subtitle={t(subtitleKey)} />
@@ -142,7 +146,7 @@ export function SearchPersonSection<T>({
               pageSize={SEARCH_PAGE_SIZE}
               total={total}
               loading={isLoading}
-              onPageChange={(p) => setParams({ [pageKey]: p })}
+              onPageChange={handlePageChange}
             />
           )}
         </div>
