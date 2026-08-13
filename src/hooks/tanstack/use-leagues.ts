@@ -12,7 +12,14 @@ const LEAGUES_API = {
 
 const FOOTBALL_GAME_ID = 202
 
-const EMPTY: LeagueApiResult = { hotLeagus: [], moreLeagus: [] }
+const EMPTY: LeagueApiResult = {
+  beiDan: [],
+  hotLeagus: [],
+  topLeagus: [],
+  moreLeagus: [],
+  jingCai: [],
+  zuCai: [],
+}
 
 export function useLeagues(gameId = FOOTBALL_GAME_ID, option = 1) {
   return useQuery({
