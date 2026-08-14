@@ -152,6 +152,7 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(
       >
         {/* ── Trigger ── */}
         <SelectPrimitive.Trigger
+          aria-label={[label, selectedOpt?.label ?? placeholder].filter(Boolean).join(": ")}
           className={cn(
             triggerVariants({ variant, size }),
             fullWidth && "w-full",

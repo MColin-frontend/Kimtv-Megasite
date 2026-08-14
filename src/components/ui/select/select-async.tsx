@@ -161,6 +161,7 @@ export function SelectAsync({
         {/* ── Trigger ── */}
         <Popover.Trigger
           disabled={disabled}
+          aria-label={[label, displayLabel ?? placeholder].filter(Boolean).join(": ")}
           className={cn(
             triggerVariants({ variant, size }),
             fullWidth && "w-full",
