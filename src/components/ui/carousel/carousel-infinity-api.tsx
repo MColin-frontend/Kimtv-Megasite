@@ -17,6 +17,8 @@ interface CarouselInfinityApiProps<T> {
   skeletonCount?: number
   /** Fetch toàn bộ mà không gửi params phân trang (vd: LIVE_SEARCH). */
   fetchAll?: boolean
+  /** Cap số lượng items hiển thị — dùng khi API trả về toàn bộ data mà không hỗ trợ pagination. */
+  limit?: number
   renderItem: (item: T, index: number, isLoading: boolean) => React.ReactNode
   renderEmpty?: () => React.ReactNode
   slideClassName?: string
@@ -35,6 +37,7 @@ export default function CarouselInfinityApi<T>({
   pageSize = DEFAULT_PAGE_SIZE,
   skeletonCount = DEFAULT_SKELETON_COUNT,
   fetchAll = false,
+  limit,
   renderItem,
   renderEmpty,
   slideClassName,
@@ -61,13 +64,17 @@ export default function CarouselInfinityApi<T>({
       try {
         if (fetchAll) {
           const data = await fetchAllAction<T>(endpoint, method, params ?? {})
-          setItems(data)
+          setItems(limit ? data.slice(0, limit) : data)
           hasMoreRef.current = false
           pageRef.current = 1
         } else {
           const data = await fetchSlideAction<T>(endpoint, method, params ?? {}, p, pageSize)
-          setItems((prev) => (p === 1 ? data : [...prev, ...data]))
-          hasMoreRef.current = data.length === pageSize
+          setItems((prev) => {
+            const next = p === 1 ? data : [...prev, ...data]
+            return limit ? next.slice(0, limit) : next
+          })
+          hasMoreRef.current =
+            data.length === pageSize && (!limit || pageRef.current * pageSize < limit)
           pageRef.current = p
         }
       } finally {

@@ -1145,6 +1145,11 @@ main .xgplayer .flex-controls .xg-inner-controls {
 }
 
 /* ─── React Toastify overrides ─────────────────────────────────── */
+.Toastify__toast-container {
+  --toastify-toast-width: 280px;
+  padding: 0 !important;
+}
+
 .Toastify__toast {
   padding: 0 !important;
   background: transparent !important;
@@ -1163,10 +1168,6 @@ main .xgplayer .flex-controls .xg-inner-controls {
   border-radius: 0 0 8px 8px !important;
   background: rgba(255, 255, 255, 0.45) !important;
   backdrop-filter: blur(4px) !important;
-}
-
-.Toastify__progress-bar--animated {
-  animation: Toastify__trackProgress linear 1 !important;
 }
 
 /* ── Video feed animations ───────────────────────────────────────────────── */

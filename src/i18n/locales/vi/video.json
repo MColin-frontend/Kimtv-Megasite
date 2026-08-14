@@ -38,7 +38,10 @@
     "reply-success": "Phản hồi bình luận thành công",
     "post-error": "Bình luận thất bại, vui lòng thử lại",
     "delete-success": "Đã xóa bình luận",
-    "delete-error": "Xóa bình luận thất bại"
+    "delete-error": "Xóa bình luận thất bại",
+    "tab-all": "Tất cả",
+    "tab-following": "Theo dõi",
+    "sort": "Sắp xếp"
   },
   "no-source": {
     "title": "Không tìm thấy nguồn phát",

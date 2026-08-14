@@ -2,9 +2,11 @@
 
 import { toast as reactToast, ToastContainer } from "react-toastify"
 import Image from "next/image"
-import { AlertTriangle, CheckCircle, Info, X, XCircle } from "lucide-react"
+import { X } from "lucide-react"
 
-import { Typography } from "@/components/ui/typography"
+import icToastError from "@assets/images/common/ic-toast-error.png"
+import icToastSuccess from "@assets/images/common/ic-toast-success.png"
+import icToastWarning from "@assets/images/common/ic-toast-warning.png"
 
 export function Toaster() {
   return (
@@ -16,36 +18,48 @@ export function Toaster() {
       pauseOnHover
       draggable={false}
       closeButton={false}
-      toastStyle={{ background: "transparent", boxShadow: "none", padding: 0, marginBottom: 6 }}
-      style={{ width: "360px" }}
+      toastStyle={{ background: "transparent", boxShadow: "none", padding: 0, marginBottom: 8 }}
+      style={{ width: "240px" }}
     />
   )
 }
 
 const VARIANTS = {
   success: {
-    border: "rgba(34,197,94,0.35)",
-    icon: "rgba(34,197,94,1)",
-    dot: "rgba(34,197,94,0.9)",
-    Icon: CheckCircle,
+    bg: "#e8f5e9",
+    border: "#a5d6a7",
+    titleColor: "#1b5e20",
+    msgColor: "#33691e",
+    closeColor: "#1b5e20",
+    icon: icToastSuccess,
+    label: "Thành công",
   },
   error: {
-    border: "rgba(239,68,68,0.35)",
-    icon: "rgba(239,68,68,1)",
-    dot: "rgba(239,68,68,0.9)",
-    Icon: XCircle,
-  },
-  info: {
-    border: "rgba(59,130,246,0.35)",
-    icon: "rgba(59,130,246,1)",
-    dot: "rgba(59,130,246,0.9)",
-    Icon: Info,
+    bg: "#fce4ec",
+    border: "#f48fb1",
+    titleColor: "#880e4f",
+    msgColor: "#ad1457",
+    closeColor: "#880e4f",
+    icon: icToastError,
+    label: "Lỗi",
   },
   warning: {
-    border: "rgba(234,179,8,0.35)",
-    icon: "rgba(234,179,8,1)",
-    dot: "rgba(234,179,8,0.9)",
-    Icon: AlertTriangle,
+    bg: "#fff8e1",
+    border: "#ffe082",
+    titleColor: "#e65100",
+    msgColor: "#bf360c",
+    closeColor: "#e65100",
+    icon: icToastWarning,
+    label: "Cảnh báo",
+  },
+  info: {
+    bg: "#e3f2fd",
+    border: "#90caf9",
+    titleColor: "#0d47a1",
+    msgColor: "#1565c0",
+    closeColor: "#0d47a1",
+    icon: icToastWarning,
+    label: "Thông báo",
   },
 } as const
 
@@ -53,93 +67,90 @@ type Variant = keyof typeof VARIANTS
 
 function ToastContent({
   id,
-  title,
-  description,
+  message,
   variant,
   image,
 }: {
   id: string | number
-  title: string
-  description?: string
+  message: string
   variant: Variant
   image?: string
 }) {
-  const { border, icon, dot, Icon } = VARIANTS[variant]
+  const v = VARIANTS[variant]
+
   return (
     <div
       style={{
-        background: "rgba(15,17,26,0.92)",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
-        borderRadius: 10,
-        border: `1px solid ${border}`,
-        boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
-        width: "100%",
+        background: v.bg,
+        border: `1px solid ${v.border}`,
+        borderRadius: 14,
+        boxShadow:
+          "0 2px 0 rgba(0,0,0,0.12), 0 6px 20px rgba(0,0,0,0.13), inset 0 1px 0 rgba(255,255,255,0.7)",
+        overflow: "visible",
       }}
-      className="flex w-full items-start gap-3 px-4 py-3"
+      className="relative flex w-full items-end gap-2.5 py-2 pr-3 pl-2"
     >
-      {image ? (
-        <Image
-          src={image}
-          alt={title}
-          width={32}
-          height={32}
-          className="mt-0.5 shrink-0 rounded-full object-cover"
-        />
-      ) : (
-        <span className="mt-0.5 shrink-0" style={{ color: icon }}>
-          <Icon size={18} />
-        </span>
-      )}
-
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1.5">
-          <span
-            className="inline-block size-1.5 shrink-0 rounded-full"
-            style={{ background: dot }}
+      {/* 3D icon — bottom-aligned, slightly overflows */}
+      <div className="shrink-0 self-end">
+        {image ? (
+          <Image
+            src={image}
+            alt={v.label}
+            width={64}
+            height={64}
+            className="object-contain"
+            style={{
+              filter:
+                "drop-shadow(0 6px 10px rgba(0,0,0,0.25)) drop-shadow(0 2px 4px rgba(0,0,0,0.18))",
+            }}
           />
-          <Typography variant="body-sm" weight="600" className="leading-snug text-white/95">
-            {title}
-          </Typography>
-        </div>
-        {description && (
-          <Typography variant="caption" className="mt-0.5 leading-relaxed text-white/55">
-            {description}
-          </Typography>
+        ) : (
+          <Image
+            src={v.icon}
+            alt={v.label}
+            width={64}
+            height={64}
+            className="object-contain"
+            style={{
+              filter:
+                "drop-shadow(0 6px 10px rgba(0,0,0,0.25)) drop-shadow(0 2px 4px rgba(0,0,0,0.18))",
+            }}
+          />
         )}
       </div>
 
+      {/* Text */}
+      <div className="min-w-0 flex-1 pb-0.5">
+        <p className="text-14 font-700 leading-tight" style={{ color: v.titleColor }}>
+          {v.label}
+        </p>
+        <p className="text-12 font-400 mt-0.5 leading-relaxed" style={{ color: v.msgColor }}>
+          {message}
+        </p>
+      </div>
+
+      {/* Close */}
       <button
         onClick={() => reactToast.dismiss(id)}
-        className="mt-0.5 shrink-0 text-white/30 transition-colors hover:text-white/70"
+        className="mt-0.5 shrink-0 self-start rounded-full transition-opacity hover:opacity-60"
+        style={{ color: v.closeColor }}
       >
-        <X size={14} />
+        <X size={18} strokeWidth={2.5} />
       </button>
     </div>
   )
 }
 
-function show(variant: Variant, title: string, description?: string, image?: string) {
+function show(variant: Variant, message: string, image?: string) {
   const id = crypto.randomUUID()
-  reactToast(
-    <ToastContent
-      id={id}
-      title={title}
-      description={description}
-      variant={variant}
-      image={image}
-    />,
-    { toastId: id }
-  )
+  reactToast(<ToastContent id={id} message={message} variant={variant} image={image} />, {
+    toastId: id,
+  })
 }
 
 export const toast = {
-  success: (title: string, description?: string, image?: string) =>
-    show("success", title, description, image),
-  error: (title: string, description?: string, image?: string) =>
-    show("error", title, description, image),
-  info: (title: string, description?: string, image?: string) =>
-    show("info", title, description, image),
-  warning: (title: string, description?: string, image?: string) =>
-    show("warning", title, description, image),
+  success: (message: string, image?: string) => show("success", message, image),
+  error: (message: string, image?: string) => show("error", message, image),
+  info: (message: string, image?: string) => show("info", message, image),
+  warning: (message: string, image?: string) => show("warning", message, image),
 }

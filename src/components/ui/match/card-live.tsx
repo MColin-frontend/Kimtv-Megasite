@@ -52,7 +52,7 @@ export function MatchCardLive({
     <div
       onClick={handleClick}
       className={cn(
-        "card-match-bg rounded-12 relative w-full overflow-hidden transition-all",
+        "card-match-bg rounded-12 relative w-full overflow-hidden transition-[box-shadow]",
         match.matchId && match.gameId ? "hover:shadow-card-hover cursor-pointer" : "cursor-default",
         "shadow-card",
         className
@@ -82,7 +82,7 @@ export function MatchCardLive({
             {(isStream || isLive) && (
               <>
                 <div className="relative flex items-center gap-1.5 overflow-visible">
-                  <div className="pointer-events-none absolute inset-0 -z-10 scale-150 animate-pulse rounded-full bg-red-600/40 blur-md" />
+                  <div className="pointer-events-none absolute inset-0 -z-10 scale-150 animate-pulse rounded-full bg-red-600/40" />
                   <div className="rounded-6 shadow-live-red relative flex h-[30px] items-center gap-1.5 bg-red-600 px-2.5 max-md:h-6 max-md:gap-1 max-md:px-2 max-sm:h-5 max-sm:gap-1 max-sm:px-2">
                     <span className="relative flex size-2.5 shrink-0 max-md:size-2 max-sm:size-2">
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75 [animation-duration:0.8s]" />
