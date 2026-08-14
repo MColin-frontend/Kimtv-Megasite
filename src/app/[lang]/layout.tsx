@@ -9,7 +9,7 @@ import { Header } from "@/components/layout/header"
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav"
 import { BackToTop } from "@/components/ui/back-to-top"
 import { PollFloatButton } from "@/components/ui/poll-float-button"
-import { Toaster } from "@/components/ui/toast"
+import { Toaster } from "@/components/ui/toast-loader"
 
 export function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }))
