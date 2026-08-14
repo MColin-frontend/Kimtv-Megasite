@@ -26,8 +26,7 @@ export function CardBackground({
   thumbnailExtras,
   stadiumExtras,
 }: CardBackgroundProps) {
-  const resolvedStadiumSrc =
-    stadiumSrc ?? (isUpcoming ? imgStadiumUpcoming.src : imgStadiumBg.src)
+  const resolvedStadiumSrc = stadiumSrc ?? (isUpcoming ? imgStadiumUpcoming.src : imgStadiumBg.src)
 
   return (
     <>
@@ -45,19 +44,19 @@ export function CardBackground({
           <div
             className={cn(
               "pointer-events-none absolute inset-0 z-0 bg-cover bg-center",
-              stadiumClassName,
+              stadiumClassName
             )}
             style={{ backgroundImage: `url(${resolvedStadiumSrc})` }}
           />
           {homeLogo && (
             <div
-              className="pointer-events-none absolute inset-0 z-0 scale-[1.6] bg-no-repeat opacity-[0.13] [background-position:-10px_center] [background-size:160px] [filter:blur(55px)_saturate(2)]"
+              className="pointer-events-none absolute inset-0 z-0 [background-size:160px] [background-position:left_center] bg-no-repeat opacity-[0.13] [filter:blur(20px)_saturate(2)]"
               style={{ backgroundImage: `url(${homeLogo})` }}
             />
           )}
           {awayLogo && (
             <div
-              className="pointer-events-none absolute inset-0 z-0 scale-[1.6] bg-no-repeat opacity-10 [background-position:calc(100%_+_10px)_center] [background-size:160px] [filter:blur(55px)_saturate(2)]"
+              className="pointer-events-none absolute inset-0 z-0 [background-size:160px] [background-position:right_center] bg-no-repeat opacity-10 [filter:blur(20px)_saturate(2)]"
               style={{ backgroundImage: `url(${awayLogo})` }}
             />
           )}

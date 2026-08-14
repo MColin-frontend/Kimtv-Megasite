@@ -33,7 +33,6 @@ import { SearchAttentionAnchorSection } from "./search-attention-anchor-section"
 import { SearchForm } from "./search-form"
 import { SearchNewsSection } from "./search-news-section"
 import { SearchSidebar } from "./search-sidebar"
-import { SearchUsersSection } from "./search-users-section"
 
 function SearchMobileFilters() {
   const { t } = useTranslation()

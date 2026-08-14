@@ -21,7 +21,7 @@ export function MatchStatBar({ stats, className }: MatchStatBarProps) {
   return (
     <div
       className={cn(
-        "rounded-8 flex items-center justify-between bg-white/5 px-2 py-1.5 backdrop-blur-[5px] [will-change:transform] max-sm:px-1 max-sm:py-0.5",
+        "rounded-8 flex items-center justify-between bg-white/10 px-2 py-1.5 [will-change:transform] max-sm:px-1 max-sm:py-0.5",
         className
       )}
     >

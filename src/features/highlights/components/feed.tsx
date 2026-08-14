@@ -28,18 +28,20 @@ import { siteConfig } from "@/config/site"
 import { FeedMenu } from "@/enums/highlights.enum"
 
 import {
+  fetchVideoByNewsId,
   fetchVideoFeed,
   toggleFollowAction,
   toggleLikeAction,
 } from "@/features/highlights/api/highlights.api"
 import type { HighlightVideoInterface } from "@/features/highlights/highlight.models"
 import { FILTER_MENU_CONFIG, LINK_MENU_CONFIG } from "@/features/highlights/highlights.constants"
-import { resolveIsLiked } from "@/features/highlights/highlights.utils"
+import { prependSeedVideo, resolveIsLiked } from "@/features/highlights/highlights.utils"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Empty } from "@/components/ui/empty"
 import { Img } from "@/components/ui/image"
 import { Skeleton } from "@/components/ui/skeleton"
+import { toast } from "@/components/ui/toast"
 import { Typography } from "@/components/ui/typography"
 import type { VideoFeedPlayerHandle } from "@/components/ui/video-feed-player"
 
@@ -76,6 +78,8 @@ const VideoFeedPlayer = dynamic(
 const CommentDrawer = dynamic(() => import("./comment-drawer").then((m) => m.CommentDrawer), {
   ssr: false,
 })
+
+const VIDEO_SEED_KEY = "mega:video-seed"
 
 function resolveNewsId(item: HighlightVideoInterface | null): string {
   if (!item) return ""
@@ -317,19 +321,10 @@ export function HighlightsFeed({
   const { user, isLoggedIn, login } = useAuth()
   const routes = getRoutes(locale)
 
-  // Nếu có ?vid=ID, đưa video đó lên đầu feed
-  const featuredVid = searchParams.get("vid")
-  const orderedInitialVideos = React.useMemo(() => {
-    if (!featuredVid) return initialVideos
-    const idx = initialVideos.findIndex((v) => String(v.newsId) === featuredVid)
-    if (idx <= 0) return initialVideos
-    const copy = [...initialVideos]
-    const [featured] = copy.splice(idx, 1)
-    return [featured, ...copy]
-  }, [initialVideos, featuredVid])
+  const shareNewsId = searchParams.get("newsId") ?? ""
 
   // ── Data state ──────────────────────────────────────────────────────────────
-  const [videos, setVideos] = useState<HighlightVideoInterface[]>(orderedInitialVideos)
+  const [videos, setVideos] = useState<HighlightVideoInterface[]>(initialVideos)
   const [activeMenu, setActiveMenu] = useState<FeedMenu>(initialMenu)
   const [loading, setLoading] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -547,6 +542,44 @@ export function HighlightsFeed({
       setDragOffsetY(0)
     }
   }, [videos.length])
+
+  // ── Seed video từ share URL (?newsId=) ───────────────────────────────────────
+  useEffect(() => {
+    if (!shareNewsId) return
+    let cancelled = false
+
+    const applySeeded = (seed: HighlightVideoInterface) => {
+      if (cancelled) return
+      setVideos((prev) => prependSeedVideo(seed, prev))
+      setActiveMenu(FeedMenu.Featured)
+      setCurrentIndex(0)
+    }
+
+    // Fast path: same-browser navigation → seed đã lưu trong sessionStorage
+    try {
+      const raw = sessionStorage.getItem(VIDEO_SEED_KEY)
+      if (raw) {
+        sessionStorage.removeItem(VIDEO_SEED_KEY)
+        const parsed = JSON.parse(raw) as HighlightVideoInterface
+        if (String(parsed?.newsId ?? "") === shareNewsId) {
+          applySeeded(parsed)
+          return () => {
+            cancelled = true
+          }
+        }
+      }
+    } catch {}
+
+    // Slow path: mở link share từ trình duyệt khác → fetch từ API
+    void fetchVideoByNewsId(shareNewsId, loginUserId).then((fetched) => {
+      if (fetched) applySeeded(fetched)
+    })
+
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shareNewsId])
 
   // ── Reset playback on video/menu change ──────────────────────────────────────
   useLayoutEffect(() => {
@@ -1005,17 +1038,24 @@ export function HighlightsFeed({
 
   function handleShareVideo() {
     if (!currentItem) return
-    const url = `${window.location.origin}${routes.video.article(String(newsId))}`
     try {
-      navigator.clipboard.writeText(url)
-    } catch {
-      const ta = document.createElement("textarea")
-      ta.value = url
-      document.body.appendChild(ta)
-      ta.select()
-      document.execCommand("copy")
-      document.body.removeChild(ta)
-    }
+      sessionStorage.setItem(VIDEO_SEED_KEY, JSON.stringify(currentItem))
+    } catch {}
+    const shareId = resolveNewsId(currentItem)
+    const url = `${window.location.origin}${routes.video.index}?newsId=${encodeURIComponent(shareId)}&highlight-status=${FeedMenu.Featured}`
+    const onCopied = () => toast.success(t("video.share.copied"))
+    navigator.clipboard
+      .writeText(url)
+      .then(onCopied)
+      .catch(() => {
+        const ta = document.createElement("textarea")
+        ta.value = url
+        document.body.appendChild(ta)
+        ta.select()
+        document.execCommand("copy")
+        document.body.removeChild(ta)
+        onCopied()
+      })
   }
 
   // ── Menu items — built from static config + runtime t() / routes ────────────

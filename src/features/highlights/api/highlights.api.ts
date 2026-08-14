@@ -15,7 +15,12 @@ import type {
   VideoFeedResultInterface,
   VideoResultRawInterface,
 } from "../highlight.models"
-import { HIGHLIGHTS_API, PAGE_SIZE_COMMENT, VALID_MENUS } from "../highlights.constants"
+import {
+  HIGHLIGHTS_API,
+  PAGE_SIZE_COMMENT,
+  VALID_MENUS,
+  VIDEO_NEWS_TYPE,
+} from "../highlights.constants"
 import {
   buildPendingPlaceholder,
   buildVideoFeedFromRaw,
@@ -66,6 +71,39 @@ async function fetchVideoFeed(
       return data ? buildVideoFeedFromRaw(FeedMenu.Latest, data) : EMPTY_FEED
     }
   }
+}
+
+async function fetchVideoByNewsId(
+  newsId: string,
+  loginUserId = ""
+): Promise<HighlightVideoInterface | null> {
+  try {
+    const data = await javaGet<Record<string, unknown[]>>(HIGHLIGHTS_API.VIDEO.HOME_VIDEOS, {
+      params: { newsId, pageIndex: 0, userId: loginUserId || "" },
+    })
+    const video = data?.videoPos?.[0] ?? data?.videos?.[0] ?? null
+    if (video) {
+      const v = video as Record<string, unknown>
+      return {
+        ...v,
+        newsType: (v.newsType as number) ?? VIDEO_NEWS_TYPE,
+      } as HighlightVideoInterface
+    }
+  } catch {}
+
+  try {
+    const data = await javaGet<Record<string, unknown>>(HIGHLIGHTS_API.VIDEO.NEWS_ARTICLE, {
+      params: { newsId, loginUserId: loginUserId || "" },
+    })
+    if (data) {
+      return {
+        ...data,
+        newsType: (data.newsType as number) ?? VIDEO_NEWS_TYPE,
+      } as HighlightVideoInterface
+    }
+  } catch {}
+
+  return null
 }
 
 function resolveInitialMenu(param: string | string[] | undefined): FeedMenu {
@@ -381,6 +419,7 @@ function deleteComment(params: {
 export {
   deleteComment,
   fetchComments,
+  fetchVideoByNewsId,
   fetchVideoFeed,
   likeComment,
   postComment,

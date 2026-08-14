@@ -1,13 +1,14 @@
 "use client"
 
-import { HTTP_METHOD, LIVE_MATCH_TYPE, MATCH_API } from "@/lib/match.utils"
+import { HTTP_METHOD, LIVE_MATCH_TYPE, MATCH_API, MATCH_QUERY_PARAMS } from "@/lib/match.utils"
 import { useRouter } from "@/hooks/use-router"
 
 import { useTranslation } from "@/i18n"
 import { COLS_CLASS } from "@/constants/common.constants"
-import { FOOTBALL_GAME_ID, FOOTBALL_GAME_MONGO_ID } from "@/constants/component/home.constants"
+import { FOOTBALL_GAME_MONGO_ID } from "@/constants/component/home.constants"
 import type { LiveSearchMatchInterface, MatchInterface } from "@/models/match.models"
 
+import { HOME_API } from "@/features/home/home.api"
 import { SEARCH_QUERY_KEY } from "@/features/search/search.constants"
 import CarouselInfinityApi from "@/components/ui/carousel/carousel-infinity-api"
 import { Empty } from "@/components/ui/empty"
@@ -34,16 +35,17 @@ export function MatchSchedule({
   const slideClass = slideClassName ?? COLS_CLASS[cols] ?? `basis-1/${cols} max-sm:basis-full`
 
   const isLive = status === LIVE_MATCH_TYPE.LIVE
-  const endpoint = isLive ? MATCH_API.LIVE_SEARCH : MATCH_API.LIST
+  const isUpcoming = status === LIVE_MATCH_TYPE.UPCOMING
+  const isFinished = status === LIVE_MATCH_TYPE.FINISHED
+  const endpoint = isLive
+    ? MATCH_API.LIVE_SEARCH
+    : isUpcoming
+      ? HOME_API.MATCH_UPCOMING
+      : HOME_API.MATCH_PAST
   const method = isLive ? HTTP_METHOD.GET : HTTP_METHOD.POST
   const params = isLive
     ? { id: FOOTBALL_GAME_MONGO_ID, keyword: keyword || undefined }
-    : {
-        gameId: FOOTBALL_GAME_ID,
-        option: status === LIVE_MATCH_TYPE.UPCOMING ? 1 : 2,
-        lot: null,
-        keyword: keyword,
-      }
+    : { ...MATCH_QUERY_PARAMS.ALL_GAMES, ...(keyword ? { keyword } : {}) }
 
   return (
     <section className="card-glow rounded-12 flex min-w-0 flex-col gap-4 overflow-x-clip p-5 max-sm:gap-3 max-sm:p-3">
@@ -57,6 +59,8 @@ export function MatchSchedule({
         method={method}
         params={params}
         skeletonCount={cols}
+        fetchAll={isFinished}
+        limit={isFinished ? 15 : undefined}
         renderItem={(match, _, isLoading) =>
           isLoading ? <CardBasicSkeleton /> : <Card match={match as unknown as MatchInterface} />
         }

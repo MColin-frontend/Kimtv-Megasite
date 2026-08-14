@@ -346,6 +346,16 @@ function pickPostedCommentRecord(
   }, null)
 }
 
+function prependSeedVideo(
+  seed: HighlightVideoInterface | null | undefined,
+  records: HighlightVideoInterface[]
+): HighlightVideoInterface[] {
+  if (!seed) return records
+  const seedId = String(seed.newsId ?? "")
+  if (!seedId) return records
+  return [seed, ...records.filter((item) => String(item.newsId ?? "") !== seedId)]
+}
+
 export type { RawVideo }
 export {
   resolveIsLiked,
@@ -354,6 +364,7 @@ export {
   filterLatestVideos,
   resolveLatestVideoFlagIndex,
   buildVideoFeedFromRaw,
+  prependSeedVideo,
   parseCommentListResult,
   normalizeCommentList,
   resolvePostedCommentId,

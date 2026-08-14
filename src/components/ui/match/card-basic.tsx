@@ -48,12 +48,6 @@ interface CardProps {
 export function Card({ match, isLoading, className }: CardProps) {
   const { t } = useTranslation()
   const navigateToLive = useLiveNavigate()
-  const countdown = useCountdown(match?.startTime)
-  const countdownDone =
-    !!match?.startTime &&
-    countdown.hours === 0 &&
-    countdown.minutes === 0 &&
-    countdown.seconds === 0
 
   const anchors: AnchorRoomVo[] = match?.anchorRoomVos ?? []
   const firstAnchor = anchors[0] ?? null
@@ -63,6 +57,14 @@ export function Card({ match, isLoading, className }: CardProps) {
     anchor: match?.anchor,
     hasAnchorRoom: !!firstAnchor,
   })
+
+  // Only run countdown interval for upcoming cards — avoids per-second re-renders on live/finished slides
+  const countdown = useCountdown(isUpcoming ? match?.startTime : null)
+  const countdownDone =
+    !!match?.startTime &&
+    countdown.hours === 0 &&
+    countdown.minutes === 0 &&
+    countdown.seconds === 0
 
   const displayMinute = useFakeGameMinute(match?.gameTime ?? null, isStream || isLive)
 
@@ -82,7 +84,7 @@ export function Card({ match, isLoading, className }: CardProps) {
     <div
       onClick={handleClick}
       className={cn(
-        "card-match-bg rounded-12 shadow-card relative h-full w-full overflow-hidden transition-all",
+        "card-match-bg rounded-12 shadow-card relative h-full w-full overflow-hidden transition-[box-shadow]",
         (isLive || isStream) && match?.matchId && match?.gameId
           ? "hover:shadow-card-hover cursor-pointer"
           : "cursor-default",

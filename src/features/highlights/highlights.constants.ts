@@ -78,6 +78,8 @@ const HIGHLIGHTS_API = {
     NEWS_TAB: "/get-news-tab",
     LATEST: (tabType: number, pageIndex: number) => `/v4/${tabType}/video/${pageIndex}`,
     LIKE: "/news/user-like",
+    HOME_VIDEOS: "/news/v2/home-videos",
+    NEWS_ARTICLE: "/news/news-article",
   },
   COMMENT: {
     LIST: "/news/news-comment",

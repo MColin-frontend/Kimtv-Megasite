@@ -220,7 +220,7 @@ export default function CarouselInfinity<T>({
           {(Array.isArray(items) ? items : []).map((item, index) => (
             <div
               key={keyExtractor ? keyExtractor(item, index) : index}
-              className={`shrink-0 ${slideClassName}`}
+              className={`shrink-0 [contain:layout_style] ${slideClassName}`}
             >
               {renderItem(item, index)}
             </div>
