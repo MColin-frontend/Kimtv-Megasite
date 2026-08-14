@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useId, useRef } from "react"
+import { preload } from "react-dom"
 import dynamic from "next/dynamic"
 import type { SimplePlayer } from "xgplayer"
 
@@ -190,6 +191,10 @@ export function VideoPlayer({
   }, [url, sources?.map((s) => s.url).join(",")])
 
   const hasSource = !!(url ?? sources?.[0]?.url)
+
+  if (!hasSource) {
+    preload(imgNoSource.src, { as: "image", fetchPriority: "high" })
+  }
 
   return (
     <div
