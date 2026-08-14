@@ -223,8 +223,7 @@ function CalendarGrid({
           const isToday = same(date, today)
 
           const isDisabled =
-            (!!maxDate && ld(date) > ld(maxDate)) ||
-            (!!minDate && ld(date) < ld(minDate))
+            (!!maxDate && ld(date) > ld(maxDate)) || (!!minDate && ld(date) < ld(minDate))
 
           const handleClick = () => {
             if (isDisabled) return
@@ -392,6 +391,7 @@ export function DatePicker({
         {selected ? (
           <span
             role="button"
+            aria-label="Xoá ngày"
             onClick={(e) => {
               e.stopPropagation()
               update(null)

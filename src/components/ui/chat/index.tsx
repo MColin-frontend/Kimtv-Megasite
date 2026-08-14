@@ -30,9 +30,9 @@ import {
   CHAT_SCROLLBAR_STYLE,
   CHAT_SOCIAL_NAMES,
   CHAT_USER_ROLE,
+  POLL_HIDDEN,
   POLL_PARAM_KEY,
   POLL_VISIBLE,
-  POLL_HIDDEN,
 } from "@/constants/ui/ui-chat.constants"
 
 import { getActivePollApi, votePollApi } from "@/features/live/api/poll.api"
@@ -137,7 +137,6 @@ export function Chat({
     setPollHidden(true)
     setParams({ [POLL_PARAM_KEY]: POLL_HIDDEN }, { replace: true, scroll: false })
   }
-
 
   async function handlePollVote(optionKeys: string[]) {
     if (!poll?.pollId) return
@@ -483,7 +482,7 @@ export function Chat({
             href={mergedSocials.telegram}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#2aabee] py-1.5 no-underline shadow-[0_2px_8px_rgba(42,171,238,0.3)] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(42,171,238,0.45)] hover:brightness-110 active:scale-95 max-sm:gap-1 max-sm:px-2 max-sm:py-1"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#0d7ab5] py-1.5 no-underline shadow-[0_2px_8px_rgba(13,122,181,0.3)] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(13,122,181,0.45)] hover:brightness-110 active:scale-95 max-sm:gap-1 max-sm:px-2 max-sm:py-1"
           >
             <Img
               src={imgTele.src}
@@ -507,7 +506,7 @@ export function Chat({
             href={mergedSocials.facebook}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#1877f2] py-1.5 no-underline shadow-[0_2px_8px_rgba(24,119,242,0.3)] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(24,119,242,0.45)] hover:brightness-110 active:scale-95 max-sm:gap-1 max-sm:px-2 max-sm:py-1"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#1060c9] py-1.5 no-underline shadow-[0_2px_8px_rgba(16,96,201,0.3)] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(16,96,201,0.45)] hover:brightness-110 active:scale-95 max-sm:gap-1 max-sm:px-2 max-sm:py-1"
           >
             <Img
               src={imgFacebook.src}
@@ -695,7 +694,7 @@ export function Chat({
                 variant="ghost"
                 size="sm"
                 onClick={handleReconnect}
-                className="bg-chat-status hover:bg-chat-status/80 gap-1.5 rounded-full text-white"
+                className="bg-chat-status hover:bg-chat-status/80 gap-1.5 rounded-full text-[#1a1100]"
               >
                 <RefreshCw className="size-3.5" />
                 {t("chat.reconnect")}

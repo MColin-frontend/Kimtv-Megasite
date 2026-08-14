@@ -36,7 +36,7 @@ export const metadata = createMetadata({
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html className={`${oswald.variable} ${inter.variable} h-full antialiased`}>
+    <html lang="vi" className={`${oswald.variable} ${inter.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <div className="fixed inset-0 -z-10">
           <Image

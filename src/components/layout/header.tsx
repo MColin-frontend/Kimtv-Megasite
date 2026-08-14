@@ -403,7 +403,7 @@ function DesktopNav({
             data-active={active}
             className={cn(
               "group rounded-12 relative flex flex-col items-center gap-2 px-6 pt-2.5 pb-3 transition-all duration-200",
-              active ? "text-gold" : "text-white/45 hover:text-white/75"
+              active ? "text-gold" : "text-white/65 hover:text-white/85"
             )}
           >
             <div className="relative z-10">
@@ -416,7 +416,7 @@ function DesktopNav({
                   objectFit="contain"
                   className={cn(
                     "size-5 transition-all duration-200",
-                    active ? "" : "opacity-45 group-hover:opacity-65"
+                    active ? "" : "opacity-60 group-hover:opacity-80"
                   )}
                   style={
                     active
