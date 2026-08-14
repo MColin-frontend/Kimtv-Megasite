@@ -1,5 +1,7 @@
 "use client"
 
+import "react-toastify/dist/ReactToastify.css"
+
 import { toast as reactToast, ToastContainer } from "react-toastify"
 import Image from "next/image"
 import { X } from "lucide-react"
