@@ -396,7 +396,7 @@ export function CommentDrawer({
       setComments((prev) =>
         prev.map((c) =>
           Number(c.ncid) === Number(parentNcid)
-            ? { ...c, children: (c.children ?? []).map(updateItem) }
+            ? { ...c, children: (c.children ?? []).map(updateItem) as NewsComment[] }
             : c
         )
       )
@@ -413,7 +413,7 @@ export function CommentDrawer({
           setComments((prev) =>
             prev.map((c) =>
               Number(c.ncid) === Number(parentNcid)
-                ? { ...c, children: (c.children ?? []).map(rollbackItem) }
+                ? { ...c, children: (c.children ?? []).map(rollbackItem) as NewsComment[] }
                 : c
             )
           )
