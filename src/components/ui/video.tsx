@@ -239,14 +239,16 @@ export function VideoPlayer({
         fallback={videoBanner}
         className="video-ad-banner absolute bottom-0 left-0 z-10 w-full"
         skeletonClassName="aspect-[1200/58]"
+        sizes="100vw"
       />
-      {/* Vị trí 1: banner góc trái trên */}
+      {/* Vị trí 1: banner góc trái trên — w-16=64px, max-sm:w-8=32px */}
       <AdBanner
         src={playerOverlay?.[1]?.mediaPc || null}
         href={playerOverlay?.[1]?.jumpUrl || null}
         fallback={imgLiveSmall}
         className="video-ad-banner absolute top-1 left-1 z-10 w-16 max-md:w-12 max-sm:w-8"
         skeletonClassName="aspect-[60/25]"
+        sizes="(max-width: 640px) 32px, (max-width: 768px) 48px, 64px"
       />
     </div>
   )
