@@ -3,7 +3,7 @@ import { LIVE_MATCH_TYPE } from "@/lib/match.utils"
 import icCornerFlag from "@assets/icons/match/ic-corner-flag.png"
 import icRedCardV2 from "@assets/icons/match/ic-red-card-v2.svg"
 import icYellowCardV2 from "@assets/icons/match/ic-yellow-card-v2.svg"
-import imgFootball from "@assets/images/match/img-football.png"
+import imgFootball from "@assets/images/match/img-football.webp"
 
 /** Map halfLabel → i18n key dùng với t() */
 export const MATCH_HALF_LABEL_I18N_KEY: Record<string, string> = {

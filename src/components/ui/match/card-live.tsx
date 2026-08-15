@@ -14,8 +14,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Typography } from "@/components/ui/typography"
 
 import icMic from "@assets/icons/match/ic-mic.svg"
-import imgStadiumBg from "@assets/images/common/img-stadium-card-bg.png"
-import imgVs from "@assets/images/common/img-vs.png"
+import imgStadiumBg from "@assets/images/common/img-stadium-card-bg.webp"
+import imgVs from "@assets/images/common/img-vs.webp"
 
 import { CardBackground } from "./parts/card-background"
 import { GameMinuteBadge } from "./parts/game-minute-badge"

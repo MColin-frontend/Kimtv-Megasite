@@ -1,14 +1,15 @@
 "use client"
 
 import { useEffect, useState } from "react"
+
 import { deriveMatchStatusFlags } from "@/lib/match.utils"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/use-auth"
 import { useBoolean } from "@/hooks/use-boolean"
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard"
-import { useLiveNavigate } from "@/hooks/use-live-navigate"
 import { useDisclosure } from "@/hooks/use-disclosure"
 import { useFakeGameMinute } from "@/hooks/use-fake-game-minute"
+import { useLiveNavigate } from "@/hooks/use-live-navigate"
 
 import { useTranslation } from "@/i18n"
 import { buildMatchStats } from "@/constants/component/match-card.constants"
@@ -27,8 +28,8 @@ import { Typography } from "@/components/ui/typography"
 
 import icPoll from "@assets/icons/common/ic-poll.svg"
 import icShare from "@assets/icons/common/ic-share.svg"
-import imgStadiumBg from "@assets/images/common/img-no-source.png"
-import imgVs from "@assets/images/common/img-vs.png"
+import imgStadiumBg from "@assets/images/common/img-no-source.webp"
+import imgVs from "@assets/images/common/img-vs.webp"
 
 import { BadgeLive } from "./parts/badge-live"
 import { CardBackground } from "./parts/card-background"

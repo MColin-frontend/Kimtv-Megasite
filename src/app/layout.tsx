@@ -7,7 +7,7 @@ import { MouseGlowProvider } from "@/components/providers/mouse-glow-provider"
 import { QueryProvider } from "@/components/providers/query-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
 
-import bgStadium from "@assets/images/common/img-stadium-bg.png"
+import bgStadium from "@assets/images/common/img-stadium-bg.webp"
 
 import "./globals.css"
 

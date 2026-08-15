@@ -21,8 +21,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Typography } from "@/components/ui/typography"
 
 import icMic from "@assets/icons/match/ic-mic.svg"
-import imgUserCardBg from "@assets/images/common/img-user-card-bg.png"
-import imgUserCardHeroBg from "@assets/images/common/img-user-card-hero-bg.png"
+import imgUserCardBg from "@assets/images/common/img-user-card-bg.webp"
+import imgUserCardHeroBg from "@assets/images/common/img-user-card-hero-bg.webp"
 
 import { USER_CARD_STATS } from "../search.constants"
 

@@ -9,7 +9,7 @@ import type { MatchInterface } from "@/models/match.models"
 import { Img } from "@/components/ui/image"
 import { Typography } from "@/components/ui/typography"
 
-import imgVs from "@assets/images/common/img-vs.png"
+import imgVs from "@assets/images/common/img-vs.webp"
 
 /* ── Score badge ────────────────────────────────────────────── */
 export function ScoreBadge({ match }: { match: MatchInterface }) {

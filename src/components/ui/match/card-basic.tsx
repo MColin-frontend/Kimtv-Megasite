@@ -19,7 +19,7 @@ import {
 import type { AnchorRoomVo, MatchInterface } from "@/models/match.models"
 
 import icMic from "@assets/icons/match/ic-mic.svg"
-import imgVs from "@assets/images/common/img-vs.png"
+import imgVs from "@assets/images/common/img-vs.webp"
 
 import { Avatar, AvatarImage } from "../avatar"
 import { Img } from "../image"

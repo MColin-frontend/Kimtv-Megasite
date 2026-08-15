@@ -3,7 +3,7 @@
 import { UserRoleEnum } from "@/features/user-info/user-info.constants"
 import type { UserInfoModel } from "@/features/user-info/user-info.models"
 
-import imgStreamer from "@assets/images/common/img-search-anchors.png"
+import imgStreamer from "@assets/images/common/img-search-anchors.webp"
 
 import { searchAnchorsInfiniteQueryOptions, searchAnchorsQueryOptions } from "../search.api"
 import { SEARCH_ANCHOR_PAGE_KEY, SearchFilterEnum } from "../search.constants"

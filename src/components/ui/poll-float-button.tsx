@@ -1,13 +1,14 @@
 "use client"
 
-import { POLL_HIDDEN, POLL_PARAM_KEY, POLL_VISIBLE } from "@/constants/ui/ui-chat.constants"
 import { useRouter } from "@/hooks/use-router"
+
+import { POLL_HIDDEN, POLL_PARAM_KEY, POLL_VISIBLE } from "@/constants/ui/ui-chat.constants"
 
 import { Button } from "@/components/ui/button"
 import { Img } from "@/components/ui/image"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
-import imgPollFloat from "@assets/images/common/img-poll-float.png"
+import imgPollFloat from "@assets/images/common/img-poll-float.webp"
 
 export function PollFloatButton() {
   const { getParam, setParams } = useRouter()

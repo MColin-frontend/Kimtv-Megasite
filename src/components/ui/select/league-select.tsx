@@ -16,7 +16,7 @@ import { Img } from "@/components/ui/image"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Typography } from "@/components/ui/typography"
 
-import imgEmpty from "@assets/images/common/img-empty.png"
+import imgEmpty from "@assets/images/common/img-empty.webp"
 
 /* ─── Types ──────────────────────────────────────────────────── */
 

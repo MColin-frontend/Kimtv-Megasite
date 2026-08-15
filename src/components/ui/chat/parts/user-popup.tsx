@@ -2,20 +2,24 @@
 
 import { useState } from "react"
 import { createPortal } from "react-dom"
+
 import { cn } from "@/lib/utils"
+
 import { useTranslation } from "@/i18n"
-import { Img } from "@/components/ui/image"
+
 import { Button } from "@/components/ui/button"
+import { Img } from "@/components/ui/image"
 import { Typography } from "@/components/ui/typography"
+
+import imgBlacklist from "@assets/images/chat/img-blacklist.webp"
+import imgCrown from "@assets/images/chat/img-crown.webp"
+import imgPin from "@assets/images/chat/img-pin.webp"
+import imgRemove from "@assets/images/chat/img-remove.webp"
+import imgRestriction from "@assets/images/chat/img-restriction.webp"
+
 import type { ChatMessage, UserRole } from "../types"
 import { ChatAvatar } from "./chat-avatar"
 import { RoleBadge } from "./role-badge"
-
-import imgBlacklist from "@assets/images/chat/img-blacklist.png"
-import imgCrown from "@assets/images/chat/img-crown.png"
-import imgPin from "@assets/images/chat/img-pin.png"
-import imgRemove from "@assets/images/chat/img-remove.png"
-import imgRestriction from "@assets/images/chat/img-restriction.png"
 
 export function UserPopup({
   message,
