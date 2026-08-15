@@ -1,6 +1,7 @@
 import { Suspense } from "react"
 
 import { fetchFeaturedNewsAction, fetchPopularNewsAction } from "@/features/home/home.api"
+import { ScheduleHeaderServer } from "@/components/ui/match/parts/schedule-header-server"
 
 import Fixtures from "./fixtures"
 import News from "./news"
@@ -30,7 +31,10 @@ export default async function MatchFixtures() {
     <section className="flex w-full gap-4 max-lg:flex-col">
       {/* Fixtures */}
       <div className={showSidebar ? "min-w-0 flex-1 max-lg:order-2" : "w-full"}>
-        <Fixtures />
+        <section className="rounded-12 card-glow flex h-full flex-col gap-4 p-5 max-sm:p-3">
+          <ScheduleHeaderServer />
+          <Fixtures />
+        </section>
       </div>
 
       {/* News sidebar — mobile: lên trên full width, desktop: sticky sidebar */}

@@ -6,7 +6,6 @@ import { useLeagues } from "@/hooks/tanstack/use-leagues"
 import { useFixturesFilter } from "@/hooks/use-fixtures-filter"
 
 import { FixturesSkeleton } from "@/components/ui/match/fixtures"
-import { ScheduleHeader } from "@/components/ui/match/parts/schedule-header"
 import {
   buildHotLeaguesFromApi,
   buildLeagueGroupsFromApi,
@@ -26,9 +25,7 @@ function Fixtures() {
   const groups = buildLeagueGroupsFromApi(leaguesData?.moreLeagus ?? [])
 
   return (
-    <section className="rounded-12 card-glow flex h-full flex-col gap-4 p-5 max-sm:p-3">
-      <ScheduleHeader />
-
+    <>
       <HeroFixtures
         groups={groups}
         hotLeagues={hotLeagues}
@@ -41,7 +38,7 @@ function Fixtures() {
         onLeagueChange={filter.setLeagueIds}
       />
       <FixturesList />
-    </section>
+    </>
   )
 }
 
