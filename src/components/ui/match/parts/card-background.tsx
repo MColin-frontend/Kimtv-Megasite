@@ -2,8 +2,8 @@ import type { ReactNode } from "react"
 
 import { cn } from "@/lib/utils"
 
-import imgStadiumBg from "@assets/images/common/img-stadium-card-bg.png"
-import imgStadiumUpcoming from "@assets/images/common/img-stadium-upcoming.png"
+import imgStadiumBg from "@assets/images/common/img-stadium-card-bg.webp"
+import imgStadiumUpcoming from "@assets/images/common/img-stadium-upcoming.webp"
 
 interface CardBackgroundProps {
   thumbnail?: string | null

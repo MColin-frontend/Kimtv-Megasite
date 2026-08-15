@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Typography } from "@/components/ui/typography"
 
-import anchorHero from "@assets/images/broadcast/img-anchor-registration-hero.png"
+import anchorHero from "@assets/images/broadcast/img-anchor-registration-hero.webp"
 
 export function AnchorRegistrationPage() {
   const { t } = useTranslation()

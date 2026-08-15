@@ -12,7 +12,7 @@ import { Empty } from "@/components/ui/empty"
 import { ScheduleHeader } from "@/components/ui/match/parts/schedule-header"
 import { Pagination } from "@/components/ui/pagination"
 
-import imgSearchUsers from "@assets/images/common/img-search-users.png"
+import imgSearchUsers from "@assets/images/common/img-search-users.webp"
 
 import {
   SEARCH_PAGE_SIZE,

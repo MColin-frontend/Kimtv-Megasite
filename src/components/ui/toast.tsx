@@ -6,9 +6,9 @@ import { toast as reactToast, ToastContainer } from "react-toastify"
 import Image from "next/image"
 import { X } from "lucide-react"
 
-import icToastError from "@assets/images/common/ic-toast-error.png"
-import icToastSuccess from "@assets/images/common/ic-toast-success.png"
-import icToastWarning from "@assets/images/common/ic-toast-warning.png"
+import icToastError from "@assets/images/common/ic-toast-error.webp"
+import icToastSuccess from "@assets/images/common/ic-toast-success.webp"
+import icToastWarning from "@assets/images/common/ic-toast-warning.webp"
 
 export function Toaster() {
   return (

@@ -15,7 +15,7 @@ import { Empty } from "@/components/ui/empty"
 import { ScheduleHeader } from "@/components/ui/match/parts/schedule-header"
 import { Pagination } from "@/components/ui/pagination"
 
-import imgSearchNews from "@assets/images/common/img-search-news.png"
+import imgSearchNews from "@assets/images/common/img-search-news.webp"
 
 import {
   SEARCH_NEWS_PAGE_SIZE,

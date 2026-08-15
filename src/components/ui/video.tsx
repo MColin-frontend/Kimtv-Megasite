@@ -15,7 +15,7 @@ import { Typography } from "@/components/ui/typography"
 import "xgplayer/dist/index.min.css"
 
 import imgLiveSmall from "@assets/images/common/img-live-small.gif"
-import imgNoSource from "@assets/images/common/img-no-source.png"
+import imgNoSource from "@assets/images/common/img-no-source.webp"
 import videoBanner from "@assets/videos/common/video-banner.mp4"
 
 const AdBanner = dynamic(() => import("@/components/ui/ad-banner").then((m) => m.AdBanner), {
