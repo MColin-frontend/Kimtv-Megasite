@@ -17,6 +17,7 @@ interface AdBannerProps {
   rounded?: string
   className?: string
   skeletonClassName?: string
+  "aria-label"?: string
 }
 
 function AdMedia({
@@ -68,6 +69,7 @@ export function AdBanner({
   rounded = "",
   className,
   skeletonClassName,
+  "aria-label": ariaLabel = "Quảng cáo",
 }: AdBannerProps) {
   if (isLoading) {
     return <Skeleton className={cn("w-full", rounded, skeletonClassName)} />
@@ -86,6 +88,7 @@ export function AdBanner({
         href={href}
         target="_blank"
         rel="noopener noreferrer"
+        aria-label={ariaLabel}
         className={cn("overflow-hidden", rounded, className)}
       >
         {media}
