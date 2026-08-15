@@ -5,6 +5,11 @@ import { cn } from "@/lib/utils"
 import imgStadiumBg from "@assets/images/common/img-stadium-card-bg.webp"
 import imgStadiumUpcoming from "@assets/images/common/img-stadium-upcoming.webp"
 
+// Route external logo URLs through Next.js image optimization (WebP, resized to 256px for 2x displays)
+function optimizedLogoUrl(src: string) {
+  return `/_next/image?url=${encodeURIComponent(src)}&w=256&q=40`
+}
+
 interface CardBackgroundProps {
   thumbnail?: string | null
   homeLogo?: string | null
@@ -51,13 +56,13 @@ export function CardBackground({
           {homeLogo && (
             <div
               className="pointer-events-none absolute inset-0 z-0 [background-size:160px] [background-position:left_center] bg-no-repeat opacity-[0.13] [filter:blur(20px)_saturate(2)]"
-              style={{ backgroundImage: `url(${homeLogo})` }}
+              style={{ backgroundImage: `url(${optimizedLogoUrl(homeLogo)})` }}
             />
           )}
           {awayLogo && (
             <div
               className="pointer-events-none absolute inset-0 z-0 [background-size:160px] [background-position:right_center] bg-no-repeat opacity-10 [filter:blur(20px)_saturate(2)]"
-              style={{ backgroundImage: `url(${awayLogo})` }}
+              style={{ backgroundImage: `url(${optimizedLogoUrl(awayLogo)})` }}
             />
           )}
           <div className="card-stadium-overlay pointer-events-none absolute inset-0 z-[1]" />
