@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect } from "react"
+import { useEffect, useRef, useState } from "react"
 import dynamic from "next/dynamic"
 
 import { cn } from "@/lib/utils"
@@ -14,7 +14,13 @@ import { Chat, type UserRole } from "@/components/ui/chat"
 import { MatchLiveInfoBar } from "@/components/ui/match/card-live-info"
 import { Skeleton } from "@/components/ui/skeleton"
 
-import type { LiveMatch } from "./hero-video"
+import {
+  getHeroPlaybackKey,
+  hasHeroCommentator,
+  HERO_PLAYBACK_TIMEOUT_MS,
+  pickHeroFallbackMatch,
+  type LiveMatch,
+} from "./hero-video.utils"
 
 export function HeroVideoClientSkeleton({ className }: { className?: string }) {
   return (
@@ -59,41 +65,68 @@ export interface HeroVideoClientProps {
 
 export function HeroVideoClient({ matches, defaultMatchId, className }: HeroVideoClientProps) {
   const { getParam, setParams } = useRouter()
+  const failedKeysRef = useRef(new Set<string>())
+  const playedRef = useRef(false)
+  const [activeKey, setActiveKey] = useState<string | null>(null)
 
-  const activeIdFromUrl =
-    getParam(HERO_VIDEO_PARAMS.MATCH_ID) ?? String(defaultMatchId ?? matches[0]?.id ?? "")
-  const activeMatch = matches.find((m) => String(m.id) === activeIdFromUrl) ?? matches[0]
+  const preferredMatch =
+    matches.find((m) => hasHeroCommentator(m) && m.sources.length > 0) ??
+    matches.find((m) => m.sources.length > 0) ??
+    matches[0]
 
-  useEffect(() => {
-    if (!activeMatch) return
-    const currentId = getParam(HERO_VIDEO_PARAMS.MATCH_ID)
-    if (!currentId) {
-      setParams(
-        {
-          [HERO_VIDEO_PARAMS.MATCH_ID]: String(activeMatch.id),
-          [HERO_VIDEO_PARAMS.GAME_ID]: String(activeMatch.gameId),
-        },
-        { scroll: false }
-      )
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeMatch?.id])
+  const urlMatchId =
+    getParam(HERO_VIDEO_PARAMS.MATCH_ID) ?? (defaultMatchId != null ? String(defaultMatchId) : null)
 
-  // Khi video lỗi → tự động chuyển sang trận kế tiếp
-  const handleVideoError = useCallback(() => {
-    if (!activeMatch || matches.length <= 1) return
-    const currentIndex = matches.findIndex((m) => String(m.id) === String(activeMatch.id))
-    const nextMatch = matches[currentIndex + 1] ?? matches[0]
-    if (!nextMatch || String(nextMatch.id) === String(activeMatch.id)) return
+  const activeMatch =
+    matches.find((m) => activeKey != null && getHeroPlaybackKey(m) === activeKey) ??
+    matches.find((m) => urlMatchId != null && String(m.id) === urlMatchId) ??
+    preferredMatch
+
+  const playbackKey = activeMatch ? getHeroPlaybackKey(activeMatch) : "default"
+
+  function goToMatch(match: LiveMatch) {
+    setActiveKey(getHeroPlaybackKey(match))
     setParams(
       {
-        [HERO_VIDEO_PARAMS.MATCH_ID]: String(nextMatch.id),
-        [HERO_VIDEO_PARAMS.GAME_ID]: String(nextMatch.gameId),
+        [HERO_VIDEO_PARAMS.MATCH_ID]: String(match.id),
+        [HERO_VIDEO_PARAMS.GAME_ID]: String(match.gameId),
       },
-      { scroll: false }
+      { scroll: false, replace: true }
+    )
+  }
+
+  function handleVideoError() {
+    if (!activeMatch) return
+    const failedKey = getHeroPlaybackKey(activeMatch)
+    failedKeysRef.current.add(failedKey)
+    const nextMatch = pickHeroFallbackMatch(matches, failedKey, failedKeysRef.current)
+    if (nextMatch) goToMatch(nextMatch)
+  }
+
+  useEffect(() => {
+    if (!activeMatch || getParam(HERO_VIDEO_PARAMS.MATCH_ID)) return
+    setParams(
+      {
+        [HERO_VIDEO_PARAMS.MATCH_ID]: String(activeMatch.id),
+        [HERO_VIDEO_PARAMS.GAME_ID]: String(activeMatch.gameId),
+      },
+      { scroll: false, replace: true }
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeMatch?.id, matches])
+  }, [playbackKey])
+
+  useEffect(() => {
+    playedRef.current = false
+    if (!activeMatch) return
+
+    const delay = activeMatch.sources.length === 0 ? 0 : HERO_PLAYBACK_TIMEOUT_MS
+    const timer = window.setTimeout(() => {
+      if (activeMatch.sources.length === 0 || !playedRef.current) handleVideoError()
+    }, delay)
+
+    return () => window.clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playbackKey])
 
   return (
     <div
@@ -104,11 +137,14 @@ export function HeroVideoClient({ matches, defaultMatchId, className }: HeroVide
     >
       <div className="card-glow rounded-12 flex min-w-0 flex-1 flex-col overflow-hidden max-lg:h-auto">
         <VideoPlayer
-          key={activeMatch?.id.toString() ?? "default"}
+          key={playbackKey}
           sources={activeMatch?.sources ?? []}
           poster={activeMatch?.poster}
           isLive
           autoplay={!!activeMatch}
+          onPlay={() => {
+            playedRef.current = true
+          }}
           onError={handleVideoError}
         />
         {activeMatch && (

@@ -1,4 +1,4 @@
-import { getRequest, postRequest } from "@/server/services/request"
+import { getRequest } from "@/server/services/request"
 import { MATCH_API } from "@/lib/match.utils"
 
 import { env } from "@/config/env"
@@ -59,7 +59,7 @@ function getEndpointByDate(date: string | null): string {
 }
 
 function fetchLiveMatchesAction(): Promise<LiveMatch[]> {
-  return postRequest<unknown[]>(HOME_API?.MATCH_LIVE, { gameId: [] })
+  return getRequest<unknown[]>(HOME_API.MATCH_LIVE)
     .then((data) => {
       if (!Array.isArray(data)) return []
 
