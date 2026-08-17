@@ -32,6 +32,17 @@ export async function fetchLiveScheduleMatches(): Promise<LiveSearchMatchInterfa
   return Array.isArray(data) ? data : []
 }
 
+/** Trận đang diễn ra kèm URL stream — GET `/v2/match/get-pc-live-game-match` */
+export async function fetchPcLiveGameMatches(): Promise<Record<string, unknown>[]> {
+  const data = await getRequest<unknown>(HOME_API.MATCH_LIVE).catch(() => null)
+  if (Array.isArray(data)) return data as Record<string, unknown>[]
+  if (data && typeof data === "object") {
+    const records = (data as { records?: unknown }).records
+    if (Array.isArray(records)) return records as Record<string, unknown>[]
+  }
+  return []
+}
+
 export function liveScheduleQueryOptions() {
   return queryOptions({
     queryKey: ["live-schedule-matches"],
