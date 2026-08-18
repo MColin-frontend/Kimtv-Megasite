@@ -1,14 +1,18 @@
 "use client"
 
-import { LIVE_MATCH_TYPE } from "@/lib/match.utils"
-import { useRouter } from "@/hooks/use-router"
-import { POLL_PARAM_KEY, POLL_VISIBLE } from "@/constants/ui/ui-chat.constants"
+import { useEffect } from "react"
 
+import { LIVE_MATCH_TYPE } from "@/lib/match.utils"
+import { buildMatchDetailViewedPayload } from "@/lib/tracking.constants"
+import { useRouter } from "@/hooks/use-router"
+import { useTracking } from "@/hooks/use-tracking"
+
+import { POLL_PARAM_KEY, POLL_VISIBLE } from "@/constants/ui/ui-chat.constants"
 import type { AnchorRoomVo, MatchInterface } from "@/models/match.models"
 
 import { Chat } from "@/components/ui/chat"
-import { Carousel } from "@/components/ui/match/carousel"
 import { MatchLiveInfoBar } from "@/components/ui/match/card-live-info"
+import { Carousel } from "@/components/ui/match/carousel"
 
 import { LIVE_SECTION_CONFIG } from "../live.constants"
 import type { LiveMatchInterface } from "../live.models"
@@ -22,6 +26,17 @@ export interface LivePageProps {
 export function LivePage({ match }: LivePageProps) {
   const { getParam } = useRouter()
   const hasPollVisible = getParam(POLL_PARAM_KEY) === POLL_VISIBLE
+  const { onClick: track } = useTracking()
+
+  useEffect(() => {
+    if (!match?.matchId) return
+    track(
+      buildMatchDetailViewedPayload(
+        match as unknown as import("@/lib/tracking.constants").MatchTrackingData
+      )
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [match?.matchId])
 
   const liveUrls = (() => {
     if (match?.liveUrls?.length) return match.liveUrls
@@ -36,7 +51,14 @@ export function LivePage({ match }: LivePageProps) {
     <div className="container flex flex-col gap-6 max-sm:gap-3">
       <div className="flex h-[min(90vh,900px)] gap-4 max-lg:h-auto max-lg:flex-col">
         <div className="card-glow rounded-12 flex min-w-0 flex-1 flex-col overflow-hidden">
-          <LiveVideoPlayer liveUrls={liveUrls} />
+          <LiveVideoPlayer
+            liveUrls={liveUrls}
+            matchId={match?.matchId != null ? String(match.matchId) : ""}
+            roomId={
+              match?.anchorRoom?.[0]?.roomId != null ? String(match.anchorRoom[0].roomId) : ""
+            }
+            gameId={match?.gameId ?? undefined}
+          />
           {match && (
             <MatchLiveInfoBar
               match={{
@@ -46,12 +68,14 @@ export function LivePage({ match }: LivePageProps) {
             />
           )}
         </div>
-        <div className={`flex w-[420px] shrink-0 flex-col overflow-hidden max-lg:h-auto max-lg:w-full ${hasPollVisible ? "max-sm:h-[60vh]" : "max-sm:h-[50vh]"}`}>
+        <div
+          className={`flex w-[420px] shrink-0 flex-col overflow-hidden max-lg:h-auto max-lg:w-full ${hasPollVisible ? "max-sm:h-[60vh]" : "max-sm:h-[50vh]"}`}
+        >
           <Chat />
         </div>
       </div>
 
-      <LiveBanner />
+      <LiveBanner matchId={match?.matchId != null ? String(match.matchId) : undefined} />
 
       {[LIVE_SECTION_CONFIG.LIVE, LIVE_SECTION_CONFIG.UPCOMING, LIVE_SECTION_CONFIG.FINISHED].map(
         (cfg) => (

@@ -14,7 +14,7 @@ export async function HighlightsPage({ highlightStatus }: HighlightsPageProps) {
   return (
     <section className="flex min-h-[calc(100vh-72px)] flex-col bg-black max-md:h-full max-md:overflow-hidden">
       <div className="container mx-auto flex flex-1 flex-col px-4 py-2.5 max-md:h-full max-md:!px-0 max-md:!py-0">
-        <HighlightsFeed initialVideos={videos} initialMenu={menu} initialHasMore={hasMore} />
+        <HighlightsFeed initialVideos={videos} initialHasMore={hasMore} />
       </div>
     </section>
   )

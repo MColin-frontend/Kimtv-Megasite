@@ -113,12 +113,11 @@ function resolveInitialMenu(param: string | string[] | undefined): FeedMenu {
 
 function toggleFollowAction(params: {
   userId: string | number
-  setFollowMap: Dispatch<SetStateAction<Record<string, boolean>>>
   setVideos: Dispatch<SetStateAction<HighlightVideoInterface[]>>
   setFollowLoading: Dispatch<SetStateAction<boolean>>
   messageSuccess?: string
 }): Promise<void> {
-  const { userId, setFollowMap, setVideos, setFollowLoading, messageSuccess } = params
+  const { userId, setVideos, setFollowLoading, messageSuccess } = params
   const aid = String(userId)
 
   setFollowLoading(true)
@@ -130,7 +129,6 @@ function toggleFollowAction(params: {
   })
     .then((result) => {
       if (result === null) return
-      setFollowMap((prev) => ({ ...prev, [aid]: true }))
       setVideos((prev) =>
         prev.map((v) => (String(v.authorId) === aid ? { ...v, hasFollow: true } : v))
       )
@@ -144,23 +142,12 @@ function toggleLikeAction(params: {
   wasLiked: boolean
   loginUserId: string
   originalCount: number
-  setLikedMap: Dispatch<SetStateAction<Record<string, boolean>>>
   setVideos: Dispatch<SetStateAction<HighlightVideoInterface[]>>
   setLikeLoading: Dispatch<SetStateAction<boolean>>
 }): Promise<void> {
-  const {
-    newsId,
-    isLike,
-    wasLiked,
-    loginUserId,
-    originalCount,
-    setLikedMap,
-    setVideos,
-    setLikeLoading,
-  } = params
+  const { newsId, isLike, wasLiked, loginUserId, originalCount, setVideos, setLikeLoading } = params
 
   setLikeLoading(true)
-  setLikedMap((prev) => ({ ...prev, [newsId]: isLike }))
   setVideos((prev) =>
     prev.map((v) =>
       String(v.newsId ?? "") === newsId
@@ -170,7 +157,6 @@ function toggleLikeAction(params: {
   )
 
   const rollback = () => {
-    setLikedMap((prev) => ({ ...prev, [newsId]: wasLiked }))
     setVideos((prev) =>
       prev.map((v) =>
         String(v.newsId ?? "") === newsId ? { ...v, isLike: wasLiked, likeCount: originalCount } : v

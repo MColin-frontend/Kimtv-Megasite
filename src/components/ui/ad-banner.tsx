@@ -1,10 +1,14 @@
 "use client"
 
+import { useEffect, useRef } from "react"
 import type { StaticImageData } from "next/image"
 
 import { VIDEO_EXT_RE } from "@/lib/regex"
 import { cn } from "@/lib/utils"
 import { useBoolean } from "@/hooks/use-boolean"
+import { useTracking } from "@/hooks/use-tracking"
+
+import { TrackingValueEnum } from "@/enums/tracking.enum"
 
 import { Img } from "@/components/ui/image"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -19,6 +23,7 @@ interface AdBannerProps {
   skeletonClassName?: string
   sizes?: string
   "aria-label"?: string
+  matchId?: string
 }
 
 function AdMedia({
@@ -74,7 +79,37 @@ export function AdBanner({
   skeletonClassName,
   sizes,
   "aria-label": ariaLabel = "Quảng cáo",
+  matchId = "",
 }: AdBannerProps) {
+  const wrapperRef = useRef<HTMLElement | null>(null)
+  const impressionSentRef = useRef(false)
+
+  // Dùng onClickAd + onAdImpression giống PC
+  const { onClickAd, onAdImpression } = useTracking()
+
+  useEffect(() => {
+    const el = wrapperRef.current
+    if (!el || !href || impressionSentRef.current) return
+    if (typeof IntersectionObserver === "undefined") return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting || impressionSentRef.current) return
+        impressionSentRef.current = true
+        // Giống PC: onAdImpression({ matchId, ctaTrackingLink, ctaContent })
+        onAdImpression({
+          matchId,
+          ctaTrackingLink: href,
+          ctaContent: TrackingValueEnum.BANNER_ADS,
+        })
+        observer.disconnect()
+      },
+      { threshold: 0.5 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [href])
+
   if (isLoading) {
     return <Skeleton className={cn("w-full", rounded, skeletonClassName)} />
   }
@@ -94,10 +129,23 @@ export function AdBanner({
   if (href) {
     return (
       <a
+        ref={(el) => {
+          wrapperRef.current = el
+        }}
         href={href}
         target="_blank"
         rel="noopener noreferrer"
         aria-label={ariaLabel}
+        onClick={(e) =>
+          // Giống PC: onClickAd({ event, targetLink, ctaType, ctaPosition, matchId })
+          onClickAd({
+            event: e.nativeEvent,
+            targetLink: href,
+            ctaType: "banner_overlay",
+            ctaPosition: "overlay",
+            matchId,
+          })
+        }
         className={cn("overflow-hidden", rounded, className)}
       >
         {media}
@@ -105,5 +153,14 @@ export function AdBanner({
     )
   }
 
-  return <div className={cn("overflow-hidden", rounded, className)}>{media}</div>
+  return (
+    <div
+      ref={(el) => {
+        wrapperRef.current = el
+      }}
+      className={cn("overflow-hidden", rounded, className)}
+    >
+      {media}
+    </div>
+  )
 }

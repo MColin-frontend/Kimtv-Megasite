@@ -3,10 +3,13 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { MessageCircle, X } from "lucide-react"
 
+import { payloadChatMessageSent } from "@/lib/tracking.constants"
 import { useAuth } from "@/hooks/use-auth"
+import { useTracking } from "@/hooks/use-tracking"
 
 import { useTranslation } from "@/i18n"
 import { getRoutes } from "@/config/routes"
+import { TrackingPayloadKeyEnum } from "@/enums/tracking.enum"
 
 import { CommentCard } from "@/features/highlights/components/comment-drawer/comment-card"
 import {
@@ -77,6 +80,7 @@ export function CommentSection({
   const [replyText, setReplyText] = useState("")
 
   const loginUserId = user?.userId != null ? String(user.userId) : user?.uid ? String(user.uid) : ""
+  const { onClick: track } = useTracking({ userId: loginUserId || null })
 
   const emitTotal = useCallback(
     (updater: number | ((prev: number) => number)) => {
@@ -268,6 +272,10 @@ export function CommentSection({
     )
       .then((result) => {
         if (result != null) {
+          track({
+            ...payloadChatMessageSent,
+            [TrackingPayloadKeyEnum.EVENT_ID]: String(newsId),
+          })
           return hydratePending(clientKey, content, result, knownIds).then((hydrated) => {
             if (!hydrated) return loadComments(true, { silent: true })
           })

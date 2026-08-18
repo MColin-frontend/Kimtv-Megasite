@@ -6,11 +6,13 @@ import NextImage from "next/image"
 import { useSearchParams } from "next/navigation"
 import { useQuery } from "@tanstack/react-query"
 
+import { payloadFilterClicked } from "@/lib/tracking.constants"
 import { cn } from "@/lib/utils"
 import { useRouter } from "@/hooks/use-router"
+import { useTracking } from "@/hooks/use-tracking"
 
 import { useTranslation } from "@/i18n"
-import { PAGE_SIZE_OPTION } from "@/constants/common.constants"
+import { TrackingPayloadKeyEnum } from "@/enums/tracking.enum"
 import type { LiveSearchMatchInterface } from "@/models/match.models"
 
 import {
@@ -52,6 +54,7 @@ export function LiveMatchFilterSection({
 }: LiveMatchFilterSectionProps = {}) {
   const { t } = useTranslation()
   const { setParams, getParam } = useRouter()
+  const { onClick: track } = useTracking()
   const searchParams = useSearchParams()
   const tab = (searchParams.get(LIVE_SCHEDULE_TAB_PARAM) ??
     LIVE_SCHEDULE_DEFAULT_TAB) as LiveScheduleTab
@@ -69,6 +72,11 @@ export function LiveMatchFilterSection({
   const total = data?.total ?? 0
 
   function handleTabChange(value: LiveScheduleTab) {
+    track({
+      ...payloadFilterClicked,
+      [TrackingPayloadKeyEnum.CONTENT]: value,
+      [TrackingPayloadKeyEnum.PREVIOUS_TAB]: tab,
+    })
     setParams(
       {
         [LIVE_SCHEDULE_TAB_PARAM]: value,

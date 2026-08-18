@@ -3,10 +3,13 @@
 import { Fragment } from "react"
 
 import { LIVE_MATCH_TYPE } from "@/lib/match.utils"
+import { payloadFilterClicked } from "@/lib/tracking.constants"
 import { cn } from "@/lib/utils"
 import { useRouter } from "@/hooks/use-router"
+import { useTracking } from "@/hooks/use-tracking"
 
 import { useTranslation } from "@/i18n"
+import { TrackingPayloadKeyEnum } from "@/enums/tracking.enum"
 
 import { MatchSchedule } from "@/features/home/components/match-schedule"
 import { LiveMatchFilterSection } from "@/features/live-schedule/components/live-match-filter-section"
@@ -38,8 +41,14 @@ function SearchMobileFilters() {
   const { t } = useTranslation()
   const { getParam, setParams } = useRouter()
   const activeFilter = (getParam(SEARCH_FILTER_KEY) ?? SearchFilterEnum.ALL) as SearchFilterEnum
+  const { onClick: track } = useTracking()
 
   function handleFilterChange(key: SearchFilterEnum) {
+    track({
+      ...payloadFilterClicked,
+      [TrackingPayloadKeyEnum.CONTENT]: key,
+      [TrackingPayloadKeyEnum.PREVIOUS_TAB]: activeFilter,
+    })
     setParams(
       {
         [SEARCH_FILTER_KEY]: key === SearchFilterEnum.ALL ? null : key,

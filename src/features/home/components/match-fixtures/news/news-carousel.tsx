@@ -3,8 +3,12 @@
 import Link from "next/link"
 import { Heart, MessageCircle } from "lucide-react"
 
+import { payloadNewsCardClicked } from "@/lib/tracking.constants"
+import { useTracking } from "@/hooks/use-tracking"
+
 import type { LocaleType } from "@/i18n"
 import { localePath, useTranslation } from "@/i18n"
+import { TrackingPayloadKeyEnum } from "@/enums/tracking.enum"
 
 import type { NewsItem } from "@/features/home/home.api"
 import CarouselInfinity from "@/components/ui/carousel/carousel-infinity"
@@ -20,9 +24,17 @@ interface NewsCarouselProps {
 }
 
 function NewsCarouselCard({ item, href }: { item: NewsItem; href: string }) {
+  const { onClick: track } = useTracking()
   return (
     <Link
       href={href}
+      onClick={() =>
+        track({
+          ...payloadNewsCardClicked,
+          [TrackingPayloadKeyEnum.TARGET_LINK]: href,
+          [TrackingPayloadKeyEnum.CONTENT]: item.title ?? "",
+        })
+      }
       className="group rounded-12 border-foreground/8 flex h-full flex-col overflow-hidden border bg-white transition-shadow hover:shadow-md"
     >
       <div className="overflow-hidden">

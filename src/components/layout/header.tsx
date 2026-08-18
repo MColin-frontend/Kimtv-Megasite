@@ -5,14 +5,22 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { LogOut, Search, UserRound, X } from "lucide-react"
 
+import {
+  payloadAuthButtonClicked,
+  payloadLogoClicked,
+  payloadMenuClicked,
+  payloadUserMenuOpened,
+} from "@/lib/tracking.constants"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/use-auth"
 import { useDisclosure } from "@/hooks/use-disclosure"
 import { useRouter } from "@/hooks/use-router"
+import { useTracking } from "@/hooks/use-tracking"
 
 import { SLUG_MAP, useTranslation } from "@/i18n"
 import { getRoutes } from "@/config/routes"
 import { HEADER_DROPDOWN_ITEMS, MAIN_NAV_ITEMS } from "@/constants/component/layout.constants"
+import { TrackingPayloadKeyEnum } from "@/enums/tracking.enum"
 
 import { SEARCH_QUERY_KEY } from "@/features/search/search.schema"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
@@ -65,9 +73,10 @@ interface AvatarDropdownProps {
   user: { name?: string | null; avatar?: string | null; vip99Icon?: string | null }
   userId?: string | number | null
   onLogout: () => void
+  onTrack: (extra: Record<string, unknown>) => void
 }
 
-function AvatarDropdown({ user, userId, onLogout }: AvatarDropdownProps) {
+function AvatarDropdown({ user, userId, onLogout, onTrack }: AvatarDropdownProps) {
   const { t, locale } = useTranslation()
   const routes = getRoutes(locale)
   const { state, open, close, toggle, setOpen } = useDisclosure("dropdown", "confirm")
@@ -90,7 +99,10 @@ function AvatarDropdown({ user, userId, onLogout }: AvatarDropdownProps) {
     <div ref={wrapRef} className="relative">
       <div className="flex w-full items-center gap-2">
         <button
-          onClick={() => toggle("dropdown")}
+          onClick={() => {
+            toggle("dropdown")
+            if (!state.dropdown) onTrack(payloadUserMenuOpened)
+          }}
           className="flex w-fit items-center gap-2 rounded-full transition-all max-sm:gap-1.5"
           aria-label={t("header.user.aria-label")}
         >
@@ -354,10 +366,12 @@ function DesktopNav({
   items,
   isActive,
   t,
+  onTrack,
 }: {
   items: typeof import("@/constants/component/layout.constants").MAIN_NAV_ITEMS
   isActive: (href: string, relatedSlugs?: string[]) => boolean
   t: (key: Parameters<ReturnType<typeof useTranslation>["t"]>[0]) => string
+  onTrack: (extra: Record<string, unknown>) => void
 }) {
   const navRef = useRef<HTMLElement>(null)
   const pathname = usePathname()
@@ -401,6 +415,15 @@ function DesktopNav({
             key={item.labelKey}
             href={href}
             data-active={active}
+            onClick={() =>
+              onTrack({
+                ...payloadMenuClicked,
+                [TrackingPayloadKeyEnum.TARGET_LINK]: href,
+                [TrackingPayloadKeyEnum.PROPERTIES]: {
+                  [TrackingPayloadKeyEnum.MENU_LABEL]: t(item.labelKey),
+                },
+              })
+            }
             className={cn(
               "group rounded-12 relative flex flex-col items-center gap-2 px-6 pt-2.5 pb-3 transition-all duration-200",
               active ? "text-gold" : "text-white/65 hover:text-white/85"
@@ -486,6 +509,10 @@ export function Header() {
   const routes = getRoutes(locale)
   const { user, isLoggedIn, login, logout } = useAuth()
 
+  const userId =
+    user?.userId != null ? String(user.userId) : user?.uid != null ? String(user.uid) : null
+  const { onClick: track } = useTracking({ userId })
+
   function isActive(href: string, relatedSlugs?: string[]): boolean {
     if (href === `/${locale}`) return pathname === `/${locale}`
     const viSlug = href.split("/")[2] ?? ""
@@ -498,7 +525,16 @@ export function Header() {
   return (
     <header id="site-header" className="bg-header sticky top-0 z-50 w-full">
       <div className="container flex h-fit items-center gap-3 py-3 max-sm:gap-2 max-sm:py-2!">
-        <Link href={routes.home} className="shrink-0">
+        <Link
+          href={routes.home}
+          className="shrink-0"
+          onClick={() =>
+            track({
+              ...payloadLogoClicked,
+              [TrackingPayloadKeyEnum.TARGET_LINK]: routes.home,
+            })
+          }
+        >
           <Img
             src={kimtvLogo}
             alt="KimTV"
@@ -510,18 +546,26 @@ export function Header() {
           />
         </Link>
 
-        <DesktopNav items={MAIN_NAV_ITEMS} isActive={isActive} t={t} />
+        <DesktopNav items={MAIN_NAV_ITEMS} isActive={isActive} t={t} onTrack={track} />
 
         <div className="ml-auto flex shrink-0 items-center gap-2 max-sm:gap-1.5 sm:gap-3">
           <Suspense fallback={<div className={searchBtnClass(false)} aria-hidden />}>
             <SearchInput />
           </Suspense>
           {isLoggedIn && user ? (
-            <AvatarDropdown user={user} userId={user.userId ?? user.uid} onLogout={logout} />
+            <AvatarDropdown
+              user={user}
+              userId={user.userId ?? user.uid}
+              onLogout={logout}
+              onTrack={track}
+            />
           ) : (
             <Button
               variant="gradient"
-              onClick={login}
+              onClick={() => {
+                track(payloadAuthButtonClicked)
+                login()
+              }}
               className="max-lg:h-9 max-lg:w-9 max-lg:rounded-full max-lg:px-0 max-sm:h-8 max-sm:w-8"
             >
               <UserRound className="h-3.5 w-3.5" />

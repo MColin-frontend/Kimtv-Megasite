@@ -5,10 +5,12 @@ import "react"
 import { Users, Video } from "lucide-react"
 
 import { deriveMatchStatusFlags, LIVE_MATCH_TYPE } from "@/lib/match.utils"
+import { buildMatchCardPayload, getMatchTrackingStatus } from "@/lib/tracking.constants"
 import { cn, formatViewers } from "@/lib/utils"
 import { useCountdown } from "@/hooks/use-countdown"
 import { useFakeGameMinute } from "@/hooks/use-fake-game-minute"
 import { useLiveNavigate } from "@/hooks/use-live-navigate"
+import { useTracking } from "@/hooks/use-tracking"
 
 import { useTranslation } from "@/i18n"
 import {
@@ -16,6 +18,7 @@ import {
   COUNTDOWN_ITEMS_CONFIG,
   MATCH_CARD_I18N_KEYS,
 } from "@/constants/component/match-card.constants"
+import { TrackingPayloadKeyEnum, TrackingValueEnum } from "@/enums/tracking.enum"
 import type { AnchorRoomVo, MatchInterface } from "@/models/match.models"
 
 import icMic from "@assets/icons/match/ic-mic.svg"
@@ -41,13 +44,18 @@ interface CardProps {
   isLoading?: boolean
   matchType?: MatchCardType
   className?: string
+  /** PC: PLACEMENT value (HERO, MATCH_LIST, SIDEBAR) — dùng khi card render ở nhiều context khác nhau */
+  placement?: string
+  /** PC: CTA_POSITION index trong list */
+  ctaPosition?: number
 }
 
 /* ── Main Component ──────────────────────────────────────── */
 
-export function Card({ match, isLoading, className }: CardProps) {
+export function Card({ match, isLoading, className, placement, ctaPosition }: CardProps) {
   const { t } = useTranslation()
   const navigateToLive = useLiveNavigate()
+  const { onClick: track } = useTracking()
 
   const anchors: AnchorRoomVo[] = match?.anchorRoomVos ?? []
   const firstAnchor = anchors[0] ?? null
@@ -72,9 +80,16 @@ export function Card({ match, isLoading, className }: CardProps) {
 
   const thumbnail = firstAnchor?.cover ?? match.animationUrl ?? null
 
-  function handleClick() {
+  function handleClick(e: React.MouseEvent) {
     if (!match?.matchId || !match?.gameId) return
     if (!isLive && !isStream) return
+    track(
+      buildMatchCardPayload(match, e.nativeEvent, {
+        [TrackingPayloadKeyEnum.MATCH_STATUS]: getMatchTrackingStatus(match),
+        [TrackingPayloadKeyEnum.PLACEMENT]: placement ?? TrackingValueEnum.MATCH_LIST,
+        ...(ctaPosition != null ? { [TrackingPayloadKeyEnum.CTA_POSITION]: ctaPosition } : {}),
+      })
+    )
     navigateToLive(match.matchId, match.gameId)
   }
 
@@ -82,7 +97,7 @@ export function Card({ match, isLoading, className }: CardProps) {
 
   return (
     <div
-      onClick={handleClick}
+      onClick={(e) => handleClick(e)}
       className={cn(
         "card-match-bg rounded-12 shadow-card relative h-full w-full overflow-hidden transition-[box-shadow]",
         (isLive || isStream) && match?.matchId && match?.gameId
@@ -102,10 +117,21 @@ export function Card({ match, isLoading, className }: CardProps) {
         {/* Row 1: LIVE badge | viewers + time (right) */}
         <div className="flex items-center justify-between max-sm:-my-1 max-sm:origin-left">
           <div className="flex items-center gap-2 max-sm:gap-1.5">
-            {isStream && <BadgeLive label="Stream" />}
-            {isLive && <BadgeLive label="LIVE" />}
+            {isStream && (
+              <span data-tracking-area={TrackingValueEnum.LIVE_BADGE}>
+                <BadgeLive label="Stream" />
+              </span>
+            )}
+            {isLive && (
+              <span data-tracking-area={TrackingValueEnum.LIVE_BADGE}>
+                <BadgeLive label="LIVE" />
+              </span>
+            )}
           </div>
-          <div className="flex items-center gap-1.5 max-sm:gap-1">
+          <div
+            className="flex items-center gap-1.5 max-sm:gap-1"
+            data-tracking-area={TrackingValueEnum.KICKOFF_TIMER}
+          >
             {isLive && <ViewersBadge count={match.onlineNum} />}
             {isLive && displayMinute != null && displayMinute !== 0 && (
               <GameMinuteBadge minute={displayMinute} />
@@ -118,7 +144,10 @@ export function Card({ match, isLoading, className }: CardProps) {
           <div className="mt-1 flex items-center gap-1.5">
             {/* Avatar với mic icon overlay */}
             {firstAnchor.userAvatar && (
-              <div className="relative shrink-0">
+              <div
+                className="relative shrink-0"
+                data-tracking-area={TrackingValueEnum.ANCHOR_AVATAR}
+              >
                 <Avatar size={32} className="ring-live-green ring-1">
                   <AvatarImage src={firstAnchor.userAvatar} />
                 </Avatar>
@@ -144,7 +173,10 @@ export function Card({ match, isLoading, className }: CardProps) {
               </div>
               {/* Name */}
               <Tooltip>
-                <TooltipTrigger className="block min-w-0 overflow-hidden">
+                <TooltipTrigger
+                  className="block min-w-0 overflow-hidden"
+                  data-tracking-area={TrackingValueEnum.ANCHOR_NAME}
+                >
                   <Typography
                     as="span"
                     variant="caption"
@@ -186,7 +218,10 @@ export function Card({ match, isLoading, className }: CardProps) {
         <div className="flex flex-1 items-center justify-between gap-2">
           {/* Home */}
           <div className="flex basis-2/5 flex-col items-center gap-1.5">
-            <div className="flex size-[80px] shrink-0 items-center justify-center max-md:size-[60px] max-sm:size-[44px]">
+            <div
+              className="flex size-[80px] shrink-0 items-center justify-center max-md:size-[60px] max-sm:size-[44px]"
+              data-tracking-area={TrackingValueEnum.HOME_TEAM_LOGO}
+            >
               <Img
                 src={match.homeLogo}
                 alt={match.homeName ?? ""}
@@ -196,7 +231,10 @@ export function Card({ match, isLoading, className }: CardProps) {
               />
             </div>
             <Tooltip>
-              <TooltipTrigger className="block min-w-0 overflow-hidden">
+              <TooltipTrigger
+                className="block min-w-0 overflow-hidden"
+                data-tracking-area={TrackingValueEnum.HOME_TEAM_NAME}
+              >
                 <Typography
                   as="span"
                   variant="label"
@@ -211,7 +249,10 @@ export function Card({ match, isLoading, className }: CardProps) {
           </div>
 
           {/* Score */}
-          <div className="flex basis-1/5 flex-col items-center gap-0.5">
+          <div
+            className="flex basis-1/5 flex-col items-center gap-0.5"
+            data-tracking-area={TrackingValueEnum.MATCH_STATUS_AREA}
+          >
             {isUpcoming ? (
               <Img
                 src={imgVs}
@@ -244,7 +285,10 @@ export function Card({ match, isLoading, className }: CardProps) {
 
           {/* Away */}
           <div className="flex basis-2/5 flex-col items-center gap-1.5">
-            <div className="flex size-[80px] shrink-0 items-center justify-center max-md:size-[60px] max-sm:size-[44px]">
+            <div
+              className="flex size-[80px] shrink-0 items-center justify-center max-md:size-[60px] max-sm:size-[44px]"
+              data-tracking-area={TrackingValueEnum.AWAY_TEAM_LOGO}
+            >
               <Img
                 src={match.awayLogo}
                 alt={match.awayName ?? ""}
@@ -254,7 +298,10 @@ export function Card({ match, isLoading, className }: CardProps) {
               />
             </div>
             <Tooltip>
-              <TooltipTrigger className="block min-w-0 overflow-hidden">
+              <TooltipTrigger
+                className="block min-w-0 overflow-hidden"
+                data-tracking-area={TrackingValueEnum.AWAY_TEAM_NAME}
+              >
                 <Typography
                   as="span"
                   variant="label"
@@ -272,7 +319,10 @@ export function Card({ match, isLoading, className }: CardProps) {
         {/* Row 4: Countdown (upcoming) */}
         {isUpcoming &&
           (countdownDone ? (
-            <div className="rounded-8 flex flex-col items-center justify-center gap-1 bg-white/[0.06] px-3 py-2 text-center backdrop-blur-2xl max-md:px-2 max-md:py-1 max-sm:px-1 max-sm:py-0.5">
+            <div
+              className="rounded-8 flex flex-col items-center justify-center gap-1 bg-white/[0.06] px-3 py-2 text-center backdrop-blur-2xl max-md:px-2 max-md:py-1 max-sm:px-1 max-sm:py-0.5"
+              data-tracking-area={TrackingValueEnum.KICKOFF_TIMER}
+            >
               <span className="flex items-center gap-1">
                 <Video
                   className="text-gold size-4 drop-shadow-[0_0_8px_rgba(245,197,24,0.8)]"
@@ -298,7 +348,10 @@ export function Card({ match, isLoading, className }: CardProps) {
               </Typography>
             </div>
           ) : (
-            <div className="flex items-center justify-center gap-3">
+            <div
+              className="flex items-center justify-center gap-3"
+              data-tracking-area={TrackingValueEnum.KICKOFF_TIMER}
+            >
               {COUNTDOWN_ITEMS_CONFIG.map((cfg) => ({
                 value: countdown[cfg.valueKey],
                 label: t(cfg.labelKey as Parameters<typeof t>[0]),

@@ -2,9 +2,13 @@
 
 import Link from "next/link"
 
+import { payloadFooterLinkClicked } from "@/lib/tracking.constants"
+import { useTracking } from "@/hooks/use-tracking"
+
 import { useTranslation } from "@/i18n"
 import { getRoutes } from "@/config/routes"
 import { FOOTER_MENUS } from "@/constants/component/layout.constants"
+import { TrackingPayloadKeyEnum } from "@/enums/tracking.enum"
 
 import type { FooterMenuInterface } from "@/components/layout/layout.models"
 import { Img } from "@/components/ui/image"
@@ -15,6 +19,7 @@ import kimtvLogo from "@assets/icons/layout/ic-kimtv.svg"
 export function Footer() {
   const { t, locale } = useTranslation()
   const routes = getRoutes(locale)
+  const { onClick: track } = useTracking()
 
   return (
     <footer className="border-line border-t">
@@ -34,7 +39,18 @@ export function Footer() {
 
           <nav className="flex flex-wrap items-center justify-center gap-9 max-lg:gap-6 max-md:gap-3">
             {FOOTER_MENUS.map((menu: FooterMenuInterface) => (
-              <Link key={menu.key} href={menu.getHref(routes)} className="footer-menu-link">
+              <Link
+                key={menu.key}
+                href={menu.getHref(routes)}
+                className="footer-menu-link"
+                onClick={() =>
+                  track({
+                    ...payloadFooterLinkClicked,
+                    [TrackingPayloadKeyEnum.MENU_LABEL]: menu.key,
+                    [TrackingPayloadKeyEnum.TARGET_LINK]: menu.getHref(routes),
+                  })
+                }
+              >
                 <Typography
                   variant="label"
                   className="hover:text-gold text-white uppercase transition-colors"

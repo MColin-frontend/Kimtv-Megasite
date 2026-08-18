@@ -3,8 +3,10 @@
 import { useState } from "react"
 
 import { useAuth } from "@/hooks/use-auth"
+import { useTracking } from "@/hooks/use-tracking"
 
 import { useTranslation } from "@/i18n"
+import { TrackingEventsEnum, TrackingPayloadKeyEnum } from "@/enums/tracking.enum"
 
 import { handleFollowUser } from "@/features/news/news.api"
 
@@ -16,6 +18,7 @@ interface FollowButtonProps {
 export function FollowButton({ authorId, initialFollow }: FollowButtonProps) {
   const { t } = useTranslation()
   const { isLoggedIn, login } = useAuth()
+  const { onClick: track } = useTracking()
   const [following, setFollowing] = useState(!!initialFollow)
   const [loading, setLoading] = useState(false)
 
@@ -27,6 +30,11 @@ export function FollowButton({ authorId, initialFollow }: FollowButtonProps) {
       return
     }
     if (loading) return
+    track({
+      [TrackingPayloadKeyEnum.EVENT_TYPE]: TrackingEventsEnum.SOCIAL_CLICKED,
+      [TrackingPayloadKeyEnum.EVENT_ID]: String(authorId),
+      [TrackingPayloadKeyEnum.CONTENT]: following ? "unfollow" : "follow",
+    })
     handleFollowUser({
       userId: authorId as number,
       isFollow: !following,

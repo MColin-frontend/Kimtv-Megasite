@@ -6,8 +6,10 @@ import { Search, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { useRouter } from "@/hooks/use-router"
+import { useTracking } from "@/hooks/use-tracking"
 
 import { useTranslation } from "@/i18n"
+import { TrackingEventsEnum, TrackingPayloadKeyEnum } from "@/enums/tracking.enum"
 
 import { Input } from "@/components/ui/input"
 
@@ -48,8 +50,9 @@ export function SearchForm({
   size = "lg",
 }: SearchFormProps) {
   const { t } = useTranslation()
-  const { setParams, removeParams, getParam } = useRouter()
+  const { setParams, getParam } = useRouter()
   const urlQuery = getParam(nameKey) ?? ""
+  const { onClick: track } = useTracking()
 
   const { control, handleSubmit, reset } = useForm<SearchFormValues>({
     defaultValues: { query: urlQuery },
@@ -64,7 +67,13 @@ export function SearchForm({
     const q = query.trim()
     const pageReset = Object.fromEntries(PAGE_KEYS.map((k) => [k, null]))
     setParams({ [nameKey]: q || null, ...pageReset }, { replace: true })
-    if (q) onSearch?.(q)
+    if (q) {
+      onSearch?.(q)
+      track({
+        [TrackingPayloadKeyEnum.EVENT_TYPE]: TrackingEventsEnum.SEARCH_SUBMITTED,
+        [TrackingPayloadKeyEnum.CONTENT]: q,
+      })
+    }
     // input giữ focus vì form không re-mount
   }
 

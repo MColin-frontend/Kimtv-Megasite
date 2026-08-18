@@ -1,5 +1,18 @@
 import { FeedMenu } from "@/enums/highlights.enum"
 
+import icDiscount from "@assets/icons/video/ic-discount.svg"
+import icGuide from "@assets/icons/video/ic-guide.svg"
+import icNews from "@assets/icons/video/ic-news.svg"
+import icOutstanding from "@assets/icons/video/ic-outstanding.svg"
+import icTopTrending from "@assets/icons/video/ic-top-trending.svg"
+
+function svgSrc(mod: unknown): string {
+  return typeof mod === "string" ? mod : (mod as { src: string }).src
+}
+
+/** URL query param key cho filter menu của video feed */
+const HIGHLIGHT_STATUS_PARAM = "highlight-status" as const
+
 const VALID_MENUS = Object.values(FeedMenu) as string[]
 
 const GAME_ID = {
@@ -70,6 +83,17 @@ const LINK_MENU_CONFIG = [
   { key: "promotion", labelKey: "video.menu.promotion", external: true },
 ] as const
 
+const FILTER_ICON: Record<FeedMenu, string> = {
+  [FeedMenu.Featured]: svgSrc(icTopTrending),
+  [FeedMenu.Latest]: svgSrc(icGuide),
+  [FeedMenu.Trending]: svgSrc(icOutstanding),
+}
+
+const LINK_ICON: Record<string, string> = {
+  news: svgSrc(icNews),
+  promotion: svgSrc(icDiscount),
+}
+
 /** Backend KimTV paths — client gọi qua `/java/*`, server qua `getRequest`. */
 const HIGHLIGHTS_API = {
   VIDEO: {
@@ -93,6 +117,7 @@ const HIGHLIGHTS_API = {
 
 export { FeedMenu }
 export {
+  HIGHLIGHT_STATUS_PARAM,
   VALID_MENUS,
   GAME_ID,
   LATEST_VIDEO_PAGE_SIZE,
@@ -102,5 +127,7 @@ export {
   NEWS_TAB_MAP,
   FILTER_MENU_CONFIG,
   LINK_MENU_CONFIG,
+  FILTER_ICON,
+  LINK_ICON,
   HIGHLIGHTS_API,
 }
