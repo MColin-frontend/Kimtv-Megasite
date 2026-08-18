@@ -12,6 +12,19 @@ import {
   type KimtvUser,
 } from "@/lib/auth-cookie"
 import { getUserManager, loginWith99kim, logoutFrom99kim } from "@/lib/oidc"
+import {
+  anonymousId,
+  doSessionResetOnLogin,
+  doSessionResetOnLogout,
+  getSessionId,
+  getTrackingContextFields,
+  payloadLogout,
+  payloadOpenAuthModal,
+  payloadSubmitLoginSuccess,
+  postTrackingEvent,
+} from "@/lib/tracking.constants"
+
+import { TrackingPayloadKeyEnum } from "@/enums/tracking.enum"
 
 const RETURN_TO_KEY = "auth_return_to"
 
@@ -65,6 +78,18 @@ export function useAuth(): AuthState & { login: () => void; logout: () => void }
 
       // Lấy lại token từ identity server (dùng refresh_token nếu có, không thì iframe)
       const user = await trySilentLogin()
+      if (user) {
+        const uid = String(user.userId ?? user.uid ?? "")
+        doSessionResetOnLogin(uid)
+        postTrackingEvent({
+          ...payloadSubmitLoginSuccess,
+          ...getTrackingContextFields(),
+          [TrackingPayloadKeyEnum.SESSION_ID]: getSessionId(),
+          [TrackingPayloadKeyEnum.USER_ID]: uid,
+          [TrackingPayloadKeyEnum.ANONYMOUS_ID]: anonymousId,
+          [TrackingPayloadKeyEnum.AUTH_METHOD]: "oidc_silent",
+        })
+      }
 
       setState({ user, isLoggedIn: !!user, isLoading: false })
     }
@@ -73,6 +98,13 @@ export function useAuth(): AuthState & { login: () => void; logout: () => void }
   }, [])
 
   const login = () => {
+    // PC: fires payloadOpenAuthModal (SIGNUP_STARTED) khi user bắt đầu login
+    postTrackingEvent({
+      ...payloadOpenAuthModal,
+      ...getTrackingContextFields(),
+      [TrackingPayloadKeyEnum.SESSION_ID]: getSessionId(),
+      [TrackingPayloadKeyEnum.ANONYMOUS_ID]: anonymousId,
+    })
     // Lưu URL hiện tại để redirect về sau khi login xong
     try {
       sessionStorage.setItem(RETURN_TO_KEY, window.location.pathname + window.location.search)
@@ -81,6 +113,20 @@ export function useAuth(): AuthState & { login: () => void; logout: () => void }
   }
 
   const logout = () => {
+    const uid =
+      state.user?.userId != null
+        ? String(state.user.userId)
+        : state.user?.uid != null
+          ? String(state.user.uid)
+          : null
+    postTrackingEvent({
+      ...payloadLogout,
+      ...getTrackingContextFields(),
+      [TrackingPayloadKeyEnum.SESSION_ID]: getSessionId(),
+      [TrackingPayloadKeyEnum.USER_ID]: uid,
+      [TrackingPayloadKeyEnum.ANONYMOUS_ID]: anonymousId,
+    })
+    doSessionResetOnLogout(uid)
     _silentLoginPromise = null
     clearAuthCookies()
     setState({ user: null, isLoggedIn: false, isLoading: false })

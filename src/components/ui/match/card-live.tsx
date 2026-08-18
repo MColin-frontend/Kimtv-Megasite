@@ -1,11 +1,14 @@
 "use client"
 
 import { deriveMatchStatusFlags } from "@/lib/match.utils"
+import { buildMatchCardPayload, getMatchTrackingStatus } from "@/lib/tracking.constants"
 import { cn } from "@/lib/utils"
 import { useLiveNavigate } from "@/hooks/use-live-navigate"
+import { useTracking } from "@/hooks/use-tracking"
 
 import { useTranslation } from "@/i18n"
 import { buildMatchStats, MATCH_CARD_I18N_KEYS } from "@/constants/component/match-card.constants"
+import { TrackingPayloadKeyEnum, TrackingValueEnum } from "@/enums/tracking.enum"
 import type { LiveSearchMatchInterface } from "@/models/match.models"
 
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
@@ -34,6 +37,7 @@ export function MatchCardLive({
 }) {
   const { t } = useTranslation()
   const navigateToLive = useLiveNavigate()
+  const { onClick: track } = useTracking()
 
   const { isStream, isLive, isUpcoming, isFinished } = deriveMatchStatusFlags({
     status: match.status,
@@ -43,14 +47,20 @@ export function MatchCardLive({
 
   const stats = buildMatchStats(match, (key) => t(key as Parameters<typeof t>[0]))
 
-  function handleClick() {
+  function handleClick(e: React.MouseEvent) {
     if (!match.matchId || !match.gameId) return
+    track(
+      buildMatchCardPayload(match, e.nativeEvent, {
+        [TrackingPayloadKeyEnum.MATCH_STATUS]: getMatchTrackingStatus(match),
+        [TrackingPayloadKeyEnum.PLACEMENT]: TrackingValueEnum.MATCH_LIST,
+      })
+    )
     navigateToLive(match.matchId, match.gameId, match.roomId)
   }
 
   return (
     <div
-      onClick={handleClick}
+      onClick={(e) => handleClick(e)}
       className={cn(
         "card-match-bg rounded-12 relative w-full overflow-hidden transition-[box-shadow]",
         match.matchId && match.gameId ? "hover:shadow-card-hover cursor-pointer" : "cursor-default",
@@ -81,7 +91,10 @@ export function MatchCardLive({
           <div className="flex items-center gap-1.5 max-md:gap-1 max-sm:gap-1">
             {(isStream || isLive) && (
               <>
-                <div className="relative flex items-center gap-1.5 overflow-visible">
+                <div
+                  className="relative flex items-center gap-1.5 overflow-visible"
+                  data-tracking-area={TrackingValueEnum.LIVE_BADGE}
+                >
                   <div className="pointer-events-none absolute inset-0 -z-10 scale-150 animate-pulse rounded-full bg-red-600/40" />
                   <div className="rounded-6 shadow-live-red relative flex h-[30px] items-center gap-1.5 bg-red-600 px-2.5 max-md:h-6 max-md:gap-1 max-md:px-2 max-sm:h-5 max-sm:gap-1 max-sm:px-2">
                     <span className="relative flex size-2.5 shrink-0 max-md:size-2 max-sm:size-2">
@@ -130,7 +143,10 @@ export function MatchCardLive({
           {isStream ? (
             <div className="flex items-center gap-2.5 max-md:origin-left max-md:zoom-75 max-sm:origin-left max-sm:zoom-75">
               {match.anchorAvatar && (
-                <div className="relative shrink-0">
+                <div
+                  className="relative shrink-0"
+                  data-tracking-area={TrackingValueEnum.ANCHOR_AVATAR}
+                >
                   <Avatar
                     size={52}
                     className="ring-live-green shadow-[0_0_16px_rgba(0,0,0,0.9),0_0_8px_rgba(0,200,100,0.3)] ring-2"
@@ -155,7 +171,10 @@ export function MatchCardLive({
                   </Typography>
                 </div>
                 <Tooltip>
-                  <TooltipTrigger className="block min-w-0 overflow-hidden">
+                  <TooltipTrigger
+                    className="block min-w-0 overflow-hidden"
+                    data-tracking-area={TrackingValueEnum.ANCHOR_NAME}
+                  >
                     <Typography
                       as="span"
                       variant="label"
@@ -177,7 +196,10 @@ export function MatchCardLive({
         {/* Row 3: Teams + Score */}
         <div className="flex flex-1 items-center justify-between gap-2">
           <div className="flex basis-2/5 flex-col items-center gap-1.5">
-            <div className="flex size-[80px] shrink-0 items-center justify-center max-md:size-[60px] max-sm:size-[44px]">
+            <div
+              className="flex size-[80px] shrink-0 items-center justify-center max-md:size-[60px] max-sm:size-[44px]"
+              data-tracking-area={TrackingValueEnum.HOME_TEAM_LOGO}
+            >
               <Img
                 src={match.homeLogo}
                 alt={match.homeName ?? ""}
@@ -187,7 +209,10 @@ export function MatchCardLive({
               />
             </div>
             <Tooltip>
-              <TooltipTrigger className="block min-w-0 overflow-hidden">
+              <TooltipTrigger
+                className="block min-w-0 overflow-hidden"
+                data-tracking-area={TrackingValueEnum.HOME_TEAM_NAME}
+              >
                 <Typography
                   as="span"
                   variant="label"
@@ -201,7 +226,10 @@ export function MatchCardLive({
             </Tooltip>
           </div>
 
-          <div className="flex basis-1/5 flex-col items-center gap-0.5">
+          <div
+            className="flex basis-1/5 flex-col items-center gap-0.5"
+            data-tracking-area={TrackingValueEnum.MATCH_STATUS_AREA}
+          >
             {isUpcoming ? (
               <Img
                 src={imgVs}
@@ -245,7 +273,10 @@ export function MatchCardLive({
           </div>
 
           <div className="flex basis-2/5 flex-col items-center gap-1.5">
-            <div className="flex size-[80px] shrink-0 items-center justify-center max-md:size-[60px] max-sm:size-[44px]">
+            <div
+              className="flex size-[80px] shrink-0 items-center justify-center max-md:size-[60px] max-sm:size-[44px]"
+              data-tracking-area={TrackingValueEnum.AWAY_TEAM_LOGO}
+            >
               <Img
                 src={match.awayLogo}
                 alt={match.awayName ?? ""}
@@ -255,7 +286,10 @@ export function MatchCardLive({
               />
             </div>
             <Tooltip>
-              <TooltipTrigger className="block min-w-0 overflow-hidden">
+              <TooltipTrigger
+                className="block min-w-0 overflow-hidden"
+                data-tracking-area={TrackingValueEnum.AWAY_TEAM_NAME}
+              >
                 <Typography
                   as="span"
                   variant="label"

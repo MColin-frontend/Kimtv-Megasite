@@ -4,11 +4,14 @@ import type { ReactNode } from "react"
 import { isEmpty } from "lodash"
 
 import { formatKickOff, formatMatchDate } from "@/lib/date"
+import { buildMatchWatchPayload, getTrackingArea } from "@/lib/tracking.constants"
 import { cn } from "@/lib/utils"
 import { useLiveNavigate } from "@/hooks/use-live-navigate"
+import { useTracking } from "@/hooks/use-tracking"
 
 import { useTranslation } from "@/i18n/use-translation"
 import { MatchStatusEnum } from "@/enums/match.enum"
+import { TrackingPayloadKeyEnum, TrackingValueEnum } from "@/enums/tracking.enum"
 import type { MatchInterface } from "@/models/match.models"
 
 import { Img } from "@/components/ui/image"
@@ -67,6 +70,7 @@ export function FixtureRow({
   extraColumn?: ExtraColumnInterface
 }) {
   const navigateToLive = useLiveNavigate()
+  const { onClick: track } = useTracking()
 
   const isStarted =
     match.status === MatchStatusEnum.LIVE || match.status === MatchStatusEnum.FINISHED
@@ -84,10 +88,16 @@ export function FixtureRow({
         ? "rgba(203,213,225,0.5)"
         : null
 
-  function handleClick() {
+  function handleClick(e: React.MouseEvent) {
     if (onSelect) {
       onSelect(match)
     } else if (isLive) {
+      // PC dùng buildMatchWatchPayload (MATCH_MATCH_CLICKED) cho schedule row — không phải MATCH_CARD_CLICKED
+      track(
+        buildMatchWatchPayload(match, undefined, {
+          [TrackingPayloadKeyEnum.CTA_POSITION]: getTrackingArea(e.nativeEvent),
+        })
+      )
       navigateToLive(match.matchId, match.gameId)
     }
   }
@@ -96,7 +106,7 @@ export function FixtureRow({
     <>
       {/* Desktop */}
       <div
-        onClick={handleClick}
+        onClick={(e) => handleClick(e)}
         className={cn(
           extraColumn ? FIXTURE_ROW_CLASS + ` ${extraColumn.width ?? "auto"}` : FIXTURE_ROW_CLASS,
           "rounded-10 fixture-row-bg border-white-linear mb-1.5 py-3 last:mb-0",
@@ -141,9 +151,17 @@ export function FixtureRow({
                 height={30}
                 objectFit="contain"
                 className="shrink-0"
+                data-tracking-area={TrackingValueEnum.HOME_TEAM_LOGO}
               />
             )}
-            <Typography as="span" variant="label" weight="600" color="white" className="truncate">
+            <Typography
+              as="span"
+              variant="label"
+              weight="600"
+              color="white"
+              className="truncate"
+              data-tracking-area={TrackingValueEnum.HOME_TEAM_NAME}
+            >
               {match.homeName}
             </Typography>
           </div>
@@ -156,15 +174,26 @@ export function FixtureRow({
                 height={30}
                 objectFit="contain"
                 className="shrink-0"
+                data-tracking-area={TrackingValueEnum.AWAY_TEAM_LOGO}
               />
             )}
-            <Typography as="span" variant="label" weight="600" color="white" className="truncate">
+            <Typography
+              as="span"
+              variant="label"
+              weight="600"
+              color="white"
+              className="truncate"
+              data-tracking-area={TrackingValueEnum.AWAY_TEAM_NAME}
+            >
               {match.awayName}
             </Typography>
           </div>
         </div>
 
-        <div className="flex flex-col items-center gap-0.5">
+        <div
+          className="flex flex-col items-center gap-0.5"
+          data-tracking-area={TrackingValueEnum.KICKOFF_TIMER}
+        >
           <Typography as="span" variant="caption" color="foreground/50" className="tabular-nums">
             {match.startTime ? formatMatchDate(match.startTime) : "—"}
           </Typography>
@@ -179,7 +208,9 @@ export function FixtureRow({
           </Typography>
         </div>
 
-        <ScoreBadge match={match} />
+        <div data-tracking-area={TrackingValueEnum.MATCH_STATUS_AREA}>
+          <ScoreBadge match={match} />
+        </div>
 
         <StatCell
           home={isStarted ? match.homeCornerKick : null}
@@ -200,7 +231,7 @@ export function FixtureRow({
 
       {/* Mobile */}
       <div
-        onClick={handleClick}
+        onClick={(e) => handleClick(e)}
         className={cn(
           "rounded-10 fixture-row-bg border-white-linear mb-1.5 px-3 py-2.5",
           "flex flex-col gap-1.5 transition-all duration-200 hover:bg-white/[0.04] lg:hidden",

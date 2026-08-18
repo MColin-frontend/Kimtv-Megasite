@@ -10,7 +10,6 @@ import {
   ChevronUp,
   Heart,
   MessageCircle,
-  Pause,
   Play,
   RotateCcw,
   Share2,
@@ -18,23 +17,39 @@ import {
   VolumeX,
 } from "lucide-react"
 
+import {
+  createHighlightVideoTrackingSession,
+  payloadChatLoginRequiredShown,
+  payloadFilterClicked,
+  payloadHighlightCardClicked,
+  payloadShareClicked,
+} from "@/lib/tracking.constants"
 import { cn, formatCount, formatDuration } from "@/lib/utils"
 import { useAuth } from "@/hooks/use-auth"
 import { useDisclosure } from "@/hooks/use-disclosure"
+import { useTracking } from "@/hooks/use-tracking"
 
 import { useTranslation } from "@/i18n"
 import { getRoutes } from "@/config/routes"
 import { siteConfig } from "@/config/site"
 import { FeedMenu } from "@/enums/highlights.enum"
+import { TrackingPayloadKeyEnum } from "@/enums/tracking.enum"
 
 import {
   fetchVideoByNewsId,
   fetchVideoFeed,
+  resolveInitialMenu,
   toggleFollowAction,
   toggleLikeAction,
 } from "@/features/highlights/api/highlights.api"
 import type { HighlightVideoInterface } from "@/features/highlights/highlight.models"
-import { FILTER_MENU_CONFIG, LINK_MENU_CONFIG } from "@/features/highlights/highlights.constants"
+import {
+  FILTER_ICON,
+  FILTER_MENU_CONFIG,
+  HIGHLIGHT_STATUS_PARAM,
+  LINK_ICON,
+  LINK_MENU_CONFIG,
+} from "@/features/highlights/highlights.constants"
 import { prependSeedVideo, resolveIsLiked } from "@/features/highlights/highlights.utils"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -45,31 +60,10 @@ import { toast } from "@/components/ui/toast"
 import { Typography } from "@/components/ui/typography"
 import type { VideoFeedPlayerHandle } from "@/components/ui/video-feed-player"
 
-import icDiscount from "@assets/icons/video/ic-discount.svg"
-import icGuide from "@assets/icons/video/ic-guide.svg"
-import icNews from "@assets/icons/video/ic-news.svg"
-import icOutstanding from "@assets/icons/video/ic-outstanding.svg"
-import icTopTrending from "@assets/icons/video/ic-top-trending.svg"
-
 import { FeedSkeleton } from "./skeleton"
-
-function svgSrc(mod: unknown): string {
-  return typeof mod === "string" ? mod : (mod as { src: string }).src
-}
 
 const menuIconClass =
   "size-5 shrink-0 [&>div]:flex [&>div]:items-center [&>div]:justify-center [&_svg]:h-5! [&_svg]:w-5! max-md:size-4 max-md:[&_svg]:h-4! max-md:[&_svg]:w-4!"
-
-// ─── Static icon maps (module-level, không re-create mỗi render) ─────────────
-const FILTER_ICON: Record<FeedMenu, string> = {
-  [FeedMenu.Featured]: svgSrc(icTopTrending),
-  [FeedMenu.Latest]: svgSrc(icGuide),
-  [FeedMenu.Trending]: svgSrc(icOutstanding),
-}
-const LINK_ICON: Record<string, string> = {
-  news: svgSrc(icNews),
-  promotion: svgSrc(icDiscount),
-}
 
 const VideoFeedPlayer = dynamic(
   () => import("@/components/ui/video-feed-player").then((m) => m.VideoFeedPlayer),
@@ -101,7 +95,6 @@ function FeedStackSlide({
   videoReady = false,
   isPaused = false,
   isEnded = false,
-  showPauseHint = false,
   showHeartBurst = false,
   playbackProgress = 0,
   newsId = "",
@@ -115,6 +108,7 @@ function FeedStackSlide({
   onToggleMute,
   onResume,
   onProgressMouseDown,
+  onTitleClick,
 }: {
   item: HighlightVideoInterface
   width: number
@@ -125,7 +119,6 @@ function FeedStackSlide({
   videoReady?: boolean
   isPaused?: boolean
   isEnded?: boolean
-  showPauseHint?: boolean
   showHeartBurst?: boolean
   playbackProgress?: number
   newsId?: string
@@ -139,6 +132,7 @@ function FeedStackSlide({
   onToggleMute?: () => void
   onResume?: () => void
   onProgressMouseDown?: (e: React.MouseEvent<HTMLDivElement>) => void
+  onTitleClick?: () => void
 }) {
   const cover = item.coverUrl ?? ""
   const showCover = !isActive || !videoReady
@@ -197,14 +191,6 @@ function FeedStackSlide({
                 <Volume2 className="size-[22px] text-white" strokeWidth={2} />
               )}
             </Button>
-          ) : null}
-
-          {showPauseHint ? (
-            <div className="pointer-events-none absolute inset-0 z-18 flex animate-[feedPauseHint_0.5s_ease_forwards] items-center justify-center">
-              <div className="flex h-18 w-18 items-center justify-center rounded-full border-2 border-white/85 bg-black/28 backdrop-blur-[10px]">
-                <Pause className="size-11 text-white" strokeWidth={2} />
-              </div>
-            </div>
           ) : null}
 
           {((isPaused && !isEnded && videoReady) || isEnded) && onResume && t ? (
@@ -278,6 +264,7 @@ function FeedStackSlide({
           <Link
             href={routes.video.article(String(newsId))}
             data-feed-nav-block
+            onClick={onTitleClick}
             className="pointer-events-auto block w-full text-left"
           >
             <Typography
@@ -306,15 +293,10 @@ function FeedStackSlide({
 
 interface HighlightsFeedProps {
   initialVideos: HighlightVideoInterface[]
-  initialMenu?: FeedMenu
   initialHasMore?: boolean
 }
 
-export function HighlightsFeed({
-  initialVideos,
-  initialMenu = FeedMenu.Featured,
-  initialHasMore = false,
-}: HighlightsFeedProps) {
+export function HighlightsFeed({ initialVideos, initialHasMore = false }: HighlightsFeedProps) {
   const { t, locale } = useTranslation()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -325,7 +307,8 @@ export function HighlightsFeed({
 
   // ── Data state ──────────────────────────────────────────────────────────────
   const [videos, setVideos] = useState<HighlightVideoInterface[]>(initialVideos)
-  const [activeMenu, setActiveMenu] = useState<FeedMenu>(initialMenu)
+  // Derive activeMenu từ URL thay vì state — URL là nguồn sự thật duy nhất
+  const activeMenu = resolveInitialMenu(searchParams.get(HIGHLIGHT_STATUS_PARAM) ?? "")
   const [loading, setLoading] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [hasMore, setHasMore] = useState(initialHasMore)
@@ -341,12 +324,8 @@ export function HighlightsFeed({
   const [isEnded, setIsEnded] = useState(false)
   const [videoReady, setVideoReady] = useState(false)
   const [playbackProgress, setPlaybackProgress] = useState(0)
-  const [showPauseHint, setShowPauseHint] = useState(false)
-  const pauseHintTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // ── Social state ────────────────────────────────────────────────────────────
-  const [likedMap, setLikedMap] = useState<Record<string, boolean>>({})
-  const [followMap, setFollowMap] = useState<Record<string, boolean>>({})
   const [likeLoading, setLikeLoading] = useState(false)
   const [followLoading, setFollowLoading] = useState(false)
   const [showHeartBurst, setShowHeartBurst] = useState(false)
@@ -400,6 +379,13 @@ export function HighlightsFeed({
   // ── Last tap for double-tap like ─────────────────────────────────────────────
   const lastTapTime = useRef(0)
 
+  // ── Video tracking session (played + progress, shared per-video newsId) ───────
+  const videoTrackSessionRef = useRef<ReturnType<
+    typeof createHighlightVideoTrackingSession
+  > | null>(null)
+  const trackingNewsIdRef = useRef("")
+  const lastProgressRef = useRef(-1)
+
   // ── Stage sizing ─────────────────────────────────────────────────────────────
   const [stageHeight, setStageHeight] = useState(720)
   const [playerWidth, setPlayerWidth] = useState(360)
@@ -446,18 +432,8 @@ export function HighlightsFeed({
   const currentItem = videos[currentIndex] ?? null
   const newsId = resolveNewsId(currentItem)
 
-  const isLiked = (() => {
-    if (!currentItem) return false
-    if (likedMap[newsId] !== undefined) return likedMap[newsId]
-    return resolveIsLiked(currentItem.isLike)
-  })()
-
-  const isFollowed = (() => {
-    if (!currentItem?.authorId) return false
-    const aid = String(currentItem.authorId)
-    if (followMap[aid] !== undefined) return followMap[aid]
-    return resolveIsFollowed(currentItem)
-  })()
+  const isLiked = currentItem ? resolveIsLiked(currentItem.isLike) : false
+  const isFollowed = currentItem ? resolveIsFollowed(currentItem) : false
 
   const displayLikeCount = Number(currentItem?.likeCount) || 0
   const canGoNext = currentIndex < videos.length - 1 || hasMore
@@ -467,6 +443,7 @@ export function HighlightsFeed({
   const showNextSlide = Boolean(nextItem) || canGoNext
   const loginUserId =
     user?.userId != null ? String(user.userId) : user?.uid != null ? String(user.uid) : ""
+  const { onClick: track } = useTracking({ userId: loginUserId || null })
   const showFollowBtn =
     !!currentItem?.authorId &&
     !(isLoggedIn && loginUserId && loginUserId === String(currentItem.authorId))
@@ -511,10 +488,16 @@ export function HighlightsFeed({
   const onMenuChange = useCallback(
     async (menu: FeedMenu) => {
       if (menu === activeMenu || loading) return
-      setActiveMenu(menu)
-      router.replace(`?highlight-status=${menu}`, { scroll: false })
+      track({
+        ...payloadFilterClicked,
+        [TrackingPayloadKeyEnum.CONTENT]: menu,
+        [TrackingPayloadKeyEnum.PREVIOUS_TAB]: activeMenu,
+      })
+      // URL là nguồn sự thật — router.replace cập nhật URL → activeMenu tự derive lại
+      router.replace(`?${HIGHLIGHT_STATUS_PARAM}=${menu}`, { scroll: false })
       await fetchVideos(menu, 1, false)
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [activeMenu, loading, fetchVideos, router]
   )
 
@@ -523,16 +506,6 @@ export function HighlightsFeed({
     if (activeMenu !== FeedMenu.Latest || loadingMore || !hasMore) return
     fetchVideos(activeMenu, page + 1, true)
   }, [activeMenu, loadingMore, hasMore, page, fetchVideos])
-
-  // ── Sync liked map on video change ───────────────────────────────────────────
-  useEffect(() => {
-    videos.forEach((v) => {
-      const id = resolveNewsId(v)
-      if (!id || likedMap[id] !== undefined) return
-      if (resolveIsLiked(v.isLike)) setLikedMap((prev) => ({ ...prev, [id]: true }))
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [videos])
 
   // ── Advance after more loaded ─────────────────────────────────────────────────
   useEffect(() => {
@@ -551,7 +524,8 @@ export function HighlightsFeed({
     const applySeeded = (seed: HighlightVideoInterface) => {
       if (cancelled) return
       setVideos((prev) => prependSeedVideo(seed, prev))
-      setActiveMenu(FeedMenu.Featured)
+      // Cập nhật URL để activeMenu derive đúng
+      router.replace(`?${HIGHLIGHT_STATUS_PARAM}=${FeedMenu.Featured}`, { scroll: false })
       setCurrentIndex(0)
     }
 
@@ -587,10 +561,8 @@ export function HighlightsFeed({
     userWantsPausedRef.current = false
     setIsPaused(false)
     setIsEnded(false)
-    setShowPauseHint(false)
     setPlaybackProgress(0)
     closeDrawer("comment")
-    if (pauseHintTimer.current) clearTimeout(pauseHintTimer.current)
 
     const p = playerRef.current
     if (p) {
@@ -906,9 +878,6 @@ export function HighlightsFeed({
     const p = playerRef.current
     p?.pause()
     setIsPaused(true)
-    setShowPauseHint(true)
-    if (pauseHintTimer.current) clearTimeout(pauseHintTimer.current)
-    pauseHintTimer.current = setTimeout(() => setShowPauseHint(false), 500)
   }
 
   function resumeVideo() {
@@ -921,7 +890,6 @@ export function HighlightsFeed({
     p.setMuted(isMuted)
     setIsPaused(false)
     setIsEnded(false)
-    setShowPauseHint(false)
     void p.play()
   }
 
@@ -1016,7 +984,6 @@ export function HighlightsFeed({
       wasLiked,
       loginUserId,
       originalCount: displayLikeCount,
-      setLikedMap,
       setVideos,
       setLikeLoading,
     })
@@ -1028,7 +995,6 @@ export function HighlightsFeed({
     } else {
       await toggleFollowAction({
         userId: String(currentItem?.authorId),
-        setFollowMap,
         setVideos,
         setFollowLoading,
         messageSuccess: t("video.follow.success"),
@@ -1038,11 +1004,15 @@ export function HighlightsFeed({
 
   function handleShareVideo() {
     if (!currentItem) return
+    track({
+      ...payloadShareClicked,
+      [TrackingPayloadKeyEnum.EVENT_ID]: newsId,
+    })
     try {
       sessionStorage.setItem(VIDEO_SEED_KEY, JSON.stringify(currentItem))
     } catch {}
     const shareId = resolveNewsId(currentItem)
-    const url = `${window.location.origin}${routes.video.index}?newsId=${encodeURIComponent(shareId)}&highlight-status=${FeedMenu.Featured}`
+    const url = `${window.location.origin}${routes.video.index}?newsId=${encodeURIComponent(shareId)}&${HIGHLIGHT_STATUS_PARAM}=${FeedMenu.Featured}`
     const onCopied = () => toast.success(t("video.share.copied"))
     navigator.clipboard
       .writeText(url)
@@ -1254,7 +1224,6 @@ export function HighlightsFeed({
                       videoReady={videoReady}
                       isPaused={isPaused}
                       isEnded={isEnded}
-                      showPauseHint={showPauseHint}
                       showHeartBurst={showHeartBurst}
                       playbackProgress={playbackProgress}
                       newsId={newsId}
@@ -1265,6 +1234,19 @@ export function HighlightsFeed({
                         setVideoReady(true)
                         if (!userWantsPausedRef.current) setIsPaused(false)
                         setIsEnded(false)
+                        // Tạo tracking session mới khi đổi video hoặc lần đầu play
+                        if (trackingNewsIdRef.current !== newsId) {
+                          trackingNewsIdRef.current = newsId
+                          lastProgressRef.current = -1
+                          const session = createHighlightVideoTrackingSession({
+                            [TrackingPayloadKeyEnum.EVENT_ID]: newsId,
+                            [TrackingPayloadKeyEnum.CONTENT]: currentItem?.title ?? "",
+                          })
+                          videoTrackSessionRef.current = session
+                          track(session.playedPayload())
+                          // PC fires progress immediately at 0% on play
+                          track(session.progressPayload(0, 0))
+                        }
                       }}
                       onPause={() => {
                         userWantsPausedRef.current = true
@@ -1279,10 +1261,26 @@ export function HighlightsFeed({
                       onTimeUpdate={(cur, dur) => {
                         if (isDragging.current || !dur) return
                         setPlaybackProgress(Math.round((cur / dur) * 100))
+                        const session = videoTrackSessionRef.current
+                        if (session) {
+                          const payload = session.progressPayload(cur, dur)
+                          if ((payload.progress as number) !== lastProgressRef.current) {
+                            lastProgressRef.current = payload.progress as number
+                            track(payload)
+                          }
+                        }
                       }}
                       onToggleMute={toggleMute}
                       onResume={resumeVideo}
                       onProgressMouseDown={onProgressMouseDown}
+                      onTitleClick={() =>
+                        track({
+                          ...payloadHighlightCardClicked,
+                          [TrackingPayloadKeyEnum.TARGET_LINK]: routes.video.article(newsId),
+                          [TrackingPayloadKeyEnum.CONTENT]: currentItem?.title ?? "",
+                          [TrackingPayloadKeyEnum.EVENT_ID]: newsId,
+                        })
+                      }
                     />
                   ) : null}
 
@@ -1366,7 +1364,15 @@ export function HighlightsFeed({
                 {/* Comment */}
                 <Button
                   type="button"
-                  onClick={() => openDrawer("comment")}
+                  onClick={() => {
+                    if (!isLoggedIn) {
+                      track({
+                        ...payloadChatLoginRequiredShown,
+                        [TrackingPayloadKeyEnum.MATCH_ID]: newsId,
+                      })
+                    }
+                    openDrawer("comment")
+                  }}
                   className="h-auto w-auto flex-col items-center gap-2 border-0 bg-transparent p-0 text-white hover:bg-transparent max-md:gap-1"
                 >
                   <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[rgba(84,84,84,0.72)] max-md:h-11 max-md:w-11">

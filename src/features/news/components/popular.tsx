@@ -10,7 +10,7 @@ export function NewsPopularPanel({
   viewAllHref,
   viewAllLabel,
   categoryLabel,
-  getHref,
+  hrefBase,
 }: NewsPanelProps) {
   if (!items.length) return null
 
@@ -23,7 +23,7 @@ export function NewsPopularPanel({
           <NewsItemRow
             key={String(item.newsId)}
             item={item}
-            href={getHref(String(item.newsId))}
+            href={`${hrefBase}/${item.newsId}`}
             categoryLabel={categoryLabel}
           />
         ))}

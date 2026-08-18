@@ -79,7 +79,7 @@ interface NewsPanelProps {
   viewAllHref: string
   viewAllLabel: string
   categoryLabel: string
-  getHref: (id: string) => string
+  hrefBase: string
 }
 
 interface FetchCommentListParamsInterface {
@@ -124,7 +124,7 @@ interface NewsSectionPropsInterface {
   categoryLabel: string
   viewAllHref: string
   viewAllLabel: string
-  getHref: (id: string) => string
+  hrefBase: string
 }
 
 export type {

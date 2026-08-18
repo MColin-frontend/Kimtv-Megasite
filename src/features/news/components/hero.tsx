@@ -3,10 +3,13 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 
+import { payloadNewsCardClicked } from "@/lib/tracking.constants"
 import { cn } from "@/lib/utils"
+import { useTracking } from "@/hooks/use-tracking"
 
 import { useTranslation } from "@/i18n"
 import { getRoutes } from "@/config/routes"
+import { TrackingPayloadKeyEnum } from "@/enums/tracking.enum"
 
 import type { NewsItem } from "@/features/news/news.models"
 import { buttonVariants } from "@/components/ui/button"
@@ -19,6 +22,7 @@ export function NewsHeroCarousel({ items }: { items: NewsItem[] }) {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const { t, locale } = useTranslation()
   const routes = getRoutes(locale)
+  const { onClick: track } = useTracking()
 
   const startTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current)
@@ -74,6 +78,13 @@ export function NewsHeroCarousel({ items }: { items: NewsItem[] }) {
 
         <Link
           href={routes.news.article(String(activeItem.newsId))}
+          onClick={() =>
+            track({
+              ...payloadNewsCardClicked,
+              [TrackingPayloadKeyEnum.TARGET_LINK]: routes.news.article(String(activeItem.newsId)),
+              [TrackingPayloadKeyEnum.CONTENT]: activeItem.title ?? "",
+            })
+          }
           className="absolute inset-0 z-10 flex items-center"
         >
           <div className="flex max-w-[860px] flex-col gap-2 p-4 md:gap-4 md:p-10">

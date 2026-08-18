@@ -4,10 +4,13 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { Drawer } from "@base-ui/react/drawer"
 import { Image, Smile, X } from "lucide-react"
 
+import { payloadChatMessageSent } from "@/lib/tracking.constants"
 import { useAuth } from "@/hooks/use-auth"
+import { useTracking } from "@/hooks/use-tracking"
 
 import { useTranslation } from "@/i18n"
 import { getRoutes } from "@/config/routes"
+import { TrackingPayloadKeyEnum } from "@/enums/tracking.enum"
 
 import type {
   CommentDrawerPropsInterface,
@@ -51,6 +54,10 @@ export function CommentDrawer({
   const { t, locale } = useTranslation()
   const routes = getRoutes(locale)
   const { user, isLoggedIn, login } = useAuth()
+
+  const userId =
+    user?.userId != null ? String(user.userId) : user?.uid != null ? String(user.uid) : null
+  const { onClick: track } = useTracking({ userId })
 
   const [comments, setComments] = useState<NewsComment[]>([])
   const [total, setTotal] = useState(commentCount)
@@ -252,6 +259,10 @@ export function CommentDrawer({
     )
       .then((result) => {
         if (result != null) {
+          track({
+            ...payloadChatMessageSent,
+            [TrackingPayloadKeyEnum.EVENT_ID]: String(newsId),
+          })
           return hydratePending(clientKey, content, result, knownIds).then((hydrated) => {
             if (!hydrated) return loadComments(true, { silent: true })
           })

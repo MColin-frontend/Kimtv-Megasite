@@ -39,7 +39,7 @@ async function PanelsSection() {
         viewAllHref={routes.news.index}
         viewAllLabel={t("news.view-all")}
         categoryLabel={t("news.category")}
-        getHref={(id) => routes.news.article(id)}
+        hrefBase={routes.news.index}
       />
       <NewsPopularPanel
         items={popularNews.slice(0, 4)}
@@ -47,7 +47,7 @@ async function PanelsSection() {
         viewAllHref={routes.news.index}
         viewAllLabel={t("news.view-all")}
         categoryLabel={t("news.category")}
-        getHref={(id) => routes.news.article(id)}
+        hrefBase={routes.news.index}
       />
     </div>
   )

@@ -1,3 +1,10 @@
+"use client"
+
+import { payloadNewsCardClicked } from "@/lib/tracking.constants"
+import { useTracking } from "@/hooks/use-tracking"
+
+import { TrackingPayloadKeyEnum } from "@/enums/tracking.enum"
+
 import type { NewsPanelProps } from "@/features/news/news.models"
 import { Img } from "@/components/ui/image"
 import { ScrollReveal, StaggerReveal } from "@/components/ui/scroll-reveal"
@@ -12,8 +19,10 @@ export function NewsLatestPanel({
   viewAllHref,
   viewAllLabel,
   categoryLabel,
-  getHref,
+  hrefBase,
 }: NewsPanelProps) {
+  const { onClick: track } = useTracking()
+
   if (!items.length) return null
 
   const featured = items[0]
@@ -26,7 +35,14 @@ export function NewsLatestPanel({
       <div className="grid grid-cols-1 items-stretch gap-5 max-md:gap-3 md:grid-cols-2">
         <ScrollReveal variant="fade-up" duration={550} distance={20}>
           <a
-            href={getHref(String(featured.newsId))}
+            href={`${hrefBase}/${featured.newsId}`}
+            onClick={() =>
+              track({
+                ...payloadNewsCardClicked,
+                [TrackingPayloadKeyEnum.TARGET_LINK]: `${hrefBase}/${featured.newsId}`,
+                [TrackingPayloadKeyEnum.CONTENT]: featured.title ?? "",
+              })
+            }
             className="card-glow group rounded-10 relative block h-full min-h-[280px] overflow-hidden bg-[#0a1128] transition-all hover:ring-1 hover:ring-white/20"
           >
             <Img
@@ -72,7 +88,7 @@ export function NewsLatestPanel({
               <NewsItemRow
                 key={String(item.newsId)}
                 item={item}
-                href={getHref(String(item.newsId))}
+                href={`${hrefBase}/${item.newsId}`}
                 categoryLabel={categoryLabel}
                 className="rounded-12 min-h-0 flex-1 bg-white/[0.04] px-2 hover:bg-white/[0.06]"
               />

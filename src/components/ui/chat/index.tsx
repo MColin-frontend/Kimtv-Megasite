@@ -12,10 +12,24 @@ import {
   fetchPinnedMessagesAction,
 } from "@/server/actions/chat.action"
 import { getTokenFromCookie, type KimtvUser } from "@/lib/auth-cookie"
+import {
+  buildChatDisconnectedPayload,
+  buildChatMessagePinnedPayload,
+  buildChatPinnedBannerClickedPayload,
+  getDeviceType,
+  payloadChatLoginRequiredShown,
+  payloadChatMessageFailed,
+  payloadChatMessageSent,
+  payloadChatScrollPaused,
+  payloadChatScrollToLatest,
+  payloadChatUrlClicked,
+  payloadSocialClicked,
+} from "@/lib/tracking.constants"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/use-auth"
 import { useBoolean } from "@/hooks/use-boolean"
 import { useRouter } from "@/hooks/use-router"
+import { useTracking } from "@/hooks/use-tracking"
 
 import { useTranslation } from "@/i18n"
 import { env } from "@/config/env"
@@ -34,6 +48,7 @@ import {
   POLL_PARAM_KEY,
   POLL_VISIBLE,
 } from "@/constants/ui/ui-chat.constants"
+import { TrackingPayloadKeyEnum } from "@/enums/tracking.enum"
 
 import { getActivePollApi, votePollApi } from "@/features/live/api/poll.api"
 import { PollVoteView } from "@/features/live/components/poll-vote-view"
@@ -93,6 +108,10 @@ export function Chat({
   const { t } = useTranslation()
   const { getParam, setParams, removeParams, pathname } = useRouter()
   const { isLoggedIn, user } = useAuth()
+
+  const userId =
+    user?.userId != null ? String(user.userId) : user?.uid != null ? String(user.uid) : null
+  const { onClick: track } = useTracking({ userId })
 
   const userRole = resolveChatRole(user, isLoggedIn)
 
@@ -276,6 +295,19 @@ export function Chat({
 
             const data = res.data as Record<string, unknown> | undefined
             if (!data || (data.code as number) === 10) return
+
+            // Server error codes — track message_failed
+            const SERVER_ERROR_CODES = [3000, 10002, 10003, 10004, 10005, 10006, 10007]
+            if (typeof data.code === "number" && SERVER_ERROR_CODES.includes(data.code)) {
+              track({
+                ...payloadChatMessageFailed,
+                [TrackingPayloadKeyEnum.MATCH_ID]: cId,
+                [TrackingPayloadKeyEnum.DEVICE_TYPE]: getDeviceType(),
+                [TrackingPayloadKeyEnum.ERROR_CODE]: String(data.code),
+                [TrackingPayloadKeyEnum.ERROR_MESSAGE]: String(data.message ?? ""),
+              })
+            }
+
             if (res.channel === CHAT_CHANNEL.CHATROOM && data.content) {
               const msg: ChatMessage = {
                 ...(data as unknown as ChatMessage),
@@ -310,6 +342,14 @@ export function Chat({
               reconnectCountRef.current++
               initWsRef.current?.(cId, gId)
             }, WS_RECONNECT_DELAY)
+          } else {
+            track(
+              buildChatDisconnectedPayload({
+                matchId: cId,
+                errorCode: "ws_close_max_retry",
+                errorMessage: "WebSocket closed after max reconnect attempts",
+              })
+            )
           }
         })
         ws.addEventListener("error", () => {
@@ -320,6 +360,7 @@ export function Chat({
         setConnectionStatus(CHAT_CONNECTION_STATUS.DISCONNECTED)
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [closeWs, startHeartbeat, clearHeartbeat, externalPoll, setParams, removeParams]
   )
 
@@ -387,10 +428,30 @@ export function Chat({
   }, [chatroomId, gameId, isLoggedIn, initWs, closeWs])
 
   const handleSendMessage = ({ content }: ChatFormType) => {
-    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return
+    if (!isLoggedIn) {
+      track({
+        ...payloadChatLoginRequiredShown,
+        [TrackingPayloadKeyEnum.MATCH_ID]: chatroomId ?? "",
+      })
+      return
+    }
+    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+      track({
+        ...payloadChatMessageFailed,
+        [TrackingPayloadKeyEnum.MATCH_ID]: chatroomId ?? "",
+        [TrackingPayloadKeyEnum.DEVICE_TYPE]: getDeviceType(),
+      })
+      return
+    }
     const payload = JSON.stringify({ type: 1, content: content })
     wsRef.current.send(payload)
     resetForm()
+    track({
+      ...payloadChatMessageSent,
+      [TrackingPayloadKeyEnum.MATCH_ID]: chatroomId ?? "",
+      [TrackingPayloadKeyEnum.DEVICE_TYPE]: getDeviceType(),
+      [TrackingPayloadKeyEnum.CONTENT]: content,
+    })
   }
 
   const handleReconnect = useCallback(() => {
@@ -408,7 +469,13 @@ export function Chat({
       scrollToBottom()
     } else {
       showNewMsgOn()
+      track({
+        ...payloadChatScrollPaused,
+        [TrackingPayloadKeyEnum.MATCH_ID]: chatroomId ?? "",
+        [TrackingPayloadKeyEnum.DEVICE_TYPE]: getDeviceType(),
+      })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages, scrollToBottom, showNewMsgOn])
 
   const handleScroll = useCallback(() => {
@@ -432,6 +499,12 @@ export function Chat({
   const isPinned = (id: string | number) => pinnedMessages.some((m) => m.id === id)
 
   const handlePin = (msg: ChatMessage) => {
+    track(
+      buildChatMessagePinnedPayload({
+        matchId: chatroomId ?? "",
+        messageContent: msg.content ?? "",
+      })
+    )
     chatroomOperateAction({
       operateType: CHAT_OPERATE_TYPE.PIN_MESSAGE,
       userId: msg.userId,
@@ -482,6 +555,13 @@ export function Chat({
             href={mergedSocials.telegram}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() =>
+              track({
+                ...payloadSocialClicked,
+                [TrackingPayloadKeyEnum.CONTENT]: CHAT_SOCIAL_NAMES.TELEGRAM,
+                [TrackingPayloadKeyEnum.TARGET_LINK]: mergedSocials.telegram ?? "",
+              })
+            }
             className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#0d7ab5] py-1.5 no-underline shadow-[0_2px_8px_rgba(13,122,181,0.3)] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(13,122,181,0.45)] hover:brightness-110 active:scale-95 max-sm:gap-1 max-sm:px-2 max-sm:py-1"
           >
             <Img
@@ -506,6 +586,13 @@ export function Chat({
             href={mergedSocials.facebook}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() =>
+              track({
+                ...payloadSocialClicked,
+                [TrackingPayloadKeyEnum.CONTENT]: CHAT_SOCIAL_NAMES.FACEBOOK,
+                [TrackingPayloadKeyEnum.TARGET_LINK]: mergedSocials.facebook ?? "",
+              })
+            }
             className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#1060c9] py-1.5 no-underline shadow-[0_2px_8px_rgba(16,96,201,0.3)] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(16,96,201,0.45)] hover:brightness-110 active:scale-95 max-sm:gap-1 max-sm:px-2 max-sm:py-1"
           >
             <Img
@@ -530,6 +617,13 @@ export function Chat({
             href={mergedSocials.zalo}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() =>
+              track({
+                ...payloadSocialClicked,
+                [TrackingPayloadKeyEnum.CONTENT]: CHAT_SOCIAL_NAMES.ZALO,
+                [TrackingPayloadKeyEnum.TARGET_LINK]: mergedSocials.zalo ?? "",
+              })
+            }
             className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#0068ff] py-1.5 no-underline shadow-[0_2px_8px_rgba(0,104,255,0.3)] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(0,104,255,0.45)] hover:brightness-110 active:scale-95 max-sm:gap-1 max-sm:px-2 max-sm:py-1"
           >
             <Img
@@ -614,7 +708,15 @@ export function Chat({
                   msg={msg}
                   isExpanded={isExpanded}
                   canUnpin={canUnpin}
-                  onToggle={() => setExpandedPinId(isExpanded ? null : msg.id)}
+                  onToggle={() => {
+                    setExpandedPinId(isExpanded ? null : msg.id)
+                    track(
+                      buildChatPinnedBannerClickedPayload({
+                        matchId: chatroomId ?? "",
+                        targetLink: msg.content ?? "",
+                      })
+                    )
+                  }}
                   onUnpin={() => handleUnpin(msg)}
                   pinLabel={t("chat.pin-label")}
                   tooltipUnpin={t("chat.actions.unpin")}
@@ -631,6 +733,17 @@ export function Chat({
         <div
           ref={listRef}
           onScroll={handleScroll}
+          onClick={(e) => {
+            const anchor = (e.target as HTMLElement).closest("a")
+            if (anchor?.href) {
+              track({
+                ...payloadChatUrlClicked,
+                [TrackingPayloadKeyEnum.MATCH_ID]: chatroomId ?? "",
+                [TrackingPayloadKeyEnum.DEVICE_TYPE]: getDeviceType(),
+                [TrackingPayloadKeyEnum.TARGET_LINK]: anchor.href,
+              })
+            }
+          }}
           className="flex-1 overflow-y-auto py-2"
           style={CHAT_SCROLLBAR_STYLE}
         >
@@ -710,6 +823,11 @@ export function Chat({
             onClick={() => {
               scrollToBottom()
               showNewMsgOff()
+              track({
+                ...payloadChatScrollToLatest,
+                [TrackingPayloadKeyEnum.MATCH_ID]: chatroomId ?? "",
+                [TrackingPayloadKeyEnum.DEVICE_TYPE]: getDeviceType(),
+              })
             }}
             className="absolute bottom-[58px] left-1/2 z-10 -translate-x-1/2 max-sm:zoom-75"
           >

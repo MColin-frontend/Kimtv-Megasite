@@ -22,6 +22,19 @@ const AdBanner = dynamic(() => import("@/components/ui/ad-banner").then((m) => m
   ssr: false,
 })
 
+// ─── xgplayer event name constants — không hardcode string ───────────────────
+const PLAYER_EVENT = {
+  READY: "ready",
+  PLAYING: "playing",
+  PAUSE: "pause",
+  ENDED: "ended",
+  ERROR: "error",
+  FULLSCREEN_CHANGE: "fullscreen_change",
+  WAITING: "waiting",
+  AUTOPLAY_PREVENTED: "autoplay_was_prevented",
+  RESOURCE_READY: "resourceReady",
+} as const
+
 export interface VideoSource {
   url: string
   name?: string
@@ -48,6 +61,8 @@ export interface VideoPlayerProps {
   onPause?: () => void
   onError?: (error: unknown) => void
   onEnded?: () => void
+  onFullscreenChange?: () => void
+  onWaiting?: () => void
 }
 
 function detectFormat(url: string) {
@@ -73,6 +88,8 @@ export function VideoPlayer({
   onPause,
   onError,
   onEnded,
+  onFullscreenChange,
+  onWaiting,
 }: VideoPlayerProps) {
   const generatedId = useId()
   const mountId = id ?? `xgp-${generatedId.replace(/[^a-z0-9]/gi, "")}`
@@ -139,27 +156,33 @@ export function VideoPlayer({
 
       const player = playerRef.current
 
-      player.on("ready", () => {
+      player.on(PLAYER_EVENT.READY, () => {
         if (destroyed) return
         onReady?.()
         if (resourceList && resourceList.length > 1) {
-          player.emit("resourceReady", resourceList)
+          player.emit(PLAYER_EVENT.RESOURCE_READY, resourceList)
         }
       })
-      player.on("playing", () => {
+      player.on(PLAYER_EVENT.PLAYING, () => {
         if (!destroyed) onPlay?.()
       })
-      player.on("pause", () => {
+      player.on(PLAYER_EVENT.PAUSE, () => {
         if (!destroyed) onPause?.()
       })
-      player.on("ended", () => {
+      player.on(PLAYER_EVENT.ENDED, () => {
         if (!destroyed) onEnded?.()
       })
-      player.on("error", (err: unknown) => {
+      player.on(PLAYER_EVENT.ERROR, (err: unknown) => {
         if (!destroyed) onError?.(err)
       })
+      player.on(PLAYER_EVENT.FULLSCREEN_CHANGE, () => {
+        if (!destroyed) onFullscreenChange?.()
+      })
+      player.on(PLAYER_EVENT.WAITING, () => {
+        if (!destroyed) onWaiting?.()
+      })
 
-      player.on("autoplay_was_prevented", () => {
+      player.on(PLAYER_EVENT.AUTOPLAY_PREVENTED, () => {
         if (destroyed) return
         player.destroy()
         setTimeout(() => {

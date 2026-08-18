@@ -10,7 +10,11 @@ const AdBanner = dynamic(() => import("@/components/ui/ad-banner").then((m) => m
   ssr: false,
 })
 
-export function LiveBanner() {
+interface LiveBannerProps {
+  matchId?: string
+}
+
+export function LiveBanner({ matchId }: LiveBannerProps) {
   const { data: ads, isLoading } = useAdPlacements()
   const liveBanner = ads?.liveBanner
 
@@ -23,6 +27,7 @@ export function LiveBanner() {
       skeletonClassName="aspect-[1660/132]"
       className="w-full"
       rounded="rounded-8 max-sm:rounded-4"
+      matchId={matchId}
     />
   )
 }

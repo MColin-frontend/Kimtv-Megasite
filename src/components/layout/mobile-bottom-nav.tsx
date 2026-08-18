@@ -4,12 +4,15 @@ import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
+import { payloadMenuClicked } from "@/lib/tracking.constants"
 import { cn } from "@/lib/utils"
 import { useBoolean } from "@/hooks/use-boolean"
+import { useTracking } from "@/hooks/use-tracking"
 
 import { SLUG_MAP, useTranslation } from "@/i18n"
 import { getRoutes } from "@/config/routes"
 import { MAIN_NAV_ITEMS } from "@/constants/component/layout.constants"
+import { TrackingPayloadKeyEnum } from "@/enums/tracking.enum"
 
 import { Img } from "@/components/ui/image"
 
@@ -47,6 +50,7 @@ export function MobileBottomNav() {
   const { locale, t } = useTranslation()
   const pathname = usePathname()
   const routes = getRoutes(locale)
+  const { onClick: track } = useTracking()
   const navRef = useRef<HTMLDivElement>(null)
   const [cx, setCx] = useState<number | null>(null)
   const [W, setW] = useState(375)
@@ -105,6 +109,15 @@ export function MobileBottomNav() {
                 key={item.labelKey}
                 href={href}
                 data-active={active}
+                onClick={() =>
+                  track({
+                    ...payloadMenuClicked,
+                    [TrackingPayloadKeyEnum.TARGET_LINK]: href,
+                    [TrackingPayloadKeyEnum.PROPERTIES]: {
+                      [TrackingPayloadKeyEnum.MENU_LABEL]: t(item.labelKey),
+                    },
+                  })
+                }
                 className="group relative flex flex-1 flex-col items-center justify-center gap-1"
               >
                 <div

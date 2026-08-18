@@ -1,7 +1,13 @@
+"use client"
+
 import Link from "next/link"
 
 import { formatPublishTime } from "@/lib/date"
+import { payloadNewsCardClicked } from "@/lib/tracking.constants"
 import { cn } from "@/lib/utils"
+import { useTracking } from "@/hooks/use-tracking"
+
+import { TrackingPayloadKeyEnum } from "@/enums/tracking.enum"
 
 import type { NewsItem } from "@/features/news/news.models"
 import { Img } from "@/components/ui/image"
@@ -35,9 +41,17 @@ export function NewsItemFeatured({
   metaTextSize = "14",
   showSummary = false,
 }: NewsItemRowProps) {
+  const { onClick: track } = useTracking()
   return (
     <Link
       href={href}
+      onClick={() =>
+        track({
+          ...payloadNewsCardClicked,
+          [TrackingPayloadKeyEnum.TARGET_LINK]: href,
+          [TrackingPayloadKeyEnum.CONTENT]: item.title ?? "",
+        })
+      }
       className={cn(
         "group rounded-8 flex h-[320px] flex-col pb-2.5 transition-colors outline-none focus-visible:outline-none",
         className
@@ -115,9 +129,17 @@ export function NewsItemRow({
   metaTextSize,
   headerTextSize = "12",
 }: NewsItemRowProps) {
+  const { onClick: track } = useTracking()
   return (
     <Link
       href={href}
+      onClick={() =>
+        track({
+          ...payloadNewsCardClicked,
+          [TrackingPayloadKeyEnum.TARGET_LINK]: href,
+          [TrackingPayloadKeyEnum.CONTENT]: item.title ?? "",
+        })
+      }
       className={cn(
         "group rounded-8 flex gap-3 py-2.5 transition-colors outline-none focus-visible:outline-none",
         className

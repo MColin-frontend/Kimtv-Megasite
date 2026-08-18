@@ -1,8 +1,11 @@
 "use client"
 
+import { useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Calendar, Home } from "lucide-react"
+
+import { useTracking } from "@/hooks/use-tracking"
 
 import { DEFAULT_LOCALE, useTranslation } from "@/i18n"
 
@@ -14,6 +17,12 @@ export default function NotFound() {
   const pathname = usePathname()
   const lang = pathname?.split("/")?.[1] || DEFAULT_LOCALE
   const { t } = useTranslation()
+  const { onPageError } = useTracking()
+
+  useEffect(() => {
+    onPageError({ errorCode: 404, errorMessage: "Not Found", pagePath: pathname ?? "" })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname])
 
   return (
     <section className="relative flex min-h-[calc(100vh-80px)] w-full flex-col items-center justify-center overflow-hidden px-4 py-16 text-center">
