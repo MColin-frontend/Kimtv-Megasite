@@ -90,7 +90,7 @@ function ToastContent({
           "0 2px 0 rgba(0,0,0,0.12), 0 6px 20px rgba(0,0,0,0.13), inset 0 1px 0 rgba(255,255,255,0.7)",
         overflow: "visible",
       }}
-      className="relative flex w-full items-end gap-2.5 py-2 pr-3 pl-2"
+      className="absolute flex w-full max-w-[250px] items-end gap-2.5 py-2 pr-3 pl-2 max-sm:top-[65px] max-sm:right-[10px]"
     >
       {/* 3D icon — bottom-aligned, slightly overflows */}
       <div className="shrink-0 self-end">
