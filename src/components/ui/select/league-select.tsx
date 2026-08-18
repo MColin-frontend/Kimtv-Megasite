@@ -280,17 +280,16 @@ export function LeagueSelect({
       <Dialog.Root open={open} onOpenChange={setOpen}>
         <Dialog.Portal>
           <Dialog.Backdrop className="data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 fixed inset-0 z-50 bg-black/75 backdrop-blur-sm data-closed:duration-150 data-open:duration-200" />
-          <Dialog.Viewport className="fixed inset-0 z-50 flex items-center justify-center p-4 max-sm:items-end max-sm:p-0">
+          <Dialog.Viewport className="fixed inset-0 z-50 flex overflow-y-auto p-4">
             <Dialog.Popup
               className={cn(
-                "flex w-full max-w-[1100px] flex-col overflow-hidden p-4 max-sm:rounded-b-none",
+                "relative m-auto flex h-[min(90vh,760px)] max-h-full w-full max-w-[1100px] flex-col overflow-hidden p-4",
                 "rounded-12 bg-[#0e1523]",
                 "shadow-[0_40px_100px_rgba(0,0,0,0.85)]",
                 "data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95",
                 "data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
                 "data-closed:duration-150 data-open:duration-200"
               )}
-              style={{ height: "min(90vh, 760px)" }}
             >
               {/* ── Modal header ── */}
               <div className="flex shrink-0 items-center justify-between">
@@ -308,11 +307,11 @@ export function LeagueSelect({
               </div>
 
               {/* ── Body ── */}
-              <div className="mt-4 flex min-h-0 flex-1 gap-4 overflow-hidden">
+              <div className="mt-4 flex min-h-0 flex-1 gap-4 overflow-hidden max-sm:flex-col">
                 {/* ── LEFT SIDEBAR ── */}
-                <div className="card-glow rounded-12 flex w-[188px] shrink-0 flex-col self-start">
-                  {/* "DANH MỤC" header */}
-                  <div className="px-4 pt-3.5 pb-2">
+                <div className="card-glow rounded-12 flex w-[188px] shrink-0 flex-col self-start max-sm:w-full max-sm:self-auto">
+                  {/* "DANH MỤC" header – hidden on mobile */}
+                  <div className="px-4 pt-3.5 pb-2 max-sm:hidden">
                     <Typography
                       as="p"
                       size="10"
@@ -323,8 +322,11 @@ export function LeagueSelect({
                     </Typography>
                   </div>
 
-                  {/* nav list */}
-                  <div style={{ scrollbarWidth: "none" }}>
+                  {/* nav list – vertical on desktop, horizontal scroll on mobile */}
+                  <div
+                    style={{ scrollbarWidth: "none" }}
+                    className="max-sm:flex max-sm:flex-row max-sm:gap-1 max-sm:overflow-x-auto max-sm:px-3 max-sm:py-2"
+                  >
                     {sidebarItems.map(({ key, label, count, flag, Icon }) => {
                       const active = sidebarKey === key
                       return (
@@ -333,11 +335,12 @@ export function LeagueSelect({
                           onClick={() => handleSidebar(key)}
                           className={cn(
                             "group relative flex w-full cursor-pointer items-center justify-between py-2 pr-3 pl-4 text-left transition-colors duration-100",
+                            "max-sm:rounded-6 max-sm:w-auto max-sm:shrink-0 max-sm:justify-start max-sm:gap-1.5 max-sm:px-2.5 max-sm:py-1.5",
                             active ? "bg-gold/10" : "hover:bg-white/4"
                           )}
                         >
                           {active && (
-                            <span className="bg-gold absolute inset-y-0 left-0 w-[3px] rounded-r-full" />
+                            <span className="bg-gold absolute inset-y-0 left-0 w-[3px] rounded-r-full max-sm:hidden" />
                           )}
 
                           <div className="flex min-w-0 items-center gap-1.5">
@@ -363,7 +366,7 @@ export function LeagueSelect({
                               size="12"
                               weight={active ? "600" : "400"}
                               className={cn(
-                                "transition-colors",
+                                "transition-colors max-sm:whitespace-nowrap",
                                 active ? "text-gold" : "text-white/55 group-hover:text-white/80"
                               )}
                             >
@@ -374,7 +377,7 @@ export function LeagueSelect({
                           {count > 0 && (
                             <span
                               className={cn(
-                                "font-600 ml-auto shrink-0 rounded-full px-1.5 py-0.5 text-[10px] leading-none tabular-nums",
+                                "font-600 ml-auto shrink-0 rounded-full px-1.5 py-0.5 text-[10px] leading-none tabular-nums max-sm:hidden",
                                 active
                                   ? "bg-gold/25 text-gold"
                                   : "bg-white/8 text-white/30 group-hover:bg-white/12"
@@ -390,7 +393,7 @@ export function LeagueSelect({
                 </div>
 
                 {/* ── RIGHT PANEL ── */}
-                <div className="card-glow rounded-12 flex min-w-0 flex-1 flex-col overflow-hidden px-5">
+                <div className="card-glow rounded-12 flex min-w-0 flex-1 flex-col overflow-hidden px-5 max-sm:min-h-0">
                   {/* search + sort bar */}
                   <div className="flex shrink-0 items-center gap-3 py-3">
                     {/* search */}
@@ -465,7 +468,7 @@ export function LeagueSelect({
                   {/* scrollable content */}
                   <div
                     ref={listRef}
-                    className="-mx-5 flex-1 overflow-y-auto overscroll-contain pb-8"
+                    className="-mx-5 flex flex-1 flex-col overflow-y-auto overscroll-contain pb-8"
                     style={{
                       scrollbarWidth: "thin",
                       scrollbarColor: "rgba(255,255,255,0.07) transparent",
@@ -486,7 +489,7 @@ export function LeagueSelect({
                             Yêu thích
                           </Typography>
                         </div>
-                        <div className="grid grid-cols-4 gap-2 max-sm:grid-cols-2">
+                        <div className="max-xs:grid-cols-1 grid grid-cols-4 gap-2 max-lg:grid-cols-3 max-md:grid-cols-2">
                           {filteredHot.map((league) => {
                             const sel = draft.includes(league.leagueId)
                             const region = resolveLeagueRegion({
@@ -512,7 +515,8 @@ export function LeagueSelect({
                                     alt={league.name}
                                     width={44}
                                     height={44}
-                                    className="size-11 shrink-0 object-contain"
+                                    objectFit="contain"
+                                    className="size-11 shrink-0 object-center"
                                   />
                                 ) : (
                                   <div
@@ -588,7 +592,7 @@ export function LeagueSelect({
 
                     {/* ── League list ── */}
                     {isEmpty ? (
-                      <div className="flex h-48 flex-col items-center justify-center gap-3">
+                      <div className="flex min-h-full flex-1 flex-col items-center justify-center gap-3">
                         <Img src={imgEmpty} alt="" width={60} height={60} className="opacity-30" />
                         <Typography size="12" className="text-white/35">
                           {t("home.league-select.empty")}
@@ -637,7 +641,8 @@ export function LeagueSelect({
                                       alt=""
                                       width={28}
                                       height={28}
-                                      className="size-7 shrink-0 object-contain"
+                                      objectFit="contain"
+                                      className="size-7 shrink-0 object-center"
                                     />
                                   ) : (
                                     <div className="font-700 text-10 flex size-7 shrink-0 items-center justify-center bg-white/10 text-white/40">
@@ -719,13 +724,13 @@ export function LeagueSelect({
               </div>
 
               {/* ── Footer ── */}
-              <div className="mt-4 flex shrink-0 items-center justify-end gap-2">
+              <div className="mt-4 flex shrink-0 items-center justify-end gap-2 max-sm:flex-col-reverse max-sm:gap-1.5">
                 <Button
                   onClick={handleClearAll}
                   variant="cancel"
                   size="sm"
                   disabled={draft.length === 0}
-                  className="text-13 font-600 h-9 px-4"
+                  className="text-white max-sm:w-full"
                 >
                   {t("home.league-select.clear-all")}
                 </Button>
@@ -733,10 +738,10 @@ export function LeagueSelect({
                   onClick={handleApply}
                   variant="gradient"
                   size="sm"
-                  className="text-13 font-600 tracking-0 h-9 gap-2 px-4"
+                  className="max-sm:w-full"
                 >
                   {draft.length > 0 && (
-                    <span className="text-10 font-700 flex h-5 min-w-5 items-center justify-center rounded-full bg-black/12 px-1.5 text-black/70 tabular-nums">
+                    <span className="text-10 font-700 flex h-4 min-w-4 items-center justify-center rounded-full bg-black/12 px-1 text-black/70 tabular-nums sm:h-5 sm:min-w-5 sm:px-1.5">
                       {draft.length}
                     </span>
                   )}
