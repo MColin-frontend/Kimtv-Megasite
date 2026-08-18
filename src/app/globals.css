@@ -1147,6 +1147,9 @@ main .xgplayer .flex-controls .xg-inner-controls {
 .Toastify__toast-container {
   --toastify-toast-width: 280px;
   padding: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  position: relative;
 }
 
 .Toastify__toast {
