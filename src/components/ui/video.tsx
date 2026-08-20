@@ -5,10 +5,29 @@ import { preload } from "react-dom"
 import dynamic from "next/dynamic"
 import type { SimplePlayer } from "xgplayer"
 
+import { resolveStreamPlayerError } from "@/lib/stream-player-error"
+import {
+  buildStreamBufferingPayload,
+  buildStreamErrorPayload,
+  buildStreamFullscreenPayload,
+  buildStreamPausedPayload,
+  buildStreamProgressPayload,
+  buildStreamRecoveredPayload,
+  buildStreamResumedPayload,
+  buildStreamStartedPayload,
+  clearStreamWatching,
+  markStreamPlaybackPaused,
+  registerStreamWatching,
+  STREAM_PROGRESS_INTERVAL_MS,
+} from "@/lib/tracking.constants"
 import { cn } from "@/lib/utils"
 import { useAdPlacements } from "@/hooks/tanstack/use-ad-placements"
+import { useAuth } from "@/hooks/use-auth"
+import { useRouter } from "@/hooks/use-router"
+import { useTracking } from "@/hooks/use-tracking"
 
 import { useTranslation } from "@/i18n"
+import { TrackingValueEnum } from "@/enums/tracking.enum"
 
 import { Typography } from "@/components/ui/typography"
 
@@ -94,10 +113,30 @@ export function VideoPlayer({
   const generatedId = useId()
   const mountId = id ?? `xgp-${generatedId.replace(/[^a-z0-9]/gi, "")}`
   const playerRef = useRef<SimplePlayer | null>(null)
+  const isPlayingRef = useRef(false)
 
   const { t } = useTranslation()
   const { data: ads } = useAdPlacements()
   const playerOverlay = ads?.playerOverlay || []
+
+  const { getParam, pathname } = useRouter()
+  const matchId = pathname.split("/").at(-1) ?? ""
+  const gameId = getParam("game_id") ? Number(getParam("game_id")) : undefined
+
+  const { user } = useAuth()
+  const userId =
+    user?.userId != null ? String(user.userId) : user?.uid != null ? String(user.uid) : null
+  const {
+    onClick: track,
+    onStreamEndedByUserUnload,
+    tryTrackStreamEndedByUser,
+  } = useTracking({ userId })
+
+  const hasStartedRef = useRef(false)
+  const lastErrorRef = useRef<{ errorCode: string; errorMessage: string } | null>(null)
+  const resumeAfterPauseRef = useRef(false)
+  const streamBufferingPendingRef = useRef(false)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
     let destroyed = false
@@ -164,22 +203,89 @@ export function VideoPlayer({
         }
       })
       player.on(PLAYER_EVENT.PLAYING, () => {
-        if (!destroyed) onPlay?.()
+        if (!destroyed) {
+          isPlayingRef.current = true
+          if (isLive && matchId) {
+            streamBufferingPendingRef.current = false
+            registerStreamWatching({ matchId, streamEntrySource: TrackingValueEnum.DETAIL })
+            if (!hasStartedRef.current) {
+              hasStartedRef.current = true
+              track(
+                buildStreamStartedPayload({ matchId, streamEntrySource: TrackingValueEnum.DETAIL })
+              )
+              track(buildStreamProgressPayload({ matchId, gameId }))
+            } else if (lastErrorRef.current) {
+              const { errorCode, errorMessage } = lastErrorRef.current
+              lastErrorRef.current = null
+              resumeAfterPauseRef.current = false
+              track(buildStreamRecoveredPayload({ matchId, gameId, errorCode, errorMessage }))
+              track(buildStreamProgressPayload({ matchId, gameId }))
+            } else if (resumeAfterPauseRef.current) {
+              resumeAfterPauseRef.current = false
+              track(buildStreamResumedPayload({ matchId }))
+              track(buildStreamProgressPayload({ matchId, gameId }))
+            }
+            if (intervalRef.current == null) {
+              intervalRef.current = setInterval(() => {
+                if (!isPlayingRef.current) return
+                track(buildStreamProgressPayload({ matchId, gameId }))
+              }, STREAM_PROGRESS_INTERVAL_MS)
+            }
+          }
+          onPlay?.()
+        }
       })
       player.on(PLAYER_EVENT.PAUSE, () => {
-        if (!destroyed) onPause?.()
+        if (!destroyed) {
+          isPlayingRef.current = false
+          if (isLive && matchId) {
+            clearInterval(intervalRef.current ?? undefined)
+            intervalRef.current = null
+            resumeAfterPauseRef.current = true
+            markStreamPlaybackPaused()
+            track(buildStreamPausedPayload({ matchId }))
+          }
+          onPause?.()
+        }
       })
       player.on(PLAYER_EVENT.ENDED, () => {
-        if (!destroyed) onEnded?.()
+        if (!destroyed) {
+          isPlayingRef.current = false
+          onEnded?.()
+        }
       })
       player.on(PLAYER_EVENT.ERROR, (err: unknown) => {
-        if (!destroyed) onError?.(err)
+        if (!destroyed) {
+          isPlayingRef.current = false
+          if (isLive && matchId) {
+            const { errorCode, errorMessage } = resolveStreamPlayerError(err)
+            lastErrorRef.current = { errorCode, errorMessage }
+            track(buildStreamErrorPayload({ matchId, gameId, errorCode, errorMessage }))
+          }
+          onError?.(err)
+        }
       })
       player.on(PLAYER_EVENT.FULLSCREEN_CHANGE, () => {
-        if (!destroyed) onFullscreenChange?.()
+        if (!destroyed) {
+          if (isLive && matchId) track(buildStreamFullscreenPayload({ matchId }))
+          onFullscreenChange?.()
+        }
       })
       player.on(PLAYER_EVENT.WAITING, () => {
-        if (!destroyed) onWaiting?.()
+        if (!destroyed) {
+          if (isLive && matchId && hasStartedRef.current && !streamBufferingPendingRef.current) {
+            streamBufferingPendingRef.current = true
+            track(
+              buildStreamBufferingPayload({
+                matchId,
+                gameId,
+                errorCode: "BUFFERING",
+                errorMessage: "waiting",
+              })
+            )
+          }
+          onWaiting?.()
+        }
       })
 
       player.on(PLAYER_EVENT.AUTOPLAY_PREVENTED, () => {
@@ -208,10 +314,34 @@ export function VideoPlayer({
         p?.pause?.()
         p?.destroy?.()
       } catch {}
+      clearInterval(intervalRef.current ?? undefined)
+      intervalRef.current = null
+      isPlayingRef.current = false
       playerRef.current = null
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url, sources?.map((s) => s.url).join(",")])
+
+  useEffect(() => {
+    if (!isLive || !matchId) return
+    hasStartedRef.current = false
+    lastErrorRef.current = null
+    resumeAfterPauseRef.current = false
+    streamBufferingPendingRef.current = false
+    return () => {
+      clearInterval(intervalRef.current ?? undefined)
+      intervalRef.current = null
+      tryTrackStreamEndedByUser()
+      clearStreamWatching()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchId])
+
+  useEffect(() => {
+    if (!isLive || !matchId) return
+    return onStreamEndedByUserUnload()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchId])
 
   const hasSource = !!(url ?? sources?.[0]?.url)
 

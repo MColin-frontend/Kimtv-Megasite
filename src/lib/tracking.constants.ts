@@ -923,7 +923,10 @@ export const buildStreamEndedByUserPayload = (
 })
 
 export const buildStreamStartedPayload = (
-  { matchId = "", roomId = "" }: { matchId?: string; roomId?: string } = {},
+  {
+    matchId = "",
+    roomId = "",
+  }: { matchId?: string; roomId?: string; streamEntrySource?: string } = {},
   extra: Record<string, unknown> = {}
 ) => ({
   ...payloadStreamStarted,

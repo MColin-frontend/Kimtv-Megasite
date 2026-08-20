@@ -258,7 +258,7 @@ export function PollHistoryModal({ open, onOpenChange, chatroomId }: PollHistory
             {/* Close */}
             <button
               onClick={() => onOpenChange(false)}
-              className="absolute top-3 right-3 z-10 flex size-8 items-center justify-center rounded-full bg-white/8 text-white/60 transition-all hover:bg-white/15 hover:text-white hover:rotate-[120deg] max-sm:top-2 max-sm:right-2 max-sm:size-6"
+              className="absolute top-3 right-3 z-10 flex size-8 items-center justify-center rounded-full bg-white/8 text-white/60 transition-all hover:rotate-[120deg] hover:bg-white/15 hover:text-white max-sm:top-2 max-sm:right-2 max-sm:size-6"
             >
               <X className="size-4 max-sm:size-3.5" />
             </button>
@@ -269,7 +269,7 @@ export function PollHistoryModal({ open, onOpenChange, chatroomId }: PollHistory
                 src={icPoll}
                 alt=""
                 objectFit="contain"
-                className="size-8 shrink-0 icon-gold max-sm:size-6"
+                className="icon-gold size-8 shrink-0 max-sm:size-6"
               />
               <div className="flex flex-col gap-1">
                 <Typography
@@ -280,7 +280,7 @@ export function PollHistoryModal({ open, onOpenChange, chatroomId }: PollHistory
                 >
                   Lịch sử bình chọn
                 </Typography>
-                <Typography as="span" variant="caption" className="text-white/35 max-sm:text-10">
+                <Typography as="span" variant="caption" className="max-sm:text-10 text-white/35">
                   Bình chọn để nhận thưởng & xem kết quả trực tiếp
                 </Typography>
               </div>
