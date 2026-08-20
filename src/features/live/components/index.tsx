@@ -51,14 +51,7 @@ export function LivePage({ match }: LivePageProps) {
     <div className="container flex flex-col gap-6 max-sm:gap-3">
       <div className="flex h-[min(90vh,900px)] gap-4 max-lg:h-auto max-lg:flex-col">
         <div className="card-glow rounded-12 flex min-w-0 flex-1 flex-col overflow-hidden">
-          <LiveVideoPlayer
-            liveUrls={liveUrls}
-            matchId={match?.matchId != null ? String(match.matchId) : ""}
-            roomId={
-              match?.anchorRoom?.[0]?.roomId != null ? String(match.anchorRoom[0].roomId) : ""
-            }
-            gameId={match?.gameId ?? undefined}
-          />
+          <LiveVideoPlayer liveUrls={liveUrls} />
           {match && (
             <MatchLiveInfoBar
               match={{
